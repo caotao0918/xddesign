@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zmdxd.xddesign.design.dao.RoomDao">
+
+    <insert id="insertRoom">
+        insert into t_room(room_name, room_desc, solu_id,room_reserve1,room_reserve2,room_reserve3) VALUES (#{room.roomName},#{room.roomDesc},#{soluId},#{room.roomReserve1},#{room.roomReserve2},#{room.roomReserve3})
+    </insert>
+
+</mapper>

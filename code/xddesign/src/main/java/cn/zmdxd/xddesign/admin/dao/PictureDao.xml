@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zmdxd.xddesign.admin.dao.PictureDao">
+
+    <resultMap id="PictureMap" type="Picture">
+        <id column="picture_id" property="pictureId" />
+        <result column="picture_name" property="pictureName" />
+        <result column="picture_link" property="pictureLink" />
+        <result column="picture_desc" property="pictureDesc" />
+        <result column="picture_add_time" property="pictureAddTime" />
+        <result column="picture_reserve" property="pictureReserve" />
+        <result column="default_picture" property="defaultPicture" />
+    </resultMap>
+
+    <insert id="insertPicture">
+        insert into t_picture(picture_name, picture_link, picture_desc, picture_reserve, product_id, default_picture)
+         VALUES(#{picture.pictureName},#{picture.pictureLink},#{picture.pictureDesc},#{picture.pictureReserve},#{productId}, #{picture.defaultPicture})
+    </insert>
+
+    <select id="getPictureById" resultMap="PictureMap">
+        select picture_id, picture_name, picture_link, picture_add_time, picture_desc, picture_reserve,default_picture
+        from t_picture where t_picture.picture_id=#{id}
+    </select>
+
+</mapper>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zmdxd.xddesign.admin.dao.SecondLevelDao">
+
+    <resultMap id="SecondAndFirst" type="SecondLevel">
+        <id property="secondId" column="second_id" />
+        <result property="secondName" column="second_name" />
+        <result property="secondDesc" column="second_desc" />
+        <association property="firstLevel" javaType="FirstLevel">
+            <id property="firstId" column="first_id" />
+            <result property="firstName" column="first_name" />
+            <result property="firstDesc" column="first_desc" />
+        </association>
+        <collection property="propertyList" ofType="Property">
+            <id property="propertyId" column="property_id" />
+            <result property="propertyName" column="property_name" />
+            <result property="propertyDesc" column="property_desc" />
+            <result property="commonValue" column="common_value"/>
+        </collection>
+    </resultMap>
+
+    <insert id="insertSecondLevel">
+        insert into t_secondlevel(second_name, second_desc, first_id) VALUES (#{secondLevel.secondName},#{secondLevel.secondDesc},#{firstId})
+    </insert>
+
+    <select id="findSecondLevels" resultMap="SecondAndFirst">
+        select second.*,first.* from t_firstlevel first ,t_secondlevel second where second.first_id=first.first_id and second.first_id=#{firstId}
+    </select>
+
+    <select id="findSecondLevel" resultMap="SecondAndFirst">
+        select second.*,first.*,property.property_id, property.property_name, property.property_desc, property.common_value
+        from t_secondlevel second
+        left join t_firstlevel first on second.first_id=first.first_id
+        left join t_property property on property.second_id=second.second_id
+        where second.second_id=#{secondId}
+    </select>
+
+</mapper>

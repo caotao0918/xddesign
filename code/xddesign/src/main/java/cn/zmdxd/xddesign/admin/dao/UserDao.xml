@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zmdxd.xddesign.admin.dao.UserDao">
+
+    <insert id="insertUser">
+        insert into t_user(username,mobile,pwd,add_time,role_id,reserve1,reserve2,reserve3,reserve4,reserve5) values (#{user.username},#{user.mobile},#{user.pwd},#{user.addTime},#{roleId},#{user.reserve1},#{user.reserve2},#{user.reserve3},#{user.reserve4},#{user.reserve5})
+    </insert>
+
+    <update id="updateUser">
+        update t_user set username=#{user.username},mobile=#{user.mobile},pwd=#{user.pwd},role_id=#{roleId},del_sign=#{user.delSign},reserve1=#{user.reserve1},reserve2=#{user.reserve2},reserve3=#{user.reserve3},reserve4=#{user.reserve4},reserve5=#{user.reserve5} where id=#{user.id}
+    </update>
+
+    <resultMap id="UserAndRole" type="User">
+        <id property="id" column="id" />
+        <result property="username" column="username" />
+        <result property="mobile" column="mobile" />
+        <result property="pwd" column="pwd" />
+        <result property="addTime" column="add_time" />
+        <result property="lastTime" column="last_time" />
+        <result property="delSign" column="del_sign" />
+        <result property="reserve1" column="reserve1" />
+        <result property="reserve2" column="reserve2" />
+        <result property="reserve3" column="reserve3" />
+        <result property="reserve4" column="reserve4" />
+        <result property="reserve5" column="reserve5" />
+        <association property="role" javaType="Role">
+            <id property="id" column="role_id" />
+            <result property="name" column="name" />
+        </association>
+    </resultMap>
+
+    <select id="findUser" resultMap="UserAndRole">
+        select u.*,r.id,r.name from t_user u ,t_role r
+        <where>
+            u.role_id=r.id and u.del_sign=false
+            <if test="id != null">
+                and u.id = #{id}
+            </if>
+        </where>
+    </select>
+
+    <select id="findByMobile" resultMap="UserAndRole">
+        select u.id,u.username, u.pwd, u.last_time ,r.name from t_user u,t_role r where u.role_id=r.id and mobile=#{mobile}
+    </select>
+
+</mapper>

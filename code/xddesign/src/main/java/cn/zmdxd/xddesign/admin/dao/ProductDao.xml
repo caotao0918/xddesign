@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zmdxd.xddesign.admin.dao.ProductDao">
+
+    <resultMap id="ProductAndPropertyAndPicture" type="Product">
+        <id column="product_id" property="productId" />
+        <result column="product_name" property="productName" />
+        <result column="product_models" property="productModels" />
+        <result column="product_desc" property="productDesc" />
+        <result column="product_link" property="productLink" />
+        <result column="price" property="price" />
+        <result column="product_reserve1" property="productReserve1" />
+        <result column="product_reserve2" property="productReserve2" />
+        <result column="product_reserve3" property="productReserve3" />
+        <result column="product_reserve4" property="productReserve4" />
+        <result column="product_reserve5" property="productReserve5" />
+        <association property="secondLevel" javaType="SecondLevel">
+            <id column="second_id" property="secondId" />
+            <result column="second_name" property="secondName" />
+        </association>
+        <association property="guide" javaType="Guide">
+            <id column="guide_id" property="guideId" />
+            <result column="guide_name" property="guideName" />
+            <result column="guide_link" property="guideLink" />
+            <result column="guide_desc" property="guideDesc" />
+            <result column="guide_add_time" property="guideAddTime" />
+        </association>
+        <association property="video" javaType="Video">
+            <id column="video_id" property="videoId" />
+            <result column="video_name" property="videoName" />
+            <result column="video_link" property="videoLink" />
+            <result column="video_desc" property="videoDesc" />
+            <result column="video_add_time" property="videoAddTime" />
+        </association>
+        <collection property="productPropertyList" ofType="ProductProperty">
+            <id column="id" property="id" />
+            <association property="value" javaType="PropertyValue">
+                <id column="value_id" property="valueId" />
+                <result column="value_name" property="valueName" />
+                <association property="property" javaType="Property">
+                    <id column="property_id" property="propertyId" />
+                    <result column="property_name" property="propertyName" />
+                    <result column="property_desc" property="propertyDesc" />
+                </association>
+            </association>
+        </collection>
+        <collection property="pictureList" ofType="Picture">
+            <id column="picture_id" property="pictureId" />
+            <result column="picture_name" property="pictureName" />
+            <result column="picture_link" property="pictureLink" />
+            <result column="picture_add_time" property="pictureAddTime" />
+            <result column="default_picture" property="defaultPicture" />
+        </collection>
+    </resultMap>
+
+    <insert id="insertProduct" useGeneratedKeys="true" keyProperty="productId">
+        insert into t_product(product_name, product_models, product_link, price, product_desc, second_id, guide_id, video_id, product_reserve1, product_reserve2, product_reserve3, product_reserve4, product_reserve5)
+        values (#{productName},#{productModels},#{productLink},#{price},#{productDesc},#{secondId},#{guideId},#{videoId},#{productReserve1},#{productReserve2},#{productReserve3},#{productReserve4},#{productReserve5})
+    </insert>
+
+    <insert id="insertProductProerty">
+        insert into t_product_property(product_id, value_id) VALUES (#{productId},#{valueId})
+    </insert>
+
+    <select id="findProducts" resultMap="ProductAndPropertyAndPicture">
+        SELECT product.product_name,product.product_id,product.product_models,product.price,product.product_link,product.product_desc,product.product_reserve1,product.product_reserve2,product.product_reserve3,product.product_reserve4,product.product_reserve5,
+               sec.second_name,sec.second_id,sec.second_desc,
+               pp.id, pp.product_id,pp.value_id,
+               property.property_name,property.property_id,property.property_desc,
+               val.value_name,val.value_id,
+               picture.picture_id, picture.picture_name, picture.picture_link, picture.picture_add_time, picture.picture_reserve,picture.default_picture,
+               video.video_id, video.video_name, video.video_link, video.video_add_time, video.video_desc, video.video_reserve,
+               guide.guide_id, guide.guide_name, guide.guide_link, guide.guide_add_time, guide.guide_desc, guide.guide_reserve
+        FROM t_product product
+                 left join t_product_property pp on pp.product_id=product.product_id
+                 left join t_property_value val on val.value_id=pp.value_id
+                 left join t_property property on property.property_id=val.property_id
+                 left join t_secondlevel sec on sec.second_id=product.second_id
+                 left join t_guide guide on guide.guide_id=product.guide_id
+                 left join t_video video on video.video_id=product.video_id
+                 left join t_picture picture on picture.product_id=product.product_id
+        <where>
+            <if test="productId != null">
+                product.product_id=#{productId}
+            </if>
+            and picture.default_picture=true
+        </where>
+    </select>
+
+    <delete id="removeProductProperty">
+        delete from t_product_property where value_id=#{valueId}
+    </delete>
+
+    <select id="findProductsBySecond" resultMap="ProductAndPropertyAndPicture">
+        SELECT product.product_name,product.product_id,product.product_models,product.price,product.product_link,product.product_desc,product.product_reserve1,product.product_reserve2,product.product_reserve3,product.product_reserve4,product.product_reserve5,
+               sec.second_name,sec.second_id,sec.second_desc,
+               pp.id, pp.product_id,pp.value_id,
+               property.property_name,property.property_id,property.property_desc,
+               val.value_name,val.value_id,
+               picture.picture_id, picture.picture_name, picture.picture_link, picture.picture_add_time, picture.picture_reserve,picture.default_picture,
+               video.video_id, video.video_name, video.video_link, video.video_add_time, video.video_desc, video.video_reserve,
+               guide.guide_id, guide.guide_name, guide.guide_link, guide.guide_add_time, guide.guide_desc, guide.guide_reserve
+        FROM t_product product
+        left join t_product_property pp on pp.product_id=product.product_id
+        left join t_property_value val on val.value_id=pp.value_id
+        left join t_property property on property.property_id=val.property_id
+        left join t_secondlevel sec on sec.second_id=product.second_id
+        left join t_guide guide on guide.guide_id=product.guide_id
+        left join t_video video on video.video_id=product.video_id
+        left join t_picture picture on picture.product_id=product.product_id
+        <where>
+            <if test="secondId != null">
+                product.second_id=#{secondId}
+            </if>
+            and picture.default_picture=true
+        </where>
+    </select>
+
+</mapper>

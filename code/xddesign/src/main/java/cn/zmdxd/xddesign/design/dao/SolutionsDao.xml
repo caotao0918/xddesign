@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zmdxd.xddesign.design.dao.SolutionsDao">
+
+    <resultMap id="SolutionsAndRoom" type="Solutions">
+
+        <id column="solu_id" property="soluId" />
+        <result column="solu_name" property="soluName" />
+        <result column="solu_desc" property="soluDesc" />
+        <result column="state" property="state" />
+        <result column="add_time" property="addTime" />
+        <result column="share_sign" property="shareSign" />
+        <result column="solu_reserve1" property="soluReserve1" />
+        <result column="solu_reserve2" property="soluReserve2" />
+        <result column="solu_reserve3" property="soluReserve3" />
+        <association property="design" javaType="User">
+            <id column="uid" property="id" />
+            <result column="name" property="username" />
+        </association>
+        <collection property="roomList" ofType="Room">
+            <id column="room_id" property="roomId" />
+            <result column="room_name" property="roomName" />
+            <result column="room_desc" property="roomDesc" />
+            <result column="room_reserve1" property="roomReserve1" />
+            <result column="room_reserve2" property="roomReserve2" />
+            <result column="room_reserve3" property="roomReserve3" />
+        </collection>
+
+    </resultMap>
+
+    <insert id="insertSolutions">
+        insert into t_solutions(solu_name, designer_id, state, solu_desc, house_id,solu_reserve1,solu_reserve2,solu_reserve3) VALUES (#{solutions.soluName},#{designId},#{solutions.state},#{solutions.soluDesc},#{houseId},#{solutions.soluReserve1},#{solutions.soluReserve2},#{solutions.soluReserve3})
+    </insert>
+
+    <select id="selectSolutionsList" resultMap="SolutionsAndRoom">
+        select solutions.*,
+               room.room_id,room.room_name,room.room_desc,room.room_reserve1,room.room_reserve2,room.room_reserve3
+        from t_solutions solutions
+        left join t_room room on solutions.solu_id=room.solu_id
+        where designer_id=#{designId}
+    </select>
+
+    <select id="selectSolutions" resultMap="SolutionsAndRoom">
+        select room.room_id,room.room_name,room.room_desc,room.room_reserve1,room.room_reserve2,room.room_reserve3
+        from t_room room
+    </select>
+
+</mapper>

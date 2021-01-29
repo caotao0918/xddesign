@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zmdxd.xddesign.design.dao.CustomerDao">
+
+    <insert id="insertCustomer">
+        insert into t_customer(username, mobile, pwd, code, `desc`, demand, address, design_id,cus_reserve1,cus_reserve2) VALUES (#{customer.username},#{customer.mobile},#{customer.pwd},#{customer.code},#{customer.desc},#{customer.demand},#{customer.address},#{designId},#{customer.cusReserve1},#{customer.cusReserve2})
+    </insert>
+
+    <update id="updateCustomer">
+        update t_customer
+        set username=#{customer.username},mobile=#{customer.mobile},
+            pwd=#{customer.pwd},`code`=#{customer.code},`desc`=#{customer.desc},
+            demand=#{customer.demand},address=#{customer.address},design_id=#{designId},
+            cus_reserve1=#{customer.cusReserve1},cus_reserve2=#{customer.cusReserve2}
+        where id=#{customer.id}
+    </update>
+
+    <resultMap id="CustomerAndUser" type="Customer">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="mobile" property="mobile" />
+        <result column="pwd" property="pwd" />
+        <result column="code" property="code" />
+        <result column="desc" property="desc" />
+        <result column="address" property="address" />
+        <result column="demand" property="demand" />
+        <result column="cus_reserve1" property="cusReserve1" />
+        <result column="cus_reserve2" property="cusReserve2" />
+        <association property="design" javaType="User">
+            <id column="uid" property="id" />
+            <result column="name" property="username" />
+        </association>
+        <collection property="houseList" ofType="House" resultMap="cn.zmdxd.xddesign.design.dao.HouseDao.HouseAndSolutions" />
+    </resultMap>
+
+    <select id="selectCustomers" resultMap="CustomerAndUser">
+        select c.*,u.id as uid,u.username as name from t_customer c ,t_user u
+        <where>
+            c.design_id=u.id
+            <if test="designId != null">
+                and c.design_id=#{designId}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectCustomer" resultMap="CustomerAndUser">
+        select customer.*,
+               user.id as uid,user.username as name,
+               house.house_id,house.house_name,house.house_address,
+               solutions.solu_id,solutions.solu_name,solutions.state,solutions.solu_desc,solutions.add_time,solutions.share_sign,
+               room.room_id,room.room_name,room.room_desc
+        from t_customer customer
+            left join t_user user on customer.design_id=user.id
+            left join t_house house on house.customer_id=customer.id
+            left join t_solutions solutions on house.house_id = solutions.house_id
+            left join t_room room on solutions.solu_id = room.solu_id
+        where customer.id=#{id}
+    </select>
+
+</mapper>
