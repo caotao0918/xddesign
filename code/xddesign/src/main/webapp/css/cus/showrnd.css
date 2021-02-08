@@ -1,0 +1,66 @@
+@charset "utf-8";
+body{
+    background-color: #F2F2F2;
+}
+*{
+    margin: 0;
+    padding: 0;
+}
+.img_back{
+    opacity: 0.39;
+    margin-top:50px;
+    margin-left:50px;
+}
+.img_back:hover{
+    opacity: 1;
+}
+/*------------------------------------------------------------------------查看设计图*/
+.div_soluimgtitle{
+    background-color: #FFFFFF;
+    margin-top:20px;
+    margin-left:50px;
+    float:left;
+}
+
+.div_soluimglist{
+    float: left;
+    clear: both;
+    margin-left: 50px;
+    margin-top: 21px;
+    background-color: #FFFFFF;
+    border-radius: 15px;
+}
+.div_soluimglist>div{
+    margin: 40px 20px 0 20px;
+    width:960px;
+    height: 480px;
+    float: left;
+    clear: both;
+}
+.div_soluimglist>div:last-child{
+    margin-bottom: 40px;
+}
+.div_soluimglist>div img{
+    width:960px;
+    height: 480px;
+}
+.div_soluimglist>div img:hover{
+    cursor: pointer;
+    width:950px;
+    height: 470px;
+    box-shadow: inset 2px 2px 2px 0 rgba(255,255,255,.5),
+    7px 7px 20px 0 rgba(0,0,0,.1),
+    14px 14px 5px 0 rgba(0,0,0,.3);
+}
+
+/*弹框中的布局*/
+pre{
+    padding-right: 20px;
+    padding-left: 40px;
+    padding-top: 20px;
+    position: absolute;
+    overflow: auto;
+    width: 500px;
+    height: 203px;
+}
+/*------------------------------------------------------------------------查看设计图*/

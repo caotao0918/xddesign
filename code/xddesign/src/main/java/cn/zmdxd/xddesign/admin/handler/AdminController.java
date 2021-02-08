@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import java.util.Map;
 @RestController
 @PropertySource(value = "classpath:config.properties")
 @RequestMapping(value = "/admin/", produces = {"application/json;charset=UTF-8;" })
+@Transactional
 public class AdminController {
 
     @Autowired
@@ -59,35 +61,9 @@ public class AdminController {
     //角色添加和修改
     @RequestMapping(value = "role/saveorupdate", method = RequestMethod.POST)
     public ReturnResult saveOrUpdateRole(Role role) {
-
-        //角色码暂时不知道怎么处理
-        /*switch (role.getName()) {
-            case "管理员":
-                role.setCode(RoleEnum.ADMIN.getCode());
-                break;
-            case "设计员":
-                role.setCode(RoleEnum.DESIGNER.getCode());
-                break;
-            case "施工人员":
-                role.setCode(RoleEnum.WORKS.getCode());
-                break;
-            case "仓管":
-                role.setCode(RoleEnum.WAREHOUSE.getCode());
-                break;
-        }*/
-
         //id存在，则为修改，否则新增
         boolean saveOrUpdate = roleService.saveOrUpdate(role);
-        ReturnResult result = new ReturnResult();
-        if (saveOrUpdate) {
-            result.setStatus(1);
-            result.setMsg("操作成功");
-
-        }else {
-            result.setStatus(0);
-            result.setMsg("操作失败，请稍后重试");
-        }
-        return result;
+        return ReturnResult.returnResult(saveOrUpdate);
     }
 
     //查看角色列表
@@ -106,17 +82,7 @@ public class AdminController {
     @RequestMapping(value = "role/del", method = RequestMethod.POST)
     public ReturnResult delRole(Integer id) {
         boolean removeById = roleService.removeById(id);
-        ReturnResult result = new ReturnResult();
-        if (removeById) {
-            result.setStatus(1);
-            result.setMsg("删除成功");
-
-        }else {
-            result.setStatus(0);
-            result.setMsg("删除失败，请稍后重试");
-
-        }
-        return result;
+        return ReturnResult.returnResult(removeById);
     }
 
     //添加系统用户和修改系统用户信息
@@ -131,7 +97,7 @@ public class AdminController {
     * @return 没有id时返回分页数据IPage，有id时返回单个User
     */
     @RequestMapping(value = "user")
-    public Object findUser(Integer id, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "8") Integer size) {
+    public Object findUser(Integer id, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
         return userService.findUser(id,current,size);
     }
 
@@ -139,22 +105,12 @@ public class AdminController {
     @RequestMapping(value = "firstlevel/saveorupdate", method = RequestMethod.POST)
     public ReturnResult saveOrUpdateFirstLevel(FirstLevel firstLevel) {
         boolean saveOrUpdate = firstLevelService.saveOrUpdate(firstLevel);
-        ReturnResult result = new ReturnResult();
-        if (!saveOrUpdate) {
-            result.setStatus(0);
-            result.setMsg("操作成功");
-
-        }else {
-            result.setStatus(1);
-            result.setMsg("操作失败，请稍后重试");
-
-        }
-        return result;
+        return ReturnResult.returnResult(saveOrUpdate);
     }
 
     //查询一级分类列表
     @RequestMapping(value = "firstlevel")
-    public Object findFirstLevelList(Integer firstId, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+    public Object findFirstLevelList(Integer firstId, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "100") Integer size) {
         Page<FirstLevel> page = new Page<>(current,size);
         if (firstId == null) return firstLevelService.page(page);
         return firstLevelService.page(page, new QueryWrapper<FirstLevel>().eq("first_id",firstId)).getRecords().get(0);
@@ -164,17 +120,7 @@ public class AdminController {
     @RequestMapping(value = "firstlevel/delete", method = RequestMethod.POST)
     public ReturnResult deleteFirstLevel(Integer firstId) {
         boolean removeById = firstLevelService.removeById(firstId);
-        ReturnResult result = new ReturnResult();
-        if (!removeById) {
-            result.setStatus(0);
-            result.setMsg("删除失败，请稍后重试");
-
-        }else {
-            result.setStatus(1);
-            result.setMsg("删除成功");
-
-        }
-        return result;
+        return ReturnResult.returnResult(removeById);
 
     }
 
@@ -185,7 +131,6 @@ public class AdminController {
      */
     @RequestMapping(value = "secondlevel/saveorupdate", method = RequestMethod.POST)
     public ReturnResult saveOrUpdate(Integer firstId, SecondLevel secondLevel) {
-        ReturnResult result = new ReturnResult();
         Boolean state;
         if (secondLevel.getSecondId() == null) {
             //新增二级分类信息
@@ -195,14 +140,7 @@ public class AdminController {
             //修改信息，可供修改的项有 二级分类名称、二级分类描述
             state = secondLevelService.update(new UpdateWrapper<SecondLevel>().eq("second_id", secondLevel.getSecondId()).set("second_name",secondLevel.getSecondName()).set("second_desc",secondLevel.getSecondDesc()));
         }
-        if (!state) {
-            result.setStatus(0);
-            result.setMsg("操作失败，请稍后重试");
-        }else {
-            result.setStatus(1);
-            result.setMsg("操作成功");
-        }
-        return result;
+        return ReturnResult.returnResult(state);
     }
 //
 //    @RequestMapping(value = "jsontest", method = RequestMethod.POST)
@@ -216,18 +154,8 @@ public class AdminController {
     //根据id删除产品二级分类信息
     @RequestMapping(value = "secondlevel/delete", method = RequestMethod.POST)
     public ReturnResult deleteSecondLevel(Integer secondId) {
-        ReturnResult result = new ReturnResult();
         boolean removeById = secondLevelService.removeById(secondId);
-        if (!removeById) {
-            result.setStatus(0);
-            result.setMsg("删除失败，请稍后重试");
-
-        }else {
-            result.setStatus(1);
-            result.setMsg("删除成功");
-
-        }
-        return result;
+        return ReturnResult.returnResult(removeById);
     }
 
     /**
@@ -262,7 +190,6 @@ public class AdminController {
      */
     @RequestMapping(value = "property/saveorupdate", method = RequestMethod.POST)
     public ReturnResult saveOrUpdateProperty(Integer secondId, Property property) {
-        ReturnResult result = new ReturnResult();
         boolean state;
         if (property.getPropertyId() == null) {
             //添加属性
@@ -271,14 +198,7 @@ public class AdminController {
             //修改属性
             state = propertyService.update(new UpdateWrapper<Property>().eq("property_id",property.getPropertyId()).set("property_name",property.getPropertyName()).set("property_desc",property.getPropertyDesc()).set("common_value",property.getCommonValue()));
         }
-        if (!state) {
-            result.setStatus(0);
-            result.setMsg("操作失败，请稍后重试");
-        }else {
-            result.setStatus(1);
-            result.setMsg("操作成功");
-        }
-        return result;
+        return ReturnResult.returnResult(state);
 
     }
 
@@ -295,16 +215,8 @@ public class AdminController {
     //根据属性id批量删除属性
     @RequestMapping(value = "property/delete",method = RequestMethod.POST)
     public ReturnResult deleteProperty(@RequestBody List<Integer> ids) {
-        ReturnResult result = new ReturnResult();
         boolean removeById = propertyService.removeByIds(ids);
-        if (!removeById) {
-            result.setStatus(0);
-            result.setMsg("删除失败，请稍后重试");
-        }else {
-            result.setStatus(1);
-            result.setMsg("删除成功");
-        }
-        return result;
+        return ReturnResult.returnResult(removeById);
     }
 
     /**
@@ -360,7 +272,7 @@ public class AdminController {
     @RequestMapping(value = "video/delete",method = RequestMethod.POST)
     public ReturnResult deleteVideo(@RequestBody ArrayList<Integer> ids) {
         ReturnResult result = new ReturnResult();
-        Video video = new Video();
+        Video video;
         for (Integer id:ids){
             video = videoService.getById(id);
             boolean deleteFile = FileUtil.deleteFile(uploadPath + video.getVideoLink().substring(fileHost.length()));//删除视频文件
@@ -371,14 +283,7 @@ public class AdminController {
             }
         }
         boolean removeByIds = videoService.removeByIds(ids);//删除数据库中的视频信息
-        if (!removeByIds) {
-            result.setStatus(0);
-            result.setMsg("删除失败，请稍后重试");
-        }else {
-            result.setStatus(1);
-            result.setMsg("删除成功");
-        }
-        return result;
+        return ReturnResult.returnResult(removeByIds);
     }
 
     /**
@@ -434,7 +339,7 @@ public class AdminController {
     @RequestMapping(value = "guide/delete", method = RequestMethod.POST)
     public ReturnResult deleteGuide(@RequestBody ArrayList<Integer> ids) {
         ReturnResult result = new ReturnResult();
-        Guide guide = new Guide();
+        Guide guide;
         for (Integer id:ids) {
             guide = guideService.getById(id);
             boolean deleteFile = FileUtil.deleteFile(uploadPath + guide.getGuideLink().substring(fileHost.length()));
@@ -445,48 +350,21 @@ public class AdminController {
             }
         }
         boolean removeByIds = guideService.removeByIds(ids);
-        if (!removeByIds) {
-            result.setStatus(0);
-            result.setMsg("删除失败，请稍后重试");
-
-        }else {
-            result.setStatus(1);
-            result.setMsg("删除成功");
-
-        }
-        return result;
+        return ReturnResult.returnResult(removeByIds);
     }
 
     //添加或修改常见问题信息
     @RequestMapping(value = "question/saveorupdate", method = RequestMethod.POST)
     public ReturnResult saveOrUpdate(Question question) {
-        ReturnResult result = new ReturnResult();
         boolean saveOrUpdate = questionService.saveOrUpdate(question);
-        if (!saveOrUpdate) {
-            result.setStatus(0);
-            result.setMsg("操作失败，请稍后重试");
-        }else {
-            result.setStatus(1);
-            result.setMsg("操作成功");
-        }
-        return result;
+        return ReturnResult.returnResult(saveOrUpdate);
     }
 
     //批量删除常见问题
     @RequestMapping(value = "question/delete", method = RequestMethod.POST)
     public ReturnResult deleteQuestion(@RequestBody ArrayList<Integer> ids) {
-        ReturnResult result = new ReturnResult();
         boolean removeByIds = questionService.removeByIds(ids);
-        if (!removeByIds) {
-            result.setStatus(0);
-            result.setMsg("删除失败，请稍后重试");
-
-        }else {
-            result.setStatus(1);
-            result.setMsg("删除成功");
-
-        }
-        return result;
+        return ReturnResult.returnResult(removeByIds);
     }
 
     /**
@@ -495,7 +373,7 @@ public class AdminController {
      * @param files:产品图片列表
      */
     @RequestMapping(value = "product/save", method = RequestMethod.POST)
-    public ReturnResult saveProduct(@RequestBody ProductVo productVo, @RequestParam(value = "files", required = false) MultipartFile[] files) {
+    public ReturnResult saveProduct(ProductVo productVo, @RequestParam(value = "files", required = false) MultipartFile[] files) {
         ReturnResult result = new ReturnResult();
         Integer productId = productService.saveProduct(productVo);//将产品基本信息保存到t_product表中
         if (productId != 1) {
@@ -524,31 +402,35 @@ public class AdminController {
                 }
             }
 
-            Picture picture = new Picture();
-            Picture picture1 = pictureService.getOne(new QueryWrapper<Picture>().eq("product_id", productId).eq("default_picture", true), true);//查看该产品图片是否已经有默认图片
-            int i = 0;
-            for (MultipartFile file:files) {
-                if (file.getSize() == 0) {
-                    result.setStatus(0);
-                    result.setMsg("没有上传任何图片");
-                    return result;
-                }
+            if (files != null) {
 
-                String saveFileName = FileUtil.saveFile(file, uploadPath + "/picture/" + productVo.getProductName());//上传图片到nginx服务器
-                String pictureLink = fileHost+saveFileName;
-                String pictureDesc = "这是一张"+productVo.getProductName()+"图片";
-                picture.setPictureName(productVo.getProductName());
-                picture.setPictureLink(pictureLink);
-                picture.setPictureDesc(pictureDesc);
-                if (picture1 == null) picture.setDefaultPicture(i == 0);//默认将第一张图片设置为默认图片
-                else picture.setDefaultPicture(false);//已经有默认图片则不设置
-                boolean state = pictureService.savePicture(picture, productId);//将图片信息保存到t_picture表中
-                if(!state) {
-                    result.setStatus(0);
-                    result.setMsg("添加失败，请稍后重试");
-                    return result;
+                Picture picture = new Picture();
+                Picture picture1 = pictureService.getOne(new QueryWrapper<Picture>().eq("product_id", productVo.getProductId()).eq("default_picture", true), true);//查看该产品图片是否已经有默认图片
+                int i = 0;
+
+                for (MultipartFile file:files) {
+                    if (file.getSize() == 0) {
+                        result.setStatus(0);
+                        result.setMsg("没有上传任何图片");
+                        return result;
+                    }
+
+                    String saveFileName = FileUtil.saveFile(file, uploadPath + "/picture/" + productVo.getProductName());//上传图片到nginx服务器
+                    String pictureLink = fileHost+saveFileName;
+                    String pictureDesc = "这是一张"+productVo.getProductName()+"图片";
+                    picture.setPictureName(productVo.getProductName());
+                    picture.setPictureLink(pictureLink);
+                    picture.setPictureDesc(pictureDesc);
+                    if (picture1 == null) picture.setDefaultPicture(i == 0);//默认将第一张图片设置为默认图片
+                    else picture.setDefaultPicture(false);//已经有默认图片则不设置
+                    boolean state = pictureService.savePicture(picture, productVo.getProductId());//将图片信息保存到t_picture表中
+                    if(!state) {
+                        result.setStatus(0);
+                        result.setMsg("添加失败，请稍后重试");
+                        return result;
+                    }
+                    i = i + 1;
                 }
-                i = i + 1;
             }
 
             result.setStatus(1);
@@ -566,10 +448,17 @@ public class AdminController {
      * @param size:每页条数
      */
     @RequestMapping(value = "products", method = RequestMethod.GET)
-    public Object findProducts(Integer productId,@RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "100") Integer size) {
-        Page<Product> page = new Page<>(current,size);
-        if (productId == null) return productService.findProducts(page,productId);
-        return productService.findProducts(page,productId).getRecords().get(0);
+    public Object findProducts(Integer productId,@RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+        //由于mybatis-plus对一表对多表left join查询的支持欠缺，所以不用它的分页查询
+        Page<Product> page = new Page<>(1,1000000000);
+        page.setSearchCount(false);
+        if (productId == null) {
+            IPage<Product> iPage = productService.findProducts(page, productId, current, size);
+            iPage.setSize(size);
+            iPage.setTotal(productService.count(new QueryWrapper<Product>().select("product_id")));
+            return iPage;
+        }
+        return productService.findProducts(page,productId,current,size).getRecords().get(0);
     }
 
     /**
@@ -579,52 +468,34 @@ public class AdminController {
      * @param size:每页条数
      */
     @RequestMapping(value = "secondlevel/products", method = RequestMethod.GET)
-    public IPage<Product> findProductsBySecondLevel(Integer secondId,@RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "100") Integer size) {
-        Page<Product> page = new Page<>(current,size);
-        return productService.findProductsBySecond(page,secondId);
+    public IPage<Product> findProductsBySecondLevel(Integer secondId,@RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+        Page<Product> page = new Page<>(1,1000000000);
+        page.setSearchCount(false);
+        IPage<Product> iPage = productService.findProductsBySecond(page, secondId, current, size);
+        iPage.setSize(size);
+        iPage.setTotal(productService.count(new QueryWrapper<Product>().select("product_id").eq("second_id",secondId)));
+        return iPage;
     }
 
     //修改产品基本信息
     @RequestMapping(value = "product/update", method = RequestMethod.POST)
     public ReturnResult updateProduct(Product product) {
-        ReturnResult result = new ReturnResult();
         boolean update = productService.update(new UpdateWrapper<Product>().eq("product_id", product.getProductId()).set("product_name", product.getProductName()).set("product_link", product.getProductLink()).set("product_models", product.getProductModels()).set("product_desc", product.getProductDesc()).set("price", product.getPrice()).set("product_reserve1", product.getProductReserve1()).set("product_reserve2", product.getProductReserve2()).set("product_reserve3", product.getProductReserve3()).set("product_reserve4", product.getProductReserve4()).set("product_reserve5", product.getProductReserve5()));
-        if (!update) {
-            result.setStatus(0);
-            result.setMsg("修改失败，请稍后测试");
-        }
-        result.setStatus(1);
-        result.setMsg("修改成功");
-        return result;
+        return ReturnResult.returnResult(update);
     }
 
     //批量删除产品
     @RequestMapping(value = "product/delete", method = RequestMethod.POST)
     public ReturnResult deleteProduct(@RequestBody List<Integer> idList) {
-        ReturnResult result = new ReturnResult();
         boolean removeByIds = productService.removeByIds(idList);
-        if (!removeByIds) {
-            result.setStatus(0);
-            result.setMsg("删除失败，请稍后重试");
-            return result;
-        }
-        result.setStatus(1);
-        result.setMsg("删除成功");
-        return result;
+        return ReturnResult.returnResult(removeByIds);
     }
 
     //修改产品某个属性信息
     @RequestMapping(value = "product/property/update", method = RequestMethod.POST)
     public ReturnResult updateProperty(PropertyValue propertyValue) {
-        ReturnResult result = new ReturnResult();
         boolean state = valueService.update(new UpdateWrapper<PropertyValue>().eq("value_id",propertyValue.getValueId()).set("value_name",propertyValue.getValueName()));
-        if (!state) {
-            result.setStatus(0);
-            result.setMsg("修改失败，请稍后测试");
-        }
-        result.setStatus(1);
-        result.setMsg("修改成功");
-        return result;
+        return ReturnResult.returnResult(state);
     }
 
     //删除产品某个属性
@@ -692,7 +563,7 @@ public class AdminController {
     @RequestMapping(value = "product/picture/delete", method = RequestMethod.POST)
     public ReturnResult deleteProductPicture(@RequestBody List<Integer> ids) {
         ReturnResult result = new ReturnResult();
-        Picture picture = new Picture();
+        Picture picture;
         String pictureLink;
         boolean deleteFile;
         for (Integer id:ids) {

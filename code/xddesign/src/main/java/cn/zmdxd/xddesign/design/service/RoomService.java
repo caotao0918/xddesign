@@ -10,5 +10,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @description:
  */
 public interface RoomService extends IService<Room>  {
-    ReturnResult saveRoom(Integer soluId, Room room);
+    Integer saveRoom(Room room);
 }

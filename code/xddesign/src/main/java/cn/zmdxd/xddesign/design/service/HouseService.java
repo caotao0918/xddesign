@@ -1,6 +1,7 @@
 package cn.zmdxd.xddesign.design.service;
 
 import cn.zmdxd.xddesign.entity.House;
+import cn.zmdxd.xddesign.utils.ReturnResult;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -9,5 +10,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @description:
  */
 public interface HouseService extends IService<House> {
-    String saveHouse(Integer customerId, House house);
+    ReturnResult saveHouse(House house);
 }

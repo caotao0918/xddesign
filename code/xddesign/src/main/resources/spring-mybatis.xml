@@ -26,6 +26,7 @@
                     <!-- COUNT SQL 解析.可以没有 -->
                     <property name="countSqlParser" ref="countSqlParser"/>
                     <property name="dbType" value="MYSQL" />
+                    <property name="limit" value="-1" />
                 </bean>
             </array>
         </property>

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,8 +40,14 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product> impleme
     }
 
     @Override
-    public IPage<Product> findProducts(Page<Product> page,Integer productId) {
-        return productDao.findProducts(page, productId);
+    public IPage<Product> findProducts(Page<Product> page,Integer productId, Integer current, Integer size) {
+        Integer offset = (current-1)*size;
+        return productDao.findProducts(page, productId, offset, size);
+    }
+
+    @Override
+    public List<Product> findProducts() {
+        return productDao.findProductList();
     }
 
     @Override
@@ -50,7 +57,8 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product> impleme
     }
 
     @Override
-    public IPage<Product> findProductsBySecond(Page<Product> page, Integer secondId) {
-        return productDao.findProductsBySecond(page,secondId);
+    public IPage<Product> findProductsBySecond(Page<Product> page, Integer secondId,Integer current, Integer size) {
+        Integer offset = (current-1)*size;
+        return productDao.findProductsBySecond(page,secondId, offset, size);
     }
 }

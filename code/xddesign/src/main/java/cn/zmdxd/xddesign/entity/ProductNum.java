@@ -22,4 +22,6 @@ public class ProductNum {
     @TableField(exist = false)
     private Product product;    //对应产品
 
+    private Integer roomId;     //房间id
+
 }

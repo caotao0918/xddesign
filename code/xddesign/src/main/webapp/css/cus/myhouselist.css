@@ -1,0 +1,125 @@
+@charset "utf-8";
+body{
+    background-color: #F2F2F2;
+}
+*{
+    margin: 0;
+    padding: 0;
+}
+/*--------------------------------------------------------------------------住宅列表*/
+.img_back{
+    opacity: 0.39;
+    margin-top:50px;
+    margin-left:50px;
+}
+.img_back:hover{
+    opacity: 1;
+}
+
+.div_myhouselist{
+    /*width: 700px;*/
+    /*height: 700px;*/
+    /*border:1px solid black;*/
+    /*background-color: #FFFFFF;*/
+}
+
+.div_myhouse{
+    background-color: #FFFFFF;
+    line-height:42px;padding:0;border:0}
+.div_myhouse_hover{
+    background-color:#89d8d3;
+    background-image:linear-gradient(315deg,#89d8d3 0,#03c8a8 74%);
+    color: #FFFFFF;
+}
+.div_myhouse span{
+    position:relative;
+    display:block;
+    float: left;
+}
+
+/*.div_myhouse:before,.div_myhouse:after{*/
+/*position:absolute;content:"";right:0;top:0;*/
+/*box-shadow:4px 4px 6px 0 rgba(255,255,255,.9),-4px -4px 6px 0 rgba(116,125,136,.2),inset -4px -4px 6px 0 rgba(255,255,255,.9),inset 4px 4px 6px 0 rgba(116,125,136,.3);transition:all .3s ease*/
+/*}*/
+/*.div_myhouse:before{*/
+/*height:0;width:.1px*/
+/*}*/
+/*.div_myhouse:after{*/
+/*width:0;height:.1px*/
+/*}.div_myhouse:hover:before{*/
+/*height:100%*/
+/*}*/
+/*.div_myhouse:hover:after{*/
+/*width:100%*/
+/*}*/
+.div_myhouse{
+    width: 300px;
+    height: 170px;
+    margin: 50px 50px;
+    float: left;
+
+    font-size: 25px;
+    font-family: 微软雅黑;
+    line-height: 170px;
+    text-align: center;
+}
+
+.span_text{
+    width: 64px;
+    height: 18px;
+    opacity: 0.39;
+    font-family: 'Arial Normal', 'Arial', sans-serif;
+    font-size: 16px;
+    color: #333333;
+    text-align: left;
+    line-height: normal;
+    text-transform: none;
+
+    margin-left: 21px;
+    margin-top:20px;
+}
+
+.span_housename{
+    width: 123px;
+    height: 18px;
+    opacity: 1;
+    font-family: 'Arial Normal', 'Arial', sans-serif;
+    font-size: 16px;
+    color: #333333;
+    text-align: left;
+    line-height: normal;
+    text-transform: none;
+
+    margin-left: 39px;
+    margin-top:20px;
+}
+
+.span_houseadd{
+    width: 159px;
+    height: 59px;
+    opacity: 1;
+    font-family: 'Arial Normal', 'Arial', sans-serif;
+    font-size: 13px;
+    color: #333333;
+    text-align: left;
+    line-height: normal;
+    text-transform: none;
+
+    margin-left: 39px;
+    margin-top:20px;
+
+    white-space:normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-all;
+}
+
+.span_lightbox{
+    width: 300px;
+    font-size: 25px;
+    font-family: 微软雅黑;
+    line-height: 170px;
+    text-align: center;
+    color: #FFFFFF;
+}
+/*--------------------------------------------------------------------------住宅列表*/

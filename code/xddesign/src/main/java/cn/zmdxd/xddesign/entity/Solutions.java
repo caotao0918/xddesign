@@ -36,6 +36,8 @@ public class Solutions {
     private String soluReserve2;
     private String soluReserve3;
 
+    private Integer houseId;    //房子id
+
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Timestamp getAddTime() {
         return addTime;

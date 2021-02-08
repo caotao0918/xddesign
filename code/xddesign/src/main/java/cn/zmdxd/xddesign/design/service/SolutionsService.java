@@ -1,10 +1,12 @@
 package cn.zmdxd.xddesign.design.service;
 
 import cn.zmdxd.xddesign.entity.Solutions;
+import cn.zmdxd.xddesign.utils.ReturnResult;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -13,7 +15,14 @@ import java.util.List;
  * @description:
  */
 public interface SolutionsService extends IService<Solutions> {
-    String saveSolutions(Integer houseId, Integer designId, Solutions solutions);
+
+//    Integer saveSolutions(Solutions solutions);
 
     IPage<Solutions> findSolutionsList(Page<Solutions> page,  Integer designId);
+
+    Solutions findSolutions(Integer soluId);
+
+    List<Solutions> findSolutionsByHouseId(Integer houseId);
+
+    ReturnResult saveOrUpdateSolution(Solutions solutions, HttpServletRequest request);
 }

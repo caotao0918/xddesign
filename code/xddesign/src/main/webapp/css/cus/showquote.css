@@ -1,0 +1,114 @@
+@charset "utf-8";
+body{
+    background-color: #F2F2F2;
+}
+*{
+    margin: 0;
+    padding: 0;
+}
+.img_back{
+    opacity: 0.39;
+    margin-top:50px;
+    margin-left:50px;
+}
+.img_back:hover{
+    opacity: 1;
+}
+/*------------------------------------------------------------------------查看报价单*/
+.div_quotetitle{
+    background-color: #FFFFFF;
+    margin-top:20px;
+    margin-left:50px;
+    float:left;
+}
+.t_quote{
+    clear: both;
+    float: left;
+    margin-left: 50px;
+    margin-top: 20px;
+    border-collapse: collapse;
+    border-style: dashed;
+}
+.t_quote:hover{
+    box-shadow: inset 2px 2px 2px 0 rgba(255,255,255,.5),
+    7px 7px 20px 0 rgba(0,0,0,.1),
+    14px 14px 5px 0 rgba(0,0,0,.1);
+}
+.t_quote tr td{
+    border: 1px solid #797979;
+    background-color: #FFFFFF;
+}
+.t_quote thead td{
+    background-color: burlywood;
+}
+.t_quote tfoot td:first-child{
+    background-color: burlywood;
+}
+.t_quote thead{
+    border-bottom-style: double;
+}
+.t_quote tfoot tr{
+    border-top-style: double;
+}
+.t_quote td{
+    width: 140px;
+    height: 40px;
+}
+.t_quote tr td:nth-child(3){
+    width: auto;
+}
+.t_quote tr td:not(:nth-child(3)){
+    text-align: center;
+}
+.t_quote thead td:nth-child(3){
+    text-align: center;
+}
+.t_quote tfoot td:nth-child(3){
+    text-align: center;
+}
+.t_quote tbody tr:hover td{
+    background:none;
+}
+.t_quote tbody tr:hover{
+    color: #FFFFFF;
+    background: #9F9F9F;
+}
+
+.div_quotepage{
+    float: left;
+}
+.div_downquote{
+    background-color:#FFFFFF;
+    margin-top:20px;
+    text-align: center;
+    line-height: 40px;
+    transition:all .3s ease;overflow:hidden;
+    z-index: 100;
+    width: 140px;
+    height: 40px;
+    border-radius: 5px;
+    font-family: 'Lato',sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .3s ease;
+    position: relative;
+    float: right;
+    clear: both;
+}
+.div_downquote:after{position:absolute;content:" ";top:0;left:0;
+    z-index:-1;
+    width:100%;height:100%;transition:all .3s ease;-webkit-transform:scale(.1);
+    transform:scale(.1)
+}
+.div_downquote:hover{
+    color:#fff;
+    background:transparent;
+    box-shadow: inset 2px 2px 2px 0 rgba(255,255,255,.5), 7px 7px 20px 0 rgba(0,0,0,.1), 4px 4px 5px 0 rgba(0,0,0,.1);
+}
+.div_downquote:hover:after{background:#0003ff;
+    background:linear-gradient(0deg,rgba(2,126,251,1) 0,rgba(0,3,255,1)100%);
+    -webkit-transform:scale(1);
+    transform:scale(1);
+    -ms-transform:scale(3);
+}
+/*------------------------------------------------------------------------查看报价单*/

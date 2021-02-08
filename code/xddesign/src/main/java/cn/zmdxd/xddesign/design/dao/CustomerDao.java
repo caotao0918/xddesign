@@ -14,9 +14,9 @@ import java.util.Map;
  * @description:
  */
 public interface CustomerDao extends BaseMapper<Customer> {
-    int insertCustomer(Map<String, Object> map);
+    int insertCustomer(Customer customer);
 
-    int updateCustomer(Map<String, Object> map);
+    int updateCustomer(Customer customer);
 
     IPage<Customer> selectCustomers(Page<?> page, @Param("designId") Integer designId);
 

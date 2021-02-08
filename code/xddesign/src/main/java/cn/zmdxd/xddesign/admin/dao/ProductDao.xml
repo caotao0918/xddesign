@@ -82,11 +82,30 @@
                  left join t_video video on video.video_id=product.video_id
                  left join t_picture picture on picture.product_id=product.product_id
         <where>
+            product.product_id in(SELECT product1.product_id from(SELECT product2.product_id from t_product as product2 limit #{offset},#{size})as product1)
             <if test="productId != null">
-                product.product_id=#{productId}
+                and product.product_id=#{productId}
             </if>
-            and picture.default_picture=true
         </where>
+    </select>
+
+    <select id="findProductList" resultMap="ProductAndPropertyAndPicture">
+        SELECT product.product_name,product.product_id,product.product_models,product.price,product.product_link,product.product_desc,product.product_reserve1,product.product_reserve2,product.product_reserve3,product.product_reserve4,product.product_reserve5,
+        sec.second_name,sec.second_id,sec.second_desc,
+        pp.id, pp.product_id,pp.value_id,
+        property.property_name,property.property_id,property.property_desc,
+        val.value_name,val.value_id,
+        picture.picture_id, picture.picture_name, picture.picture_link, picture.picture_add_time, picture.picture_reserve,picture.default_picture,
+        video.video_id, video.video_name, video.video_link, video.video_add_time, video.video_desc, video.video_reserve,
+        guide.guide_id, guide.guide_name, guide.guide_link, guide.guide_add_time, guide.guide_desc, guide.guide_reserve
+        FROM t_product product
+        left join t_product_property pp on pp.product_id=product.product_id
+        left join t_property_value val on val.value_id=pp.value_id
+        left join t_property property on property.property_id=val.property_id
+        left join t_secondlevel sec on sec.second_id=product.second_id
+        left join t_guide guide on guide.guide_id=product.guide_id
+        left join t_video video on video.video_id=product.video_id
+        left join t_picture picture on picture.product_id=product.product_id
     </select>
 
     <delete id="removeProductProperty">
@@ -110,12 +129,8 @@
         left join t_guide guide on guide.guide_id=product.guide_id
         left join t_video video on video.video_id=product.video_id
         left join t_picture picture on picture.product_id=product.product_id
-        <where>
-            <if test="secondId != null">
-                product.second_id=#{secondId}
-            </if>
-            and picture.default_picture=true
-        </where>
+        where product.product_id in(SELECT product1.product_id from(SELECT product2.product_id from t_product as product2 limit #{offset},#{size})as product1)
+        and product.second_id=#{secondId}
     </select>
 
 </mapper>

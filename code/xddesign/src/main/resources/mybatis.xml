@@ -8,6 +8,8 @@
     	<setting name="mapUnderscoreToCamelCase" value="true"/>
         <setting name="lazyLoadingEnabled" value="true"/>
         <setting name="aggressiveLazyLoading" value="false"/>
+        <!-- 打印sql日志 -->
+        <setting name="logImpl" value="STDOUT_LOGGING" />
     </settings>
     <!--注册别名-->
     <typeAliases>

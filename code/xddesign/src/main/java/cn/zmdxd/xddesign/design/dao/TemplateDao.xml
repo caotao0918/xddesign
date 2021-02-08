@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zmdxd.xddesign.design.dao.TemplateDao">
+
+    <resultMap id="TemplateResultMap" type="Template">
+        <id column="temp_id" property="tempId" />
+        <result column="temp_name" property="tempName" />
+        <result column="temp_desc" property="tempDesc" />
+        <result column="temp_reserve1" property="tempReserve1" />
+        <result column="temp_reserve2" property="tempReserve2" />
+        <result column="temp_reserve3" property="tempReserve3" />
+        <association property="houseType" javaType="HouseType">
+            <id column="type_id" property="typeId" />
+            <result column="type_name" property="typeName" />
+        </association>
+        <association property="design" javaType="User">
+            <id column="id" property="id" />
+            <result column="username" property="username" />
+        </association>
+        <association property="solutions" javaType="Solutions" resultMap="cn.zmdxd.xddesign.design.dao.SolutionsDao.SolutionsAndRoom" />
+    </resultMap>
+
+    <select id="selectTemplatesPage" resultMap="TemplateResultMap">
+        select template.temp_id,template.temp_name,template.temp_desc,template.temp_reserve1,template.temp_reserve2,template.temp_reserve3,
+        design.username,type.type_name
+        from t_template template,t_user design,t_house_type type
+        where template.type_id=type.type_id and design.id=template.designer_id
+    </select>
+
+    <select id="selectTemplate" resultMap="TemplateResultMap">
+        select template.temp_id,template.temp_name,template.temp_desc,template.solu_id,template.temp_reserve1,template.temp_reserve2,template.temp_reserve3,
+               design.username,type.type_name,
+               solution.solu_id,solution.solu_name,solution.designer_id,solution.state,solution.add_time,solution.solu_desc,solution.share_sign,
+               room.room_id,room.room_name,room.room_desc,
+               pn.product_id,pn.pn_num,pn.pn_id,
+               product.product_id,product.product_name,
+               picture.picture_id,picture.picture_link,picture.picture_name
+        from t_template template
+        left join t_house_type type on template.temp_id=type.type_id
+        left join t_user design on design.id=template.designer_id
+        left join t_solutions solution on template.designer_id=solution.designer_id
+        left join t_room room on room.solu_id=solution.solu_id
+        left join t_product_num pn on room.room_id = pn.room_id
+        left join t_product product on pn.product_id = product.product_id
+        left join t_picture picture on product.product_id = picture.product_id
+        where template.temp_id=#{tempId}
+    </select>
+
+    <select id="selectTypeIdBySoluId" resultType="Integer">
+        select type.type_id from t_house house ,t_solutions solutions,t_house_type type
+        where house.house_id=solutions.house_id and type.type_id=house.type_id
+          and solutions.solu_id=#{soluId}
+    </select>
+
+    <insert id="insertTemplate">
+        insert into t_template(temp_name, temp_desc, type_id, solu_id, designer_id, temp_reserve1, temp_reserve2, temp_reserve3) VALUES (#{template.tempName},#{template.tempDesc},#{typeId},#{template.solutions.soluId},#{designId},#{template.tempReserve1},#{template.tempReserve2},#{template.tempReserve3})
+    </insert>
+
+    <select id="selectTemplateBySoluId" resultMap="TemplateResultMap">
+        select temp_name, temp_desc, type_id, designer_id as id, temp_reserve1, temp_reserve2, temp_reserve3
+        from t_template
+        where solu_id=#{soluId}
+    </select>
+
+    <select id="selectTemplateByHouseId" resultType="Template">
+        select template.temp_id,template.temp_name from t_template template, t_house house, t_solutions solutions
+        where template.solu_id=solutions.solu_id and house.house_id=solutions.house_id
+        and house.house_id=#{houseId}
+    </select>
+
+</mapper>

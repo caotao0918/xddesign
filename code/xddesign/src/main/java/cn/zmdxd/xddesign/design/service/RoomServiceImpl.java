@@ -22,19 +22,7 @@ public class RoomServiceImpl extends ServiceImpl<RoomDao, Room> implements RoomS
     private RoomDao roomDao;
 
     @Override
-    public ReturnResult saveRoom(Integer soluId, Room room) {
-        Map<String,Object> map = new HashMap<>();
-        map.put("soluId",soluId);
-        map.put("room",room);
-        int insert = roomDao.insertRoom(map);
-        ReturnResult result = new ReturnResult();
-        if (insert!=1) {
-            result.setStatus(0);
-            result.setMsg("添加失败，请稍后重试");
-        } else {
-            result.setStatus(1);
-            result.setMsg("添加成功");
-        }
-        return result;
+    public Integer saveRoom(Room room) {
+        return roomDao.insertRoom(room);
     }
 }

@@ -8,15 +8,18 @@
         <id column="house_id" property="houseId" />
         <result column="house_name" property="houseName" />
         <result column="house_address" property="houseAddress" />
-        <result column="house_type" property="houseType" />
         <result column="house_reserve1" property="houseReserve1" />
         <result column="house_reserve2" property="houseReserve2" />
         <result column="house_reserve3" property="houseReserve3" />
+        <association property="houseType" javaType="HouseType">
+            <id column="type_id" property="typeId" />
+            <result column="type_name" property="typeName" />
+        </association>
         <collection property="solutionsList" ofType="Solutions" resultMap="cn.zmdxd.xddesign.design.dao.SolutionsDao.SolutionsAndRoom" />
     </resultMap>
 
-    <insert id="insertHouse">
-        insert into t_house(house_name, house_address, customer_id, house_type, house_reserve1, house_reserve2, house_reserve3) VALUES (#{house.houseName},#{house.houseAddress},#{customerId},#{house.houseType},#{house.houseReserve1},#{house.houseReserve2},#{house.houseReserve3})
+    <insert id="insertHouse" useGeneratedKeys="true" keyProperty="houseId" keyColumn="house_id">
+        insert into t_house(house_name, house_address, customer_id, type_id, house_reserve1, house_reserve2, house_reserve3) VALUES (#{houseName},#{houseAddress},#{customerId},#{houseType.typeId},#{houseReserve1},#{houseReserve2},#{houseReserve3})
     </insert>
 
 </mapper>

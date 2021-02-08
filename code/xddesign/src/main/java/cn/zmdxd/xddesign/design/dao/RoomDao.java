@@ -13,5 +13,5 @@ import java.util.Map;
 public interface RoomDao extends BaseMapper<Room> {
 
 
-    int insertRoom(Map<String, Object> map);
+    int insertRoom(Room room);
 }

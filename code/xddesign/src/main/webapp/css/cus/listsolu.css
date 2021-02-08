@@ -1,0 +1,78 @@
+@charset "utf-8";
+body{
+    background-color: #F2F2F2;
+}
+*{
+    margin: 0;
+    padding: 0;
+}
+/*--------------------------------------------------------------------------方案列表*/
+.img_back{
+    opacity: 0.39;
+    margin-top:50px;
+    margin-left:50px;
+}
+.img_back:hover{
+    opacity: 1;
+}
+.t_solu tr td{
+    width:100px;
+    height: 30px;
+    text-align: center;
+}
+.t_solu tr td:nth-child(4){
+    width:auto;
+    text-align: left;
+}
+.t_solu tr td:nth-last-child(4){
+    width:auto;
+}
+
+.t_solu tr{
+    background-color: #FFFFFF;
+    display: block;
+    margin:0px 0px 14px 50px;
+}
+
+.t_solu tr:nth-child(1){
+    margin:52px 0px 14px 50px;
+}
+
+.div_pagerender{
+    background-color: #FFFFFF;
+    margin: 0px 0px 0px 50px;
+    /*width: 840px;*/
+    text-align: center;
+}
+
+.td_asbutton{
+    transition:all .3s ease;overflow:hidden;
+    z-index: 100;
+    width: 100px;
+    height: 30px;
+    /*border-radius: 5px;*/
+    /*padding: 10px 25px;*/
+    /*font-family: 'Lato',sans-serif;*/
+    /*font-weight: 500;*/
+    background: transparent;
+    cursor: pointer;
+    transition: all .3s ease;
+    position: relative;
+    box-shadow: inset 2px 2px 2px 0 rgba(255,255,255,.5), 7px 7px 20px 0 rgba(0,0,0,.1), 4px 4px 5px 0 rgba(0,0,0,.1);
+}
+.td_asbutton:after{position:absolute;content:" ";top:0;left:0;
+    z-index:-1;
+    width:100%;height:100%;transition:all .3s ease;-webkit-transform:scale(.1);
+    transform:scale(.1)
+}
+.td_asbutton:hover{
+    color:#fff;
+    background:transparent
+}
+.td_asbutton:hover:after{background:#0003ff;
+    background:linear-gradient(0deg,rgba(2,126,251,1) 0,rgba(0,3,255,1)100%);
+    -webkit-transform:scale(1);
+    transform:scale(1);
+    -ms-transform:scale(3);
+}
+/*--------------------------------------------------------------------------方案列表*/

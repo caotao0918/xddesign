@@ -3,6 +3,7 @@ package cn.zmdxd.xddesign.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.util.List;
@@ -19,7 +20,9 @@ public class House {
     private Integer houseId;
     private String houseName;               //房子名称
     private String houseAddress;            //房子地址
-    private String houseType;               //房子户型（两室一厅/三室两厅）
+
+    @TableField(exist = false)
+    private HouseType houseType;               //房子户型（两室一厅/三室两厅）
 
     @TableField(exist = false)
     private List<Solutions> solutionsList;  //方案列表
@@ -27,5 +30,7 @@ public class House {
     private String houseReserve1;                   //保留字段
     private String houseReserve2;
     private String houseReserve3;
+
+    private Integer customerId;//客户id
 
 }

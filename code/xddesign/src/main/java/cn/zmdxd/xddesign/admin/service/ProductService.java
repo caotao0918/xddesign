@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * @author 曹涛
  * @date 2021/1/27 9:54
@@ -16,9 +18,10 @@ public interface ProductService extends IService<Product> {
 
     boolean saveProductProperty(Integer productId, Integer valueId);
 
-    IPage<Product> findProducts(Page<Product> page, Integer productId);
+    IPage<Product> findProducts(Page<Product> page, Integer productId,Integer current, Integer size);
+    List<Product> findProducts();
 
     boolean removeProductProperty(Integer valueId);
 
-    IPage<Product> findProductsBySecond(Page<Product> page, Integer secondId);
+    IPage<Product> findProductsBySecond(Page<Product> page, Integer secondId, Integer current, Integer size);
 }

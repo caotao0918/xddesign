@@ -11,5 +11,5 @@ import java.util.Map;
  * @description:
  */
 public interface HouseDao extends BaseMapper<House> {
-    int insertHouse(Map<String, Object> map);
+    int insertHouse(House house);
 }

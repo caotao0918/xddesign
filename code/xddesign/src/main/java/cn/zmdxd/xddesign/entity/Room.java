@@ -23,8 +23,10 @@ public class Room {
     @TableField(exist = false)
     private List<ProductNum> productNumList;   //房间内产品列表
 
-    private String roomReserve1;                   //保留字段
+    private String roomReserve1;               //保留字段
     private String roomReserve2;
     private String roomReserve3;
+
+    private Integer soluId;                    //方案id
 
 }

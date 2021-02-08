@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author 曹涛
@@ -14,8 +14,12 @@ import java.util.Map;
  * @description:
  */
 public interface SolutionsDao extends BaseMapper<Solutions> {
-    int insertSolutions(Map<String, Object> map);
+    int insertSolutions(Solutions solutions);
 
     IPage<Solutions> selectSolutionsList(Page<?> page, @Param("designId") Integer designId);
+
+    Solutions selectSolutions(Integer soluId);
+
+    List<Solutions> selectSolutionsByHouseId(Integer houseId);
 
 }

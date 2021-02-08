@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,9 +23,10 @@ public interface ProductDao extends BaseMapper<Product> {
 
     Integer insertProduct(ProductVo productVo);
 
-    IPage<Product> findProducts(Page<Product> page, @Param("productId") Integer productId);
+    IPage<Product> findProducts(Page<Product> page, @Param("productId") Integer productId, @Param("offset") Integer offset, @Param("size")Integer size);
+    List<Product> findProductList();
 
     int removeProductProperty(Integer valueId);
 
-    IPage<Product> findProductsBySecond(Page<Product> page, @Param("secondId") Integer secondId);
+    IPage<Product> findProductsBySecond(Page<Product> page, @Param("secondId") Integer secondId, @Param("offset") Integer offset, @Param("size")Integer size);
 }

@@ -1,0 +1,104 @@
+@charset "utf-8";
+body{
+    background-color: #F2F2F2;
+}
+*{
+    margin: 0;
+    padding: 0;
+}
+.img_back{
+    opacity: 0.39;
+    margin-top:50px;
+    margin-left:50px;
+}
+.img_back:hover{
+    opacity: 1;
+}
+/*--------------------------------------------------------------------------产品详情*/
+.div_prodimglist {
+    margin-left: 50px;
+    margin-top: 43px;
+    float: left;
+}
+
+.div_proddesc{
+    width:630px;
+    height: 211px;
+    background-color: #FFFFFF;
+    float: left;
+    margin-left: 9px;
+    margin-top: 43px;
+
+    position: relative;
+    overflow: hidden;
+}
+
+.div_proddesc span{
+    font-family: "STXinwei";
+    font-size:20px;
+    margin-left: 43px;
+    margin-top: 15px;
+    float: left;
+    opacity: 0.39;
+}
+.div_proddesc pre{
+    font-family: "STXinwei";
+    font-size:20px;
+    margin-top:35px;
+    opacity: 1;
+
+    position: absolute;
+    overflow: auto;
+    width: 545px;
+    height: 141px;
+    padding-left: 43px;
+    padding-right: 60px;
+}
+
+.div_prodprop{
+    width:980px;
+    background-color: #FFFFFF;
+
+    float: left;
+    margin-left: 50px;
+    margin-top:14px;
+}
+.div_prodprop div{
+    float: left;
+}
+.div_prodprop>div{
+    width: 326.6px;
+    text-align: left;
+    margin-top: 23px;
+}
+.div_prodprop>div div:first-child{
+    margin-left: 17px;
+    width: 64px;
+    height: 18px;
+    opacity: 0.39;
+    font-family: 'Arial Normal', 'Arial', sans-serif;
+    font-size: 16px;
+    color: #333333;
+    text-align: left;
+}
+.div_prodprop>div div:last-child{
+    margin-left: 39px;
+    width: 206px;
+    height: 18px;
+    opacity: 1;
+    font-family: 'Arial Normal', 'Arial', sans-serif;
+    font-size: 16px;
+    color: #333333;
+    text-align: left;
+}
+
+.div_prodprop>div:nth-child(3n+1){
+    clear: both;
+}
+.div_prodprop>div:nth-child(-n+3){
+    margin-top:24px;
+}
+.div_prodprop>div:last-child{
+    margin-bottom:24px;
+}
+/*--------------------------------------------------------------------------产品详情*/

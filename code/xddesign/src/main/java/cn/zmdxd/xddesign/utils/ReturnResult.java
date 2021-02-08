@@ -29,4 +29,16 @@ public class ReturnResult implements Serializable {
         return "ReturnResult [status=" + status + ", msg=" + msg + "]";
     }
 
+    public static ReturnResult returnResult(boolean state) {
+        ReturnResult result = new ReturnResult();
+        if (state) {
+            result.setStatus(1);
+            result.setMsg("操作成功");
+        }else {
+            result.setMsg("操作失败");
+            result.setStatus(0);
+        }
+        return result;
+    }
+
 }

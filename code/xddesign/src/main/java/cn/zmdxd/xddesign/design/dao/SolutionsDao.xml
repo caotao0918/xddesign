@@ -17,34 +17,52 @@
         <result column="solu_reserve3" property="soluReserve3" />
         <association property="design" javaType="User">
             <id column="uid" property="id" />
-            <result column="name" property="username" />
+            <result column="uname" property="username" />
+            <result column="umobile" property="mobile" />
         </association>
-        <collection property="roomList" ofType="Room">
-            <id column="room_id" property="roomId" />
-            <result column="room_name" property="roomName" />
-            <result column="room_desc" property="roomDesc" />
-            <result column="room_reserve1" property="roomReserve1" />
-            <result column="room_reserve2" property="roomReserve2" />
-            <result column="room_reserve3" property="roomReserve3" />
-        </collection>
+        <collection property="roomList" ofType="Room" resultMap="cn.zmdxd.xddesign.design.dao.RoomDao.RoomAndProductNum" />
 
     </resultMap>
 
-    <insert id="insertSolutions">
-        insert into t_solutions(solu_name, designer_id, state, solu_desc, house_id,solu_reserve1,solu_reserve2,solu_reserve3) VALUES (#{solutions.soluName},#{designId},#{solutions.state},#{solutions.soluDesc},#{houseId},#{solutions.soluReserve1},#{solutions.soluReserve2},#{solutions.soluReserve3})
+    <insert id="insertSolutions" parameterType="Solutions" useGeneratedKeys="true" keyProperty="soluId" keyColumn="solu_id">
+        insert into t_solutions(solu_name, designer_id, state, solu_desc, house_id,solu_reserve1,solu_reserve2,solu_reserve3) VALUES (#{soluName},#{design.id},#{state},#{soluDesc},#{houseId},#{soluReserve1},#{soluReserve2},#{soluReserve3})
     </insert>
 
     <select id="selectSolutionsList" resultMap="SolutionsAndRoom">
-        select solutions.*,
-               room.room_id,room.room_name,room.room_desc,room.room_reserve1,room.room_reserve2,room.room_reserve3
-        from t_solutions solutions
-        left join t_room room on solutions.solu_id=room.solu_id
-        where designer_id=#{designId}
+        select solutions.*,design.id as uid,design.username as uname
+        from t_solutions solutions,t_user design
+        <where>
+            solutions.designer_id=design.id
+            <if test="designId != null">
+                and designer_id=#{designId}
+            </if>
+        </where>
     </select>
 
     <select id="selectSolutions" resultMap="SolutionsAndRoom">
-        select room.room_id,room.room_name,room.room_desc,room.room_reserve1,room.room_reserve2,room.room_reserve3
-        from t_room room
+        select solutions.solu_id,solutions.solu_name,solutions.designer_id,solutions.state,solutions.add_time,solutions.solu_desc,solutions.share_sign,
+               room.room_id,room.room_name,room.room_desc,
+               user.id as uid,user.username as uname,
+               pn.product_id,pn.pn_num,pn.pn_id,
+               product.product_id,product.product_name,
+               picture.picture_id,picture.picture_link,picture.picture_name
+        from t_solutions solutions
+            left join t_user user on solutions.designer_id = user.id
+            left join t_room room on room.solu_id=solutions.solu_id
+            left join t_product_num pn on room.room_id = pn.room_id
+            left join t_product product on pn.product_id = product.product_id
+            left join t_picture picture on product.product_id = picture.product_id
+        where solutions.solu_id=#{soluId}
+    </select>
+
+    <select id="selectSolutionsByHouseId" resultMap="SolutionsAndRoom">
+        select solu.solu_id,solu.solu_desc,solu.add_time,solu.solu_name,solu.state,solu.solu_reserve1,solu.solu_reserve2,solu.solu_reserve3,
+               design.username as uname,design.mobile as umobile
+        from t_solutions solu,t_house house,t_user design
+        where house.house_id=#{houseId}
+          and house.house_id=solu.house_id
+          and solu.designer_id=design.id
+          and (solu.state='施工完毕' or solu.state='设计完毕' or solu.state='施工中')
     </select>
 
 </mapper>

@@ -11,21 +11,8 @@
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
     </bean>
-    <!--事务通知-->
-    <tx:advice id="txAdvice" transaction-manager="transactionManager">
-        <tx:attributes>
-            <tx:method name="find*" isolation="DEFAULT" propagation="REQUIRED"/>
-            <tx:method name="add*" isolation="DEFAULT" propagation="REQUIRED"/>
-            <tx:method name="modify*" isolation="DEFAULT" propagation="REQUIRED"/>
-            <tx:method name="del*" isolation="DEFAULT" propagation="REQUIRED" rollback-for="Exception"/>
-            <tx:method name="createOrder" isolation="DEFAULT" propagation="REQUIRED" rollback-for="Exception"/>
-        </tx:attributes>
-    </tx:advice>
 
-    <!--AOP切面配置-->
-    <aop:config>
-        <aop:pointcut id="myPC" expression="execution(* *..service.*.*(..))"/>
-        <aop:advisor advice-ref="txAdvice" pointcut-ref="myPC"/>
-    </aop:config>
+    <!-- 配置事务注解驱动 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
 
 </beans>

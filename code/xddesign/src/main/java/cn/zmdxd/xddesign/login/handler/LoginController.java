@@ -4,10 +4,7 @@ import cn.zmdxd.xddesign.admin.service.UserService;
 import cn.zmdxd.xddesign.design.service.CustomerService;
 import cn.zmdxd.xddesign.entity.Customer;
 import cn.zmdxd.xddesign.entity.User;
-import cn.zmdxd.xddesign.utils.CaptchaUtil;
-import cn.zmdxd.xddesign.utils.CookieUtil;
-import cn.zmdxd.xddesign.utils.MD5Utils;
-import cn.zmdxd.xddesign.utils.EntityResult;
+import cn.zmdxd.xddesign.utils.*;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +55,7 @@ public class LoginController {
     //系统用户登录
     @RequestMapping(value = "/user/login",method = RequestMethod.POST,produces = {"application/json;charset=UTF-8;"})
     @ResponseBody
-    public String login(String mobile, String password, String imgcode, HttpSession session, Model model, HttpServletRequest request,HttpServletResponse response) {
+    public EntityResult<User> login(String mobile, String password, String imgcode, HttpSession session, Model model, HttpServletRequest request,HttpServletResponse response) {
 
         EntityResult<User> userResult = new EntityResult<>();
 
@@ -66,21 +63,25 @@ public class LoginController {
         String msg;//登录错误信息
         int status = 0;   //登陆状态 0代表失败/1代表成功
         //要跳转到的页面
-        String htmlPage = "登陆页面";
-
-//        System.out.println(MD5Utils.verify(password,user.getPwd()));
+//        String htmlPage = "登陆页面";
 
         if (!imgcode.equals(session.getAttribute("imgcode")) || session.getAttribute("imgcode")==null) {
             msg = "验证码错误或已过期";
-            return msg;
+            userResult.setMsg(msg);
+            userResult.setStatus(status);
+            return userResult;
         }
         if (user == null) {
             msg = "用户不存在";
-            return msg;
+            userResult.setMsg(msg);
+            userResult.setStatus(status);
+            return userResult;
         } else {
             if (!MD5Utils.verify(password, user.getPwd())) {
                 msg = "密码错误";
-                return msg;
+                userResult.setMsg(msg);
+                userResult.setStatus(status);
+                return userResult;
             }
             msg = "登陆成功";
             status = 1;
@@ -94,104 +95,129 @@ public class LoginController {
             userService.update(new UpdateWrapper<User>().eq("id",user.getId()).set("last_time", lastTime));
 
             //根据用户角色跳转到不同页面
-            switch (user.getRole().getName()) {
-                case "管理员":
-                    htmlPage = "管理员页面";
-                    break;
-                case "设计人员":
-                    htmlPage = "设计人员页面";
-                    break;
-                case "施工人员":
-                    htmlPage = "施工人员页面";
-                    break;
-                case "仓管":
-                    htmlPage = "仓管页面";
-                    break;
-                default:
-                    htmlPage = "登陆页面";
-
-            }
+//            switch (user.getRole().getName()) {
+//                case "管理员":
+//                    htmlPage = "管理员页面";
+//                    break;
+//                case "设计人员":
+//                    htmlPage = "设计人员页面";
+//                    break;
+//                case "施工人员":
+//                    htmlPage = "施工人员页面";
+//                    break;
+//                case "仓管":
+//                    htmlPage = "仓管页面";
+//                    break;
+//                default:
+//                    htmlPage = "登陆页面";
+//
+//            }
         }
-//        userResult.setData(user);
-//        userResult.setMsg(msg);
-//        userResult.setStatus(status);
+        userResult.setData(user);
+        userResult.setMsg(msg);
+        userResult.setStatus(status);
 //        model.addAttribute("userResult",userResult);
-        return htmlPage;
+        return userResult;
     }
 
     //系统用户改密
     @RequestMapping(value = "/user/modifypassword", method = RequestMethod.POST,produces = {"application/json;charset=UTF-8;"})
     @ResponseBody
-    public String modifyUserPassword(String password,HttpServletRequest request) {
+    public ReturnResult modifyUserPassword(String password, HttpServletRequest request) {
         password = MD5Utils.generate(password);
         boolean update = userService.update(new UpdateWrapper<User>().eq("id", Integer.valueOf(CookieUtil.getCookieValue(request, "userId"))).set("pwd", password));
-        if (!update) return "操作失败，请稍后重试";
-        return "修改成功";
+        ReturnResult result = new ReturnResult();
+        if (!update) {
+            result.setStatus(0);
+            result.setMsg("修改失败，请稍后重试");
+            return result;
+        }
+        result.setStatus(1);
+        result.setMsg("修改成功");
+        return result;
     }
 
     //用户退出系统
     @RequestMapping(value = "/user/logout", method = RequestMethod.POST,produces = {"application/json;charset=UTF-8;"})
     @ResponseBody
-    public String userLogout(HttpServletRequest request,HttpServletResponse response) {
-        if (CookieUtil.removeCookie(request,response,"userId") && CookieUtil.removeCookie(request,response,"roleName")) return "退出成功";
-        else return "退出失败,请稍后重试";
+    public ReturnResult userLogout(HttpServletRequest request,HttpServletResponse response) {
+        ReturnResult result = new ReturnResult();
+        if (CookieUtil.removeCookie(request,response,"userId") && CookieUtil.removeCookie(request,response,"roleName")) {
+            result.setStatus(1);
+            result.setMsg("退出成功");
+            return result;
+        }
+        result.setStatus(0);
+        result.setMsg("退出失败,请稍后重试");
+        return result;
     }
 
     //客户登录
     @RequestMapping(value = "/customer/login", method = RequestMethod.POST,produces = {"application/json;charset=UTF-8;"})
     @ResponseBody
-    public String customerLogin(String mobile, String password, String imgcode, HttpSession session, Model model, HttpServletRequest request,HttpServletResponse response) {
+    public EntityResult<Customer> customerLogin(String mobile, String password, String imgcode, HttpSession session, Model model, HttpServletRequest request,HttpServletResponse response) {
 
         EntityResult<Customer> customerResult = new EntityResult<>();
 
         Customer customer = customerService.getOne(new QueryWrapper<Customer>().eq("mobile",mobile),false);
-        System.out.println(customer);
-        String msg;//登录错误信息
-        int status = 0;   //登陆状态 0代表失败/1代表成功
 
         if (!imgcode.equals(session.getAttribute("imgcode")) || session.getAttribute("imgcode")==null) {
-            msg = "验证码错误或已过期";
-            return msg;
+            customerResult.setStatus(0);
+            customerResult.setMsg("验证码错误或已过期");
+            return customerResult;
         }
         if (customer == null) {
-            msg = "您输入的账号不存在,请确认无误后再次输入";
-            return msg;
+            customerResult.setStatus(0);
+            customerResult.setMsg("您输入的账号不存在,请确认无误后再次输入");
+            return customerResult;
         } else {
             if (!MD5Utils.verify(password, customer.getPwd())) {
-                msg = "密码错误";
-                return msg;
+                customerResult.setStatus(0);
+                customerResult.setMsg("密码错误");
+                return customerResult;
             }
-            msg = "登陆成功";
-            status = 1;
 
             //保存用户id、角色保存到cookie中
             CookieUtil.setCookie(request,response,"customerId",customer.getId().toString(),60*60*24*30);
 
         }
-//        customerResult.setData(customer);
-//        customerResult.setMsg(msg);
-//        customerResult.setStatus(status);
-//        model.addAttribute("customerResult",customerResult);
-        return "客户主页面";
+        customerResult.setData(customer);
+        customerResult.setMsg("登陆成功");
+        customerResult.setStatus(1);
+        return customerResult;
 
     }
 
     //客户改密
     @RequestMapping(value = "/customer/modifypassword", method = RequestMethod.POST,produces = {"application/json;charset=UTF-8;"})
     @ResponseBody
-    public String modifyCustomerPassword(String password,HttpServletRequest request) {
+    public ReturnResult modifyCustomerPassword(String password,HttpServletRequest request) {
         password = MD5Utils.generate(password);
         boolean update = customerService.update(new UpdateWrapper<Customer>().eq("id", Integer.valueOf(CookieUtil.getCookieValue(request, "customerId"))).set("pwd", password));
-        if (!update) return "操作失败，请稍后重试";
-        return "修改成功";
+        ReturnResult result = new ReturnResult();
+        if (!update) {
+            result.setMsg("操作失败，请稍后重试");
+            result.setStatus(0);
+            return result;
+        }
+        result.setMsg("修改成功");
+        result.setStatus(1);
+        return result;
     }
 
     //客户退出系统
     @RequestMapping(value = "/customer/logout", method = RequestMethod.POST,produces = {"application/json;charset=UTF-8;"})
     @ResponseBody
-    public String customerLogout(HttpServletRequest request,HttpServletResponse response) {
-        if (CookieUtil.removeCookie(request,response,"customerId")) return "退出成功";
-        else return "退出失败,请稍后重试";
+    public ReturnResult customerLogout(HttpServletRequest request,HttpServletResponse response) {
+        ReturnResult result = new ReturnResult();
+        if (CookieUtil.removeCookie(request,response,"customerId")) {
+            result.setMsg("修改成功");
+            result.setStatus(1);
+            return result;
+        }
+        result.setMsg("退出失败,请稍后重试");
+        result.setStatus(0);
+        return result;
     }
 
 }
