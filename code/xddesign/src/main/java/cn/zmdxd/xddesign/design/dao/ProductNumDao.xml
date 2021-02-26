@@ -4,8 +4,46 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.zmdxd.xddesign.design.dao.ProductNumDao">
 
+    <resultMap id="ProductNumAndProduct" type="ProductNum">
+        <id column="pn_id" property="pnId" />
+        <result column="pn_num" property="pnNum" />
+        <association property="product" javaType="Product">
+            <id column="product_id" property="productId" />
+            <result column="product_name" property="productName" />
+            <collection property="pictureList" ofType="Picture">
+                <id column="picture_id" property="pictureId" />
+                <result column="picture_name" property="pictureName" />
+                <result column="picture_link" property="pictureLink" />
+            </collection>
+        </association>
+    </resultMap>
+
     <insert id="insertProductNum" parameterType="ProductNum">
         insert into t_product_num(room_id, product_id, pn_num) VALUES (#{roomId},#{product.productId},#{pnNum})
     </insert>
+
+    <select id="selectProductNum" resultMap="ProductNumAndProduct">
+        SELECT pn.pn_id,pn.pn_num,product.product_name
+        FROM t_product_num pn
+             left join t_product product on pn.product_id = product.product_id
+             left join t_room room on pn.room_id = room.room_id
+             left join t_solutions solutions on room.solu_id = solutions.solu_id
+             left join t_house house on solutions.house_id = house.house_id
+             left join t_customer cus on house.customer_id = cus.id
+        <where>
+            <if test="pn.roomId != null and pn.roomId != 0">
+                pn.room_id = #{pn.roomId}
+            </if>
+            <if test="pn.soluId != null and pn.soluId != 0">
+                and solutions.solu_id = #{pn.soluId}
+            </if>
+            <if test="pn.houseId != null and pn.houseId != 0">
+                and house.house_id = #{pn.houseId}
+            </if>
+            <if test="pn.customerId != null and pn.customerId != 0">
+                and cus.id = #{pn.customerId}
+            </if>
+        </where>
+    </select>
 
 </mapper>

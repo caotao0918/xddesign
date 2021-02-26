@@ -1,6 +1,6 @@
 package cn.zmdxd.xddesign.entity;
 
-import cn.zmdxd.xddesign.utils.BaseEnum;
+import cn.zmdxd.xddesign.util.BaseEnum;
 import lombok.Getter;
 
 @Getter

@@ -4,8 +4,38 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.zmdxd.xddesign.admin.dao.PropertyDao">
 
-    <insert id="insertProperty">
-        insert into t_property(property_name, property_desc, second_id, common_value) VALUES (#{property.propertyName},#{property.propertyDesc},#{secondId},#{property.commonValue})
+    <resultMap id="PropertyAndSecondLevel" type="Property">
+        <id property="propertyId" column="property_id" />
+        <result property="propertyName" column="property_name" />
+        <result property="propertyDesc" column="property_desc" />
+        <result property="commonValue" column="common_value"/>
+        <association property="secondLevel" javaType="SecondLevel">
+            <id property="secondId" column="second_id" />
+            <result property="secondName" column="second_name" />
+            <result property="secondDesc" column="second_desc" />
+        </association>
+    </resultMap>
+
+    <insert id="insertProperty" parameterType="Property">
+        insert into t_property(property_name, property_desc, second_id, common_value) VALUES (#{propertyName},#{propertyDesc},#{secondLevel.secondId},#{commonValue})
     </insert>
+
+    <select id="selectProperty" parameterType="Property" resultMap="PropertyAndSecondLevel">
+        select property.property_id, property.property_name, property.property_desc, property.common_value,
+               second.second_id, second.second_name
+        from t_property property
+        left join t_secondlevel second on property.second_id = second.second_id
+        left join t_firstlevel first on second.first_id = first.first_id
+        <where>
+            <if test="property.firstId != 0">
+                first.first_id = #{property.firstId}
+            </if>
+            <if test="property.secondLevel != null">
+                <if test="property.secondLevel.secondId != null and property.secondLevel.secondId != 0">
+                    and second.second_id = #{property.secondLevel.secondId}
+                </if>
+            </if>
+        </where>
+    </select>
 
 </mapper>

@@ -1,0 +1,250 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>方案管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="/html/admin/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/html/admin/layuiadmin/style/admin.css" media="all">
+    <script src="/js/utils/getUrlParam.js"></script>
+    <script>
+        let houseId = UrlParam.param("houseId");
+        document.getElementsByName("houseId").value = houseId;
+    </script>
+</head>
+<body>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">方案名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="soluName" placeholder="请输入" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">客户</label>
+                    <div class="layui-input-block">
+                        <select name="customerId" lay-filter="inithouse" lay-search>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">房子</label>
+                    <div class="layui-input-block">
+                        <select name="houseId" lay-search>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">设计人员</label>
+                    <div class="layui-input-block">
+                        <select name="design.id">
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-solutions-front-search">
+                        <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-card-body">
+            <div style="padding-bottom: 10px;">
+                <button class="layui-btn layuiadmin-btn-useradmin" data-type="batchdel">删除</button>
+<!--                <button class="layui-btn layuiadmin-btn-useradmin" data-type="add">添加</button>-->
+            </div>
+
+            <table id="LAY-solutions-manage" lay-filter="LAY-solutions-manage"></table>
+            <!--        <script type="text/html" id="imgTpl"> -->
+            <!--          <img style="display: inline-block; width: 50%; height: 100%;" src= {{ d.avatar }}>-->
+            <!--        </script> -->
+            <script type="text/html" id="table-solutions-admin">
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+            </script>
+        </div>
+    </div>
+</div>
+
+<script src="/html/admin/layuiadmin/layui/layui.js"></script>
+<script>
+    layui.config({
+        base: '/html/admin/layuiadmin/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'customeradmin', 'table'], function(){
+        var $ = layui.$
+            ,form = layui.form
+            ,admin = layui.admin
+            ,table = layui.table;
+
+        //查询客户列表和设计人员列表
+        $(function () {
+
+            $.ajax({
+                url:"/design/customers/nopage"
+                ,type:"GET"
+                ,dataType:"json"
+                ,async: false
+                ,success:function(res) {
+                    let select = $("select[name='customerId']");
+                    select.empty();
+                    let con = '<option value="0">全部</option>';
+                    for (let i = 0; i < res.length; i++) {
+                        con += '<option value='+'"'+res[i].id+'"'+'>'+res[i].username+'</option>';
+                    }
+                    select.html(con);
+                    //这一步必不可少
+                    form.render("select");
+                }
+            });
+            $.ajax({
+                url:"/admin/design"
+                ,type:"GET"
+                ,dataType:"json"
+                ,async: false
+                ,success:function(res) {
+                    let select = $("select[name='design.id']");
+                    select.empty();
+                    let con = '<option value="0">全部</option>';
+                    for (let i = 0; i < res.length; i++) {
+                        con += '<option value='+'"'+res[i].id+'"'+'>'+res[i].username+'</option>';
+                    }
+                    select.html(con);
+                    //这一步必不可少
+                    form.render("select");
+                }
+            });
+        })
+
+        //监听搜索
+        form.on('submit(LAY-solutions-front-search)', function(data){
+            let field = data.field;
+
+            //执行重载
+            table.reload('LAY-solutions-manage', {
+                where: field
+            });
+        });
+        form.on('select(inithouse)', function (data) {
+            $.ajax({
+                url:"/design/customer/house/nopage"
+                ,type:"GET"
+                ,data:{"customerId":data.value}
+                ,dataType:"json"
+                ,async: false
+                ,success:function(res) {
+                    let select = $("select[name='houseId']");
+                    select.empty();
+                    let con = '<option value="0">全部</option>';
+                    for (let i = 0; i < res.length; i++) {
+                        con += '<option value='+'"'+res[i].houseId+'"'+'>'+res[i].houseName+'</option>';
+                    }
+                    select.html(con);
+                    //这一步必不可少
+                    form.render("select");
+                }
+            });
+        });
+
+        //事件
+        var active = {
+            batchdel: function(){
+                var checkStatus = table.checkStatus('LAY-solutions-manage')
+                    ,checkData = checkStatus.data; //得到选中的数据
+
+                if(checkData.length === 0){
+                    return layer.msg('请选择数据');
+                }
+                // layer.prompt({
+                //   formType: 1
+                //   ,title: '敏感操作，请验证口令'
+                // }, function(value, index){
+                //   console.log("口令"+value);
+                //   if (value != 123) {
+                //     layer.msg("口令非法");
+                //     return false;
+                //   }
+                //   layer.close(index);
+                layer.confirm('确定删除吗？', function(index) {
+
+                    //执行 Ajax 后重载
+                    $.ajax({
+                        url: '/design/customer/solutions/batchdelete'
+                        ,type: 'POST'
+                        ,data: JSON.stringify(checkData)
+                        ,dataType: 'json'
+                        ,contentType: 'application/json;charset=utf-8'
+                        ,success: function (res) {
+                            if (res.status == 0) {
+                                layer.msg(res.msg, {icon:5});
+                                return false;
+                            }
+                            table.reload('LAY-solutions-manage');
+                            layer.msg('已删除');
+                        }
+                    });
+                    // table.reload('LAY-solutions-manage');
+                    // layer.msg('已删除');
+                });
+                // });
+            }
+            ,add: function(){
+                layer.open({
+                    type: 2
+                    ,title: '添加房子'
+                    ,content: 'solutionsform.html'
+                    ,maxmin: true
+                    ,area: ['500px', '500px']
+                    ,btn: ['确定', '取消']
+                    ,yes: function(index, layero){
+                        var iframeWindow = window['layui-layer-iframe'+ index]
+                            ,submitID = 'LAY-solutions-front-submit'
+                            ,submit = layero.find('iframe').contents().find('#'+ submitID);
+
+                        //监听提交
+                        iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
+                            let field = data.field; //获取提交的字段
+                            //提交 Ajax 成功后，静态更新表格中的数据
+                            $.ajax({
+                                url: '/admin/customer/solutions/update'
+                                ,type: 'POST'
+                                ,data: field
+                                ,dataType: 'json'
+                                ,success: function (res) {
+                                    if (res.status==0) {
+                                        layer.msg(res.msg, {icon:5});
+                                        return false;
+                                    }
+                                    table.reload('LAY-solutions-manage'); //数据刷新
+                                    layer.close(index); //关闭弹层
+                                }
+                            });
+
+                        });
+
+                        submit.trigger('click');
+                    },success:function (index, layero) {
+
+                    }
+                });
+            }
+        };
+
+        $('.layui-btn.layuiadmin-btn-useradmin').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>
+</body>
+</html>

@@ -2,10 +2,10 @@ package cn.zmdxd.xddesign.design.handler;
 
 import cn.zmdxd.xddesign.design.service.*;
 import cn.zmdxd.xddesign.entity.*;
-import cn.zmdxd.xddesign.utils.CookieUtil;
-import cn.zmdxd.xddesign.utils.EnumUtil;
-import cn.zmdxd.xddesign.utils.FileUtil;
-import cn.zmdxd.xddesign.utils.ReturnResult;
+import cn.zmdxd.xddesign.util.CookieUtil;
+import cn.zmdxd.xddesign.util.EnumUtil;
+import cn.zmdxd.xddesign.util.FileUtil;
+import cn.zmdxd.xddesign.util.ReturnResult;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -72,6 +72,12 @@ public class DesignController {
 
     }
 
+    //客户类别列表
+    @RequestMapping(value = "customer/category")
+    public List<Map<String,Object>> findCustomerCategory() {
+        return EnumUtil.enumToListMap(CustomerEnum.class);
+    }
+
    /**
     * @description: 分页查询客户列表
     * @param current:当前页
@@ -79,20 +85,29 @@ public class DesignController {
     * @return IPage:分页对象
     */
     @RequestMapping("customers")
-    public IPage<Customer> findCustomers(@RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "1") Integer size, HttpServletRequest request) {
+    public IPage<Customer> findCustomers(Customer customer, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size, HttpServletRequest request) {
         Page<Customer> page = new Page<>(current,size);
-        Integer designId = null;
+        int designId;
+        User design = new User();
         if ("设计人员".equals(CookieUtil.getCookieValue(request,"roleName","utf-8"))) {
-            designId = Integer.valueOf(CookieUtil.getCookieValue(request, "userId"));
+            designId = Integer.parseInt(CookieUtil.getCookieValue(request, "userId"));
+            design.setId(designId);
+            customer.setDesign(design);
         }
-        return customerService.findCustomers(page, designId);
+        return customerService.findCustomers(page, customer);
     }
 
     //不分页查询全部客户
     @RequestMapping(value = "customers/nopage")
     public List<Customer> findCustomerList(HttpServletRequest request) {
-        Integer designId = Integer.valueOf(CookieUtil.getCookieValue(request, "userId"));
-        return customerService.list(new QueryWrapper<Customer>().eq("design_id", designId).select("id","username"));
+        if ("设计人员".equals(CookieUtil.getCookieValue(request, "roleName", "utf-8"))) {
+            Integer designId = Integer.valueOf(CookieUtil.getCookieValue(request, "userId"));
+            return customerService.list(new QueryWrapper<Customer>().eq("design_id", designId).select("id", "username"));
+        }else if ("管理员".equals(CookieUtil.getCookieValue(request, "roleName", "utf-8")))
+            return customerService.list(new QueryWrapper<Customer>().select("id", "username"));
+         else   //这里先暂时这样处理，方便测试
+            return customerService.list(new QueryWrapper<Customer>().select("id", "username"));
+//            return new ArrayList<>();
     }
 
     //根据id查询客户信息
@@ -101,23 +116,39 @@ public class DesignController {
         return customerService.findCustomer(id);
     }
 
+    //删除客户
+    @RequestMapping(value = "customer/del", method = RequestMethod.POST)
+    public ReturnResult delCustomer(Integer id) {
+//        ReturnResult result;
+//        Customer customer = customerService.findCustomer(id);
+//        List<House> houseList = customer.getHouseList();
+//        if (houseList.get(0).getHouseId() != null) {
+//            for (House house : houseList) {
+//                result = deleteHouse(house.getHouseId());
+//                if (result.getStatus() == 0) return result;
+//            }
+//        }
+//        boolean removeById = customerService.removeById(id);
+
+        //假删除
+        boolean update = customerService.update(new UpdateWrapper<Customer>().eq("id", id).set("del_sign", true));
+        return ReturnResult.returnResult(update);
+    }
+
+
     //批量删除客户
-    @RequestMapping(value = "customer/delete",method = RequestMethod.POST)
-    public ReturnResult deleteCustomer(@RequestBody List<Integer> idList) {
-//        boolean removeByIds = customerService.removeByIds(idList);
-//        return ReturnResult.returnResult(removeByIds);
-        Customer customer;
-        boolean removeById;
-        ReturnResult result;
-        for (Integer id:idList) {
-            customer = customerService.findCustomer(id);
-            List<House> houseList = customer.getHouseList();
-            for (House house:houseList) {
-                result = deleteHouse(house.getHouseId());
-                if (result.getStatus() == 0) return result;
-            }
-            removeById = customerService.removeById(id);
-            if (!removeById) return ReturnResult.returnResult(false);
+    @RequestMapping(value = "customer/batchdel",method = RequestMethod.POST)
+    public ReturnResult deleteCustomer(@RequestBody List<Customer> customerList) {
+//        boolean removeById;
+//        for (Customer customer:customerList) {
+//            removeById = customerService.removeById(customer.getId());
+//            if (!removeById) return ReturnResult.returnResult(false);
+//        }
+//        return ReturnResult.returnResult(true);
+
+        for (Customer customer:customerList) {
+            boolean update = customerService.update(new UpdateWrapper<Customer>().eq("id", customer.getId()).set("del_sign", true));
+            if (!update) return ReturnResult.returnResult(false);
         }
         return ReturnResult.returnResult(true);
     }
@@ -164,7 +195,7 @@ public class DesignController {
 
         if (house.getHouseId() == null) {
             //新增房子信息
-            house.setCustomerId(customerId);
+//            house.setCustomerId(customerId);
             return houseService.saveHouse(house);
 
         }else {
@@ -175,15 +206,53 @@ public class DesignController {
         }
     }
 
+    //查询客户房子列表
+    @RequestMapping(value = "customer/house")
+    public IPage<House> findHouse(House house, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size, HttpServletRequest request) {
+        Page<House> page = new Page<>(current, size);
+        Customer customer = house.getCustomer();
+        if (customer != null) {
+            if (customer.getUsername().trim().equals("")) house.setCustomer(null);
+            else customer.setUsername(customer.getUsername().trim());
+        }
+//        if ("设计人员".equals(CookieUtil.getCookieValue(request, "roleName", "utf-8"))) {
+//
+//        }
+        return houseService.findHouse(page, house);
+    }
+
+    //根据客户id查询客户房子列表
+    @RequestMapping(value = "customer/house/nopage")
+    public List<House> findHouse(Integer customerId) {
+        return houseService.list(new QueryWrapper<House>().eq("customer_id", customerId).select("house_id", "house_name"));
+    }
+    //根据房子id查询客户方案列表
+    @RequestMapping(value = "customer/solutions/nopage")
+    public List<Solutions> findSolutions(Integer houseId) {
+        return solutionsService.list(new QueryWrapper<Solutions>().eq("house_id", houseId).select("solu_id", "solu_name"));
+    }
+    //根据方案id查询房间列表
+    @RequestMapping(value = "customer/room/nopage")
+    public List<Room> findRoom(Integer soluId) {
+        return roomService.list(new QueryWrapper<Room>().eq("solu_id", soluId).select("room_id", "room_name"));
+    }
+
+    //批量删除房子信息
+    @RequestMapping(value = "customer/house/batchdel", method=RequestMethod.POST)
+    public ReturnResult deleteHouse(@RequestBody List<House> houseList) {
+        for (House house:houseList) {
+            ReturnResult result = deleteHouse(house.getHouseId());
+            if (result.getStatus() == 0) return ReturnResult.returnResult(false, result.getMsg());
+        }
+        return ReturnResult.returnResult(true);
+    }
+
     //删除客户房子信息
-    @RequestMapping(value = "customer/house/delete",method = RequestMethod.POST)
+    @RequestMapping(value = "customer/house/del",method = RequestMethod.POST)
     public ReturnResult deleteHouse(Integer houseId) {
         //检查该房子是否关联了模板方案
         if (templateService.findTemplateByHouseId(houseId) != null) {
-            ReturnResult result = new ReturnResult();
-            result.setStatus(0);
-            result.setMsg("关联了模板方案，不能删除");
-            return result;
+            return ReturnResult.returnResult(false, "关联了模板方案，不能删除");
         }
         boolean removeById = houseService.removeById(houseId);
         return ReturnResult.returnResult(removeById);
@@ -350,16 +419,27 @@ public class DesignController {
         return ReturnResult.returnResult(solutionsService.removeById(soluId));
     }
 
+    //批量删除客户方案信息
+    @RequestMapping(value = "customer/solutions/batchdelete", method = RequestMethod.POST)
+    public ReturnResult deleteSolutions(@RequestBody List<Solutions> solutionsList) {
+        for (Solutions solutions:solutionsList) {
+            ReturnResult result = deleteSolutions(solutions.getSoluId());
+            if (result.getStatus() == 0) return ReturnResult.returnResult(false, "其中一些方案关联了模板方案，不能删除");
+        }
+        return ReturnResult.returnResult(true);
+    }
+
     //分页查询方案列表
     @RequestMapping(value = "customer/solutions")
-    public IPage<Solutions> findSolutions(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
-        //管理员的designId为null
-        Integer designId = null;
+    public IPage<Solutions> findSolutions(Solutions solutions, HttpServletRequest request, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
         if ("设计人员".equals(CookieUtil.getCookieValue(request,"roleName","utf-8"))) {
-            designId = Integer.valueOf(CookieUtil.getCookieValue(request, "userId"));
+            User design = new User();
+            Integer designId = Integer.valueOf(CookieUtil.getCookieValue(request, "userId"));
+            design.setId(designId);
+            solutions.setDesign(design);
         }
         Page<Solutions> page = new Page<>(current,size);
-        return solutionsService.findSolutionsList(page,designId);
+        return solutionsService.findSolutionsList(page,solutions);
     }
 
     //根据id查询单条报价数据

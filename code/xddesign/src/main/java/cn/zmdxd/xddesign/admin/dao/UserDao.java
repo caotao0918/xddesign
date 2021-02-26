@@ -21,8 +21,10 @@ public interface UserDao extends BaseMapper<User> {
 
     Integer updateUser(Map<String, Object> map);
 
-    IPage<User> findUser(Page<?> page, @Param("id") Integer id);
+    IPage<User> findUser(Page<?> page, @Param("user") User user);
 
     User findByMobile(String mobile);
+
+    List<User> selectDesignList();
 
 }

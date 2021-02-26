@@ -26,6 +26,8 @@ public class Customer {
     private String address;         //客户联系地址
 //    private String city;
 
+    private Boolean delSign;        //是否删除(假删除)
+
     @TableField(exist = false)
     private List<House> houseList; //客户房子列表
 

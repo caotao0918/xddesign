@@ -32,5 +32,8 @@ public class House {
     private String houseReserve3;
 
     private Integer customerId;//客户id
+    //这里是我没考虑周到，开始只定义一个 customerId, 后来才发现只定义个客户id不够，但是我又不想改代码了，于是我又增加个客户实体类字段
+    @TableField(exist = false)
+    private Customer customer;
 
 }

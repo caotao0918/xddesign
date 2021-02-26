@@ -24,4 +24,9 @@ public class Property {
     @TableField(exist = false)
     private List<String> commonValueList;//封装常用值到list
 
+    @TableField(exist = false)
+    private SecondLevel secondLevel;
+    @TableField(exist = false)
+    private Integer firstId;
+
 }

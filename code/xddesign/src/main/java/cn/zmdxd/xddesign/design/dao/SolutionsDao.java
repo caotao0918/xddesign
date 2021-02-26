@@ -16,7 +16,7 @@ import java.util.List;
 public interface SolutionsDao extends BaseMapper<Solutions> {
     int insertSolutions(Solutions solutions);
 
-    IPage<Solutions> selectSolutionsList(Page<?> page, @Param("designId") Integer designId);
+    IPage<Solutions> selectSolutionsList(Page<?> page, @Param("solutions") Solutions solutions);
 
     Solutions selectSolutions(Integer soluId);
 

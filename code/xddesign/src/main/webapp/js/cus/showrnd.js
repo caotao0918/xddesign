@@ -12,10 +12,10 @@ $(function(){
     function querySoluImg(){
         $.ajax({
             //---------------------------------------------------------------url查询设计图
-            url:ctx + "/querySoluImg",
+            url:"/public/customer/renderings",
             data: {"soluId" : soluId},
             dataType:"json",
-            type:"get",
+            type:"GET",
             async:false,
             success:function(json) {
                 soluImgList = json;
@@ -27,7 +27,7 @@ $(function(){
         var add = "";
         for(var i = 0;i<soluImgList.length;i++){
             add += "<div>" +
-                "<img src ='" + soluImgList[i].rendPath +"'/>" +
+                "<img src ='" + soluImgList[i].rendPath +"'\>" +
                 "</div>";
         }
         $('#div_soluimglist').append(add);
@@ -49,7 +49,7 @@ $(function(){
 
 
     $('#img_back').click(function() {
-         location.href("---------------------------------------------客户方案列表页面");
+        history.go(-1);
     })
 })
 /**

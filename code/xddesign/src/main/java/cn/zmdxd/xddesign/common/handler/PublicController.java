@@ -1,29 +1,20 @@
 package cn.zmdxd.xddesign.common.handler;
 
-import cn.zmdxd.xddesign.admin.service.GuideService;
-import cn.zmdxd.xddesign.admin.service.ProductService;
-import cn.zmdxd.xddesign.admin.service.QuestionService;
-import cn.zmdxd.xddesign.admin.service.VideoService;
-import cn.zmdxd.xddesign.common.easyexcel.MyWriteHandler;
+import cn.zmdxd.xddesign.admin.service.*;
 import cn.zmdxd.xddesign.design.service.CustomerService;
 import cn.zmdxd.xddesign.design.service.QuoteService;
 import cn.zmdxd.xddesign.design.service.RenderingsService;
 import cn.zmdxd.xddesign.design.service.SolutionsService;
 import cn.zmdxd.xddesign.entity.*;
-import cn.zmdxd.xddesign.utils.CookieUtil;
+import cn.zmdxd.xddesign.util.CookieUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.metadata.property.OnceAbsoluteMergeProperty;
 import com.alibaba.excel.write.merge.OnceAbsoluteMergeStrategy;
-import com.alibaba.excel.write.metadata.style.WriteCellStyle;
-import com.alibaba.excel.write.metadata.style.WriteFont;
-import com.alibaba.excel.write.style.HorizontalCellStyleStrategy;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,8 +29,6 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.apache.poi.ss.usermodel.BorderStyle.MEDIUM;
 
 /**
  * @author 曹涛
@@ -66,6 +55,8 @@ public class PublicController {
     private RenderingsService renderingsService;
     @Autowired
     private ProductService productService;
+    @Autowired
+    private SecondLevelService secondLevelService;
 
     //分页查询产品视频列表
     @RequestMapping(value = "videos")
@@ -73,12 +64,22 @@ public class PublicController {
         Page<Video> page = new Page<>(current,size);
         return videoService.page(page);
     }
+    @RequestMapping(value = "video")
+    public List<Video> findVideo(String productName) {
+        if (productName != null) return videoService.list(new QueryWrapper<Video>().like("video_name",productName));
+        return videoService.list();
+    }
 
     //查看手册列表
     @RequestMapping(value = "guides")
     public IPage<Guide> findGuideList(@RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "100") Integer size) {
         Page<Guide> page = new Page<>(current, size);
         return guideService.page(page);
+    }
+    @RequestMapping(value = "guide")
+    public List<Guide> findGuideList(String productName) {
+        if (productName != null) return guideService.list(new QueryWrapper<Guide>().like("guide_name",productName));
+        return guideService.list();
     }
 
     /**
@@ -117,19 +118,34 @@ public class PublicController {
         out.close();
     }
 
-
-    //查看问题
-    @RequestMapping(value = "questions")
-    public IPage<Question> findQuestionList(@RequestParam(required = false) String keyword , @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "100") Integer size) {
-        Page<Question> page = new Page<>(current,size);
-        if (keyword != null) return questionService.page(page, new QueryWrapper<Question>().like("keyword", keyword));
-        return questionService.page(page);
+    //查询二级分类列表
+    @RequestMapping(value = "secondlevels/products")
+    public Map<String, List<Product>> findSecondLevelList() {
+        List<SecondLevel> secondLevelList = secondLevelService.list(new QueryWrapper<SecondLevel>().select("second_id", "second_name"));
+        List<Product> productList;
+        Map<String, List<Product>> map = new HashMap<>();
+        for (SecondLevel secondLevel:secondLevelList) {
+            productList = productService.list(new QueryWrapper<Product>().select("product_name").eq("second_id", secondLevel.getSecondId()));
+            for (Product product:productList) {
+                product.setSecondLevel(secondLevel);
+            }
+            map.put(secondLevel.getSecondName(), productList);
+        }
+        System.out.println(map);
+        return map;
     }
 
-    //客户根据房子id找到其下的方案列表(正在设计中的方案客户看不到)
+    @RequestMapping(value = "questions")
+    public List<Question> findQuestionList(@RequestParam(required = false) String productName) {
+        if (productName != null) return questionService.list(new QueryWrapper<Question>().like("question", productName).or().like("answer", productName));
+        return null;
+    }
+
+    //客户根据房子id找到其下的方案列表
     @RequestMapping(value = "customer/house/solutions")
-    public List<Solutions> findSolutionsByHouseId(Integer houseId) {
-        return solutionsService.findSolutionsByHouseId(houseId);
+    public IPage<Solutions> findSolutionsByHouseId(Integer houseId, @RequestParam(value = "pageNum",defaultValue = "1") Integer current, @RequestParam(value = "pageSize", defaultValue = "10") Integer size) {
+        Page<Solutions> page = new Page<>(current,size);
+        return solutionsService.page(page,new QueryWrapper<Solutions>().eq("house_id",houseId).select("solu_id","solu_name","state","add_time"));
     }
 
     //客户查询自己的信息
@@ -148,7 +164,11 @@ public class PublicController {
     //根据方案id查看方案报价单
     @RequestMapping(value = "customer/quotes")
     public List<Quote> findQuoteList(Integer soluId) {
-        return quoteService.list(new QueryWrapper<Quote>().eq("solu_id", soluId));
+        List<Quote> quoteList = quoteService.list(new QueryWrapper<Quote>().eq("solu_id", soluId));
+        for (Quote quote:quoteList) {
+            quote.setTotalPrice(quote.getPrice()*quote.getProductNum());
+        }
+        return quoteList;
     }
 
     //根据报价单生成Excel
@@ -250,6 +270,12 @@ public class PublicController {
     @RequestMapping(value = "customer/renderings")
     public List<Renderings> findRenderingsList(Integer soluId) {
         return renderingsService.list(new QueryWrapper<Renderings>().eq("solu_id",soluId));
+    }
+
+    //根据产品id查询单个产品详情
+    @RequestMapping(value = "product")
+    public Product findProduct(Integer productId) {
+        return productService.findProduct(productId);
     }
 
     //查看产品列表（不分页）

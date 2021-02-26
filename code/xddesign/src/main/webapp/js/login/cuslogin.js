@@ -23,7 +23,7 @@ $(function(){
         var listNeedInput = $('#div_cuslogin>div input');
         for(var i = 0;i<listNeedInput.length;i++){
             var $this = listNeedInput.eq(i);
-            if($this.val().trim() == ''){
+            if($this.val().trim() === ''){
                 lightbox_tip($this.prev().html() + inputEmptyTip_text);
                 $this.focus();
                 isOk = false;
@@ -39,27 +39,27 @@ $(function(){
         return isOk;
     }
 
-    $('#div_cuslogin>div input:first-of-type').blur(function(){
-        if($(this).val().trim() != ''){
-            $.ajax({
-                type: "GET",
-                url: ctx + "--------------------------------------------检校账号是否存在",
-                data: {'username':$(this).val()},
-                async: false,
-                cache: false,
-                dataType: "json",
-                beforeSend: function () {
-
-                },
-                complete: function () {
-
-                },
-                success: function (data) {
-
-                }
-            });
-        }
-    })
+    // $('#div_cuslogin>div input:first-of-type').blur(function(){
+    //     if($(this).val().trim() != ''){
+    //         $.ajax({
+    //             type: "GET",
+    //             url: "--------------------------------------------检校账号是否存在",
+    //             data: {'username':$(this).val()},
+    //             async: false,
+    //             cache: false,
+    //             dataType: "json",
+    //             beforeSend: function () {
+    //
+    //             },
+    //             complete: function () {
+    //
+    //             },
+    //             success: function (data) {
+    //
+    //             }
+    //         });
+    //     }
+    // })
 
     $('#div_cuslogin>div:last-of-type').click(
         function login(){
@@ -68,18 +68,23 @@ $(function(){
                 return;
             }
             $.ajax({
-                type: "GET",
-                url: ctx + "-----------------------------------------------------------登录",
-                data:{'username': $('#div_cuslogin>div input:first-of-type').val(),
-                    'password': $('#div_cuslogin>div input:last-of-type').val()},
-                async: false,
-                cache: false,
+                type: "POST",
+                url: "/customer/login",
+                data:{'mobile': $('#div_cuslogin>div input:first-of-type').val(),
+                    'pwd': $('#div_cuslogin>div input:password').val()},
                 dataType: "json",
                 beforeSend: function () {
                 },
                 complete: function () {
                 },
                 success: function (data) {
+                    if (data.status===0) {
+                        lightbox_tip(data.msg);
+                    }else {
+                        window.localStorage.setItem("cusName",data.data.username);
+                        window.localStorage.setItem("cusId",data.data.id);
+                        window.location.href = "/customer/main.html";
+                    }
                 }
             });
         }

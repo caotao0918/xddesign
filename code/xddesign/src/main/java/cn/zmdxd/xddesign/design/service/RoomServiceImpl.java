@@ -2,13 +2,11 @@ package cn.zmdxd.xddesign.design.service;
 
 import cn.zmdxd.xddesign.design.dao.RoomDao;
 import cn.zmdxd.xddesign.entity.Room;
-import cn.zmdxd.xddesign.utils.ReturnResult;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author 曹涛
@@ -24,5 +22,10 @@ public class RoomServiceImpl extends ServiceImpl<RoomDao, Room> implements RoomS
     @Override
     public Integer saveRoom(Room room) {
         return roomDao.insertRoom(room);
+    }
+
+    @Override
+    public IPage<Room> findRoom(Page<Room> page, Room room) {
+        return roomDao.selectRoom(page, room);
     }
 }

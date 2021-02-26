@@ -24,17 +24,14 @@ public class SecondLevelServiceImpl extends ServiceImpl<SecondLevelDao, SecondLe
     private SecondLevelDao secondLevelDao;
 
     @Override
-    public Boolean saveSecondLevel(Integer firstId, SecondLevel secondLevel) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("firstId",firstId);
-        map.put("secondLevel",secondLevel);
-        int insertSecondLevel = secondLevelDao.insertSecondLevel(map);
+    public Boolean saveSecondLevel(SecondLevel secondLevel) {
+        int insertSecondLevel = secondLevelDao.insertSecondLevel(secondLevel);
         return insertSecondLevel == 1;
     }
 
     @Override
-    public IPage<SecondLevel> findSecondLevels(Page<SecondLevel> page, Integer firstId) {
-        return secondLevelDao.findSecondLevels(page, firstId);
+    public IPage<SecondLevel> findSecondLevels(Page<SecondLevel> page, SecondLevel secondLevel) {
+        return secondLevelDao.findSecondLevels(page, secondLevel);
     }
 
     @Override

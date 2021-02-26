@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>方案详情</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <!-- we code these -->
+  <link rel="stylesheet" type="text/css" href="/css/cus/showcussolu.css" />
+  <script type="text/javascript" src="/cmn/jquery/jquery-1.8.3.js"></script>
+  <script type="text/javascript" src="/js/utils/getUrlParam.js"></script>
+  <script type="text/javascript" src="/js/cus/showcussolu.js"></script>
+</head>
+<body>
+<div>
+  <div>
+    <img id = "img_back" class = "img_back" src="/img/back.svg"/>
+  </div>
+  <div id = "div_soluname" class = "div_soluname">
+    <span></span>
+  </div>
+  <div id = "div_roomlist" class = "div_roomlist">
+  </div>
+  <div id = "div_tab" class = "div_tab">
+  </div>
+
+</div>
+</body>
+<script type="text/javascript">
+
+  // $('#div_soluname span').html(soluName);
+  function bindRoom() {
+    var add = "<div>" + allProd_text + "</div>";
+    for (var i = 0; i < roomList.length; i++) {
+      add += "<div>" + roomList[i].roomName + "</div>";
+    }
+    $('#div_roomlist').append(add);
+    $('#div_roomlist').children().addClass("div_room");
+  }
+
+  function bindProdList(){
+    var add = "";
+    for (var j = 0; j < roomList.length; j++) {
+      productNumList = roomList[j].productNumList;
+      add += "<div>";
+      for (var l = 0; l < productNumList.length; l++) {
+        productNum = productNumList[l];
+        for (var num = 0; num < productNum.pnNum; num++) {
+          add += "<div>" +
+                  "<img src =" +productNum.product.pictureList[0].pictureLink + "\>" +
+                  "<span>" + productNum.product.productName + "</span>" +
+                  "<span style = 'display: none;'>" + productNum.product.productId + "</span>" +
+                  "</div>";
+        }
+      }
+      add += "</div>";
+    }
+
+    $('#div_tab').append(add);
+    var addFirst = "<div>";
+    $('#div_tab>div').each(function(){
+      addFirst += $(this).html();
+    })
+    addFirst += "</div>";
+    $('#div_tab').prepend(addFirst);
+
+    $('#div_tab>div').addClass("div_prodlist");
+    $('#div_tab>div div').addClass("div_prod");
+  }
+
+
+</script>
+</html>

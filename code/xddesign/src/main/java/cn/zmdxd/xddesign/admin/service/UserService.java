@@ -1,8 +1,9 @@
 package cn.zmdxd.xddesign.admin.service;
 
 import cn.zmdxd.xddesign.entity.User;
-import cn.zmdxd.xddesign.utils.ReturnResult;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * @author 曹涛
@@ -12,8 +13,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface UserService extends IService<User> {
     String saveOrUpdateUser(User user);
 
-    Object findUser(Integer id, Integer current, Integer size);
+    Object findUser(User user, Integer current, Integer size);
 
     User findByMobile(String mobile);
+
+    List<User> findDesignList();
 
 }

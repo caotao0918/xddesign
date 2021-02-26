@@ -1,6 +1,8 @@
 package cn.zmdxd.xddesign.admin.service;
 
 import cn.zmdxd.xddesign.entity.Property;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.Map;
@@ -12,6 +14,8 @@ import java.util.Map;
  */
 public interface PropertyService extends IService<Property> {
 
-    Boolean saveProperty(Integer secondId, Property property);
+    Boolean saveProperty(Property property);
+
+    IPage<Property> findPropertyList(Page<Property> page, Property property);
 
 }

@@ -13,13 +13,13 @@ var myHouseList;
 $(function() {
     $.ajax({
         //"-----------------------------------------------------------查询客户住宅列表"
-        url: ctx + "/queryMyHouseList",
+        url: "/public/customer",
         //      data:data,
         dataType:"json",
-        type:"post",
+        type:"GET",
         async:false,
         success:function(data) {
-            myHouseList = data;
+            myHouseList = data.houseList;
             //        alert("----------" + data[0].houseName + "----------");
         }
     })
@@ -30,7 +30,7 @@ $(function() {
         addNodeMain.append("<span class = 'span_text'>"+ houseName_text +"</span>");
         addNodeMain.append("<span class = 'span_housename'>"+ myHouseList[i].houseName +"</span>");
         addNodeMain.append("<span class = 'span_text'>"+ houseType_text +"</span>");
-        addNodeMain.append("<span class = 'span_housename'>"+ myHouseList[i].houseType +"</span>");
+        addNodeMain.append("<span class = 'span_housename'>"+ myHouseList[i].houseType.typeName +"</span>");
         addNodeMain.append("<span class = 'span_text'>"+ houseAdd_text +"</span>");
         addNodeMain.append("<span class = 'span_houseadd'>"+
                 //              "我家住在黄土高坡，大风从坡上刮过，不管是西北风还是东南风，" +
@@ -48,7 +48,7 @@ $(function() {
             $(this).append("<span class = 'span_lightbox'>" +cusShowSoluList_text+"</span>");
             $(this).children(".span_lightbox").click(function(){
                 var houseId = $(this).parent().attr('id');
-                location.href("----------------------------------------------方案列表页面");
+                window.location.href = "listsolu.html?houseId=" + houseId;
 
 
             });
@@ -67,7 +67,7 @@ $(function() {
             clearTimeout(t);
         })
         $('#img_back').click(function(){
-            location.href("---------------------------------------------------客户主页面");
+            history.go(-1);
         })
     })
 })

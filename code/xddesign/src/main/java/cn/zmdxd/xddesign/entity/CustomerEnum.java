@@ -1,12 +1,12 @@
 package cn.zmdxd.xddesign.entity;
 
-import cn.zmdxd.xddesign.utils.BaseEnum;
+import cn.zmdxd.xddesign.util.BaseEnum;
 import lombok.Getter;
 
 @Getter
 public enum CustomerEnum implements BaseEnum {
 
-    PERSONAL(0,"个人"),
+    PERSONAL(5,"个人"),
     DISTRICT(1,"小区"),
     RENOVATION(2,"装修队"),
     DEVELOPER(3,"开发商"),

@@ -2,6 +2,9 @@ package cn.zmdxd.xddesign.admin.dao;
 
 import cn.zmdxd.xddesign.entity.Property;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Map;
 
@@ -12,6 +15,8 @@ import java.util.Map;
  */
 public interface PropertyDao extends BaseMapper<Property> {
 
-    int insertProperty(Map<String,Object> map);
+    int insertProperty(Property property);
+
+    IPage<Property> selectProperty(Page<Property> page, @Param("property") Property property);
 
 }

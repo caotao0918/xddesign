@@ -1,7 +1,7 @@
 package cn.zmdxd.xddesign.design.service;
 
 import cn.zmdxd.xddesign.entity.Solutions;
-import cn.zmdxd.xddesign.utils.ReturnResult;
+import cn.zmdxd.xddesign.util.ReturnResult;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -18,7 +18,7 @@ public interface SolutionsService extends IService<Solutions> {
 
 //    Integer saveSolutions(Solutions solutions);
 
-    IPage<Solutions> findSolutionsList(Page<Solutions> page,  Integer designId);
+    IPage<Solutions> findSolutionsList(Page<Solutions> page,  Solutions solutions);
 
     Solutions findSolutions(Integer soluId);
 

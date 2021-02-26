@@ -11,23 +11,33 @@
         <result column="room_reserve1" property="roomReserve1" />
         <result column="room_reserve2" property="roomReserve2" />
         <result column="room_reserve3" property="roomReserve3" />
-        <collection property="productNumList" ofType="ProductNum">
-            <id column="pn_id" property="pnId" />
-            <result column="pn_num" property="pnNum" />
-            <association property="product" javaType="Product">
-                <id column="product_id" property="productId" />
-                <result column="product_name" property="productName" />
-                <collection property="pictureList" ofType="Picture">
-                    <id column="picture_id" property="pictureId" />
-                    <result column="picture_name" property="pictureName" />
-                    <result column="picture_link" property="pictureLink" />
-                </collection>
-            </association>
+        <collection property="productNumList" ofType="ProductNum" resultMap="cn.zmdxd.xddesign.design.dao.ProductNumDao.ProductNumAndProduct">
         </collection>
     </resultMap>
 
     <insert id="insertRoom" parameterType="Room" useGeneratedKeys="true" keyProperty="roomId" keyColumn="room_id">
         insert into t_room(room_name, room_desc, solu_id,room_reserve1,room_reserve2,room_reserve3) VALUES (#{roomName},#{roomDesc},#{soluId},#{roomReserve1},#{roomReserve2},#{roomReserve3})
     </insert>
+
+    <select id="selectRoom" resultType="Room">
+        select room.* from t_room room
+        left join t_solutions solutions on room.solu_id = solutions.solu_id
+        left join t_house house on solutions.house_id = house.house_id
+        left join t_customer cus on house.customer_id = cus.id
+        <where>
+            <if test="room.customerId != null and room.customerId != 0 ">
+                cus.id = #{room.customerId}
+            </if>
+            <if test="room.houseId != null and room.houseId != 0 ">
+                and house.house_id = #{room.houseId}
+            </if>
+            <if test="room.soluId != null and room.soluId != 0 ">
+                and room.solu_id = #{room.soluId}
+            </if>
+            <if test="room.roomName != null and room.roomName != '' ">
+                and room.room_name like '%${room.roomName}%'
+            </if>
+        </where>
+    </select>
 
 </mapper>

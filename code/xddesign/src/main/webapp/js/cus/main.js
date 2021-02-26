@@ -11,10 +11,10 @@ $(function() {
     $('#div_housemgt').html(cusOpt_text_1);
     $('#div_aftersalesp').html(cusOpt_text_2);
     $('#div_housemgt').click(function () {
-        location.href(ctx + "/gotoMyHouseList" + "-------------------------我的住宅");
+        location.href = "/customer/myhouselist.html";
     })
     $('#div_aftersalesp').click(function () {
-        location.href(ctx + "售后中心-----------------------------");
+        location.href = "/customer/aftersalecnt.html";
     })
 })
 /**

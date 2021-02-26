@@ -11,4 +11,3 @@
 <script type="text/javascript">
   var ctx = "${pageContext.request.contextPath}";
 </script>
-

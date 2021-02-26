@@ -1,7 +1,8 @@
 package cn.zmdxd.xddesign.design.service;
 
 import cn.zmdxd.xddesign.entity.Room;
-import cn.zmdxd.xddesign.utils.ReturnResult;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -11,4 +12,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface RoomService extends IService<Room>  {
     Integer saveRoom(Room room);
+
+    IPage<Room> findRoom(Page<Room> page, Room room);
 }

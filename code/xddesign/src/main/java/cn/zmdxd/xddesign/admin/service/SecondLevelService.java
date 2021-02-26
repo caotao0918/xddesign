@@ -14,9 +14,9 @@ import java.util.List;
  */
 public interface SecondLevelService extends IService<SecondLevel> {
 
-    Boolean saveSecondLevel(Integer firstId, SecondLevel secondLevel);
+    Boolean saveSecondLevel(SecondLevel secondLevel);
 
-    IPage<SecondLevel> findSecondLevels(Page<SecondLevel> page, Integer firstId);
+    IPage<SecondLevel> findSecondLevels(Page<SecondLevel> page, SecondLevel secondLevel);
 
     SecondLevel findSecondLevel(Integer secondId);
 }

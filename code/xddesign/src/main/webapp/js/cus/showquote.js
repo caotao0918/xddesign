@@ -22,10 +22,10 @@ $(function(){
     function queryQuoteList(){
         $.ajax({
             //---------------------------------------------------------------url查询报价单
-            url:ctx + "/queryQuoteList",
+            url:"/public/customer/quotes",
             data: {"soluId" : soluId},
             dataType:"json",
-            type:"get",
+            type:"GET",
             async:false,
             success:function(json) {
                 quoteList = json;
@@ -72,10 +72,10 @@ $(function(){
     }
 
     $('#div_downquote').click(function() {
-        location.href(ctx + "-------------------------------------------------下载报表");
+        window.location.href = "/public/customer/quote/toexcel?soluId=" + soluId;
     })
     $('#img_back').click(function() {
-         location.href(ctx + "---------------------------------------客户方案列表页面");
+        history.go(-1);
     })
 })
 /**

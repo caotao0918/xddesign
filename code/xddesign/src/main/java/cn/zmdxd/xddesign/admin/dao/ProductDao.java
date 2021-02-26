@@ -23,8 +23,9 @@ public interface ProductDao extends BaseMapper<Product> {
 
     Integer insertProduct(ProductVo productVo);
 
-    IPage<Product> findProducts(Page<Product> page, @Param("productId") Integer productId, @Param("offset") Integer offset, @Param("size")Integer size);
+    IPage<Product> findProducts(Page<Product> page, @Param("offset") Integer offset, @Param("size")Integer size);
     List<Product> findProductList();
+    Product findProduct(Integer productId);
 
     int removeProductProperty(Integer valueId);
 

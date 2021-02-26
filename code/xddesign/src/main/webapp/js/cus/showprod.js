@@ -5,19 +5,21 @@
  *----------------------------------------------------------------------------产品详情
  */
 var prodeDesc_text = "产品描述";
+var prodName_text = "产品名称";
 var prod;
 $(function(){
     $('#div_proddesc span').html(prodeDesc_text);
+    $('#prodname').html(prodName_text);
     function queryProdProp(){
         $.ajax({
             //---------------------------------------------------------------url查询产品
-            url:ctx + "/queryProdProp",
-            data: {"prodId" : prodId},
+            url:"/public/product",
+            data: {"productId" : prodId},
             dataType:"json",
-            type:"get",
+            type:"GET",
             async:false,
-            success:function(json) {
-                prod = json;
+            success:function(data) {
+                prod = data;
             }
         })
     }
@@ -26,13 +28,16 @@ $(function(){
         var add = "";
         var imgList = prod.pictureList;
         for(var i = 0;i<imgList.length;i++){
-            add += "<img src ='" + imgList[i].pictureLink +"'/>";
+            add += "<img src =" + imgList[i].pictureLink + "\>";
         }
         $('#div_prodimglist div').append(add);
     }
 
-    function bindProdDesc(){
+
+
+    function bindProdInfo(){
         $('#div_proddesc pre').html(prod.productDesc);
+        $("#prodnamevalue").html(prod.productName);
     }
 
     function bindProdProp(){
@@ -41,7 +46,7 @@ $(function(){
         for(var i = 0;i<list.length;i++){
             var objCurr = list[i].value.property;
             var name = objCurr.propertyName;
-            var value = objCurr.commonValue;
+            var value = list[i].value.valueName;
             add += "<div>" +
                 "<div>" + name + "</div>" +
                 "<div>" + value + "</div>" +
@@ -53,12 +58,12 @@ $(function(){
 
     queryProdProp();
     bindImg();
-    bindProdDesc();
+    bindProdInfo();
     bindProdProp();
     crsl_prodImg('div_prodimglist');
 
     $('#img_back').click(function(){
-         location.href(ctx + "--------------------------------回到刚才的客户方案页面");
+        history.go(-1);
     })
 })
 /**

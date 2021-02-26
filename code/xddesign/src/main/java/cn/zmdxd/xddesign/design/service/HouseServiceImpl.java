@@ -2,13 +2,12 @@ package cn.zmdxd.xddesign.design.service;
 
 import cn.zmdxd.xddesign.design.dao.HouseDao;
 import cn.zmdxd.xddesign.entity.House;
-import cn.zmdxd.xddesign.utils.ReturnResult;
+import cn.zmdxd.xddesign.util.ReturnResult;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author 曹涛
@@ -36,5 +35,10 @@ public class HouseServiceImpl extends ServiceImpl<HouseDao, House> implements Ho
         result.setStatus(1);
         result.setMsg("添加成功");
         return result;
+    }
+
+    @Override
+    public IPage<House> findHouse(Page<House> page, House house) {
+        return houseDao.selectHouse(page, house);
     }
 }

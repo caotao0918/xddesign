@@ -23,5 +23,11 @@ public class ProductNum {
     private Product product;    //对应产品
 
     private Integer roomId;     //房间id
+    @TableField(exist = false)
+    private Integer soluId;     //方案id
+    @TableField(exist = false)
+    private Integer houseId;    //房子id
+    @TableField(exist = false)
+    private Integer customerId; //客户id
 
 }

@@ -18,7 +18,7 @@ public interface CustomerDao extends BaseMapper<Customer> {
 
     int updateCustomer(Customer customer);
 
-    IPage<Customer> selectCustomers(Page<?> page, @Param("designId") Integer designId);
+    IPage<Customer> selectCustomers(Page<?> page, @Param("customer") Customer customer);
 
     Customer selectCustomer(Integer id);
 }

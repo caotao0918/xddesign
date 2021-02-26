@@ -37,6 +37,8 @@ public class Solutions {
     private String soluReserve3;
 
     private Integer houseId;    //房子id
+    @TableField(exist = false)
+    private Integer customerId; //客户id
 
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Timestamp getAddTime() {

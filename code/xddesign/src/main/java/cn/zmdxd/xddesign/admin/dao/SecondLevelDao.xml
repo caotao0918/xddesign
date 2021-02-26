@@ -13,20 +13,28 @@
             <result property="firstName" column="first_name" />
             <result property="firstDesc" column="first_desc" />
         </association>
-        <collection property="propertyList" ofType="Property">
-            <id property="propertyId" column="property_id" />
-            <result property="propertyName" column="property_name" />
-            <result property="propertyDesc" column="property_desc" />
-            <result property="commonValue" column="common_value"/>
-        </collection>
+<!--        <collection property="propertyList" ofType="Property">-->
+<!--            <id property="propertyId" column="property_id" />-->
+<!--            <result property="propertyName" column="property_name" />-->
+<!--            <result property="propertyDesc" column="property_desc" />-->
+<!--            <result property="commonValue" column="common_value"/>-->
+<!--        </collection>-->
     </resultMap>
 
-    <insert id="insertSecondLevel">
-        insert into t_secondlevel(second_name, second_desc, first_id) VALUES (#{secondLevel.secondName},#{secondLevel.secondDesc},#{firstId})
+    <insert id="insertSecondLevel" parameterType="SecondLevel">
+        insert into t_secondlevel(second_name, second_desc, first_id) VALUES (#{secondName},#{secondDesc},#{firstLevel.firstId})
     </insert>
 
-    <select id="findSecondLevels" resultMap="SecondAndFirst">
-        select second.*,first.* from t_firstlevel first ,t_secondlevel second where second.first_id=first.first_id and second.first_id=#{firstId}
+    <select id="findSecondLevels" parameterType="SecondLevel" resultMap="SecondAndFirst">
+        select second.second_id, second.second_name, second.second_desc, first.first_id, first.first_name from t_firstlevel first ,t_secondlevel second
+        <where>
+            second.first_id=first.first_id
+            <if test="second.firstLevel != null ">
+            <if test="second.firstLevel.firstId != 0">
+                and second.first_id = #{second.firstLevel.firstId}
+            </if>
+            </if>
+        </where>
     </select>
 
     <select id="findSecondLevel" resultMap="SecondAndFirst">

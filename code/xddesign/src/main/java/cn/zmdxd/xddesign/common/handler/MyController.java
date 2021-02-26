@@ -7,10 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Wzz20210118 on 2021/1/25.
@@ -19,28 +16,28 @@ import java.util.Map;
 public class MyController {
 
     @RequestMapping("/gotoCusLogin")
-    public String gotoCustomerLogin(){
+    public String gotoCustomerLogin() {
         return "login/cuslogin";
     }
 
     @RequestMapping("/gotoCusMain")
-    public String gotoCustomerMain(){
+    public String gotoCustomerMain() {
         return "cus/main";
     }
 
     @RequestMapping("/gotoMyHouseList")
-    public String gotoMyHouseList(){
+    public String gotoMyHouseList() {
         return "cus/myhouselist";
     }
 
     @RequestMapping("/queryMyHouseList")
     @ResponseBody
     public List<House> queryMyHouseList() {
-       return getMyHouseList();
+        return getMyHouseList();
     }
 
     //--------------------------------------------------------测试数据，需要改成真的
-    public List<House>  getMyHouseList(){
+    public List<House> getMyHouseList() {
         Product product_1 = new Product();
         product_1.setProductId(1);
         product_1.setProductName("筒灯A款");
@@ -120,7 +117,7 @@ public class MyController {
     }
 
     @RequestMapping("/gotoListSolu")
-    public String gotoListSolu(ModelMap mm){
+    public String gotoListSolu(ModelMap mm) {
         mm.addAttribute("cusId", 1);
         mm.addAttribute("cusName", "张一山");
         return "cus/listsolu";
@@ -128,26 +125,26 @@ public class MyController {
 
     @RequestMapping("/queryHouseSolu")
     @ResponseBody
-    public  Map<String,Object> queryHouseSolu(Integer pageNum,Integer pageSize){
+    public Map<String, Object> queryHouseSolu(Integer pageNum, Integer pageSize) {
         System.out.println("-----------------" + pageNum + "-----------------");
         System.out.println("-----------------" + pageSize + "-----------------");
-        Map<String,Object> map = new HashMap<String, Object>(10);
-        map.put("count",19);
-        if(pageNum ==1){
-            map.put("list",getHouseSolu_page_1());
+        Map<String, Object> map = new HashMap<String, Object>(10);
+        map.put("count", 19);
+        if (pageNum == 1) {
+            map.put("list", getHouseSolu_page_1());
             return map;
-        }else{
-            map.put("list",getHouseSolu_page_2());
+        } else {
+            map.put("list", getHouseSolu_page_2());
             return map;
         }
     }
 
     //--------------------------------------------------------测试数据，需要改成真的
-    public   List<Solutions>  getHouseSolu_page_1(){
+    public List<Solutions> getHouseSolu_page_1() {
         List<Solutions> solutionsList = new ArrayList<Solutions>(10);
-        for(int i = 0;i<10;i++){
+        for (int i = 0; i < 10; i++) {
             Solutions solutions_1 = new Solutions();
-            solutions_1.setSoluId( i + 1);
+            solutions_1.setSoluId(i + 1);
             solutions_1.setSoluName("一房一厅1号方案");
             solutions_1.setState("设计完毕");
             solutions_1.setAddTime(new Timestamp(1611906506161L));
@@ -157,11 +154,11 @@ public class MyController {
     }
 
     //--------------------------------------------------------测试数据，需要改成真的
-    public  List<Solutions>  getHouseSolu_page_2(){
+    public List<Solutions> getHouseSolu_page_2() {
         List<Solutions> solutionsList = new ArrayList<Solutions>(10);
-        for(int i = 0;i<9;i++){
+        for (int i = 0; i < 9; i++) {
             Solutions solutions_1 = new Solutions();
-            solutions_1.setSoluId( i + 10 +1);
+            solutions_1.setSoluId(i + 10 + 1);
             solutions_1.setSoluName("一房一厅111号方案");
             solutions_1.setState("施工中");
             solutions_1.setAddTime(new Timestamp(1611906506161L));
@@ -171,14 +168,14 @@ public class MyController {
     }
 
     @RequestMapping("/gotoShowCusSolu")
-    public String gotoShowCusSolu(Integer soluId, ModelMap mm){
+    public String gotoShowCusSolu(Integer soluId, ModelMap mm) {
         System.out.println("---------" + soluId);
         mm.addAttribute("solu", getSolu());
         return "cus/showcussolu";
     }
 
     //--------------------------------------------------------测试数据，需要改成真的
-    public Solutions getSolu(){
+    public Solutions getSolu() {
         Picture picture_1 = new Picture();
         picture_1.setPictureId(601);
         picture_1.setPictureLink("http://www.zmdxd.cn:8089//xddz/ueditor/2020/11/5/eeb94e7fed66407998860b9e83a6ff91.jpg");
@@ -245,7 +242,7 @@ public class MyController {
         room_1.setProductNumList(productNumList_1);
         roomList.add(room_1);
 
-        for(int i = 0;i<8;i++) {
+        for (int i = 0; i < 8; i++) {
             Room room_2 = new Room();
             room_2.setRoomId(441 + i + 1);
             room_2.setRoomName("小黑屋");
@@ -262,23 +259,23 @@ public class MyController {
     }
 
     @RequestMapping("/gotoShowRnd")
-    public String gotoShowRnd(Integer soluId, ModelMap mm){
-        mm.addAttribute("soluId",soluId);
+    public String gotoShowRnd(Integer soluId, ModelMap mm) {
+        mm.addAttribute("soluId", soluId);
         return "cus/showrnd";
     }
 
     @RequestMapping("/querySoluImg")
     @ResponseBody
-    public List<Renderings> querySoluImg(Integer soluId){
+    public List<Renderings> querySoluImg(Integer soluId) {
         //测试数据
         soluId = 100;
         return getSoluImgList();
     }
 
     //--------------------------------------------------------测试数据，需要改成真的
-    public List<Renderings> getSoluImgList(){
+    public List<Renderings> getSoluImgList() {
         List<Renderings> list = new ArrayList<Renderings>(5);
-        for(int i = 0;i<3;i++) {
+        for (int i = 0; i < 3; i++) {
             Renderings rng = new Renderings();
             rng.setRendName("        一房一厅A方案设计图1/3号\n");
             rng.setRendDesc("    一房一厅A方案设计图1/3号,全房共有3个独立房间，每个房间放置3-5个智能家居产品，报价" + "2000RMB，经济实用，物美价廉。----------------------------------" +
@@ -287,7 +284,7 @@ public class MyController {
 
                     "    一房一厅A方案设计图1/3号,全房共有3个独立房间，每个房间放置3-5个智能家居产品，报价" + "2000RMB，经济实用，物美价廉。----------------------------------" +
                     "---------------------------------\n" +
-                    "--------------------------------------"+
+                    "--------------------------------------" +
 
                     "    一房一厅A方案设计图1/3号,全房共有3个独立房间，每个房间放置3-5个智能家居产品，报价" + "2000RMB，经济实用，物美价廉。----------------------------------" +
                     "---------------------------------\n" +
@@ -299,21 +296,21 @@ public class MyController {
     }
 
     @RequestMapping("/gotoShowProd")
-    public String gotoShowProd(Integer prodId, ModelMap mm){
+    public String gotoShowProd(Integer prodId, ModelMap mm) {
         //测试数据
         prodId = 100;
-        mm.addAttribute("prodId",prodId);
+        mm.addAttribute("prodId", prodId);
         return "cus/showprod";
     }
 
     @RequestMapping("/queryProdProp")
     @ResponseBody
-    public Product queryProdProp(Integer prodId){
+    public Product queryProdProp(Integer prodId) {
         return getProdProp();
     }
 
     //--------------------------------------------------------测试数据，需要改成真的
-    public Product getProdProp(){
+    public Product getProdProp() {
         Product prod = new Product();
         prod.setProductDesc("    该产品设计简约流畅，光源可自适应调节，以满足" +
                 "消费者的不同需求。\n" +
@@ -368,7 +365,7 @@ public class MyController {
         pp_1.setValue(pv_1);
         list.add(pp_1);
 
-        for(int i = 0;i<13;i ++){
+        for (int i = 0; i < 13; i++) {
             ProductProperty pp = new ProductProperty();
             PropertyValue pv = new PropertyValue();
             Property p = new Property();
@@ -385,19 +382,19 @@ public class MyController {
 
 
     @RequestMapping("/gotoShowQuote")
-    public String gotoShowQuote(Integer soluId, ModelMap mm){
+    public String gotoShowQuote(Integer soluId, ModelMap mm) {
         System.out.println("---------" + soluId);
         return "cus/showquote";
     }
 
     @RequestMapping("/queryQuoteList")
     @ResponseBody
-    public List<Quote> queryQuoteList(Integer soluId){
+    public List<Quote> queryQuoteList(Integer soluId) {
         return getQuoteList();
     }
 
     //--------------------------------------------------------测试数据，需要改成真的
-    public List<Quote> getQuoteList(){
+    public List<Quote> getQuoteList() {
         List<Quote> list = new ArrayList<Quote>(10);
         Quote quote_1 = new Quote();
         quote_1.setRoomName("大门");
@@ -434,4 +431,108 @@ public class MyController {
         return list;
     }
 
+    @RequestMapping("/gotoAfterSaleCnt")
+    public String gotoAfterSaleCnt() {
+        return "/customer/aftersalecnt.html";
+    }
+
+    @RequestMapping("/queryLeftNav")
+    @ResponseBody
+    public List<List<SecondLevel>> queryLeftNav() {
+        return getLeftNav();
+    }
+
+    //--------------------------------------------------------测试数据，需要改成真的
+    public List<List<SecondLevel>> getLeftNav() {
+        FirstLevel firstLevel_1 = new FirstLevel();
+        firstLevel_1.setFirstName("ZigBee");
+        FirstLevel firstLevel_2 = new FirstLevel();
+        firstLevel_2.setFirstName("WiFi");
+
+        List<SecondLevel> list_1 = new ArrayList<SecondLevel>(10);
+        for (int i = 0; i < 10; i++) {
+            SecondLevel secondLevel = new SecondLevel();
+            secondLevel.setFirstLevel(firstLevel_1);
+            secondLevel.setSecondName("照明" + (i + 1) );
+            list_1.add(secondLevel);
+        }
+        List<SecondLevel> list_2 = new ArrayList<SecondLevel>(10);
+        for (int i = 0; i < 10; i++) {
+            SecondLevel secondLevel = new SecondLevel();
+            secondLevel.setFirstLevel(firstLevel_2);
+            secondLevel.setSecondName("开关" + (i + 1));
+            list_2.add(secondLevel);
+        }
+
+        List<List<SecondLevel>> list = new ArrayList<List<SecondLevel>>(22);
+        list.add(list_1);
+        list.add(list_2);
+        return list;
+    }
+
+    @RequestMapping("/queryQst")
+    @ResponseBody
+    public List<Question> queryQst(String fstLevName,String scdLevName) {
+        //传了一级二级的fstLevName、scdLevName，当做问题查询的关键字。
+        return getQst();
+    }
+
+    //--------------------------------------------------------测试数据，需要改成真的
+    public List<Question> getQst() {
+        List<Question> list = new ArrayList<Question>(10);
+        for (int i = 0; i < 10; i++) {
+            Question qst = new Question();
+            qst.setQuestion("为什么智能产品点击WiFi连接，却一直无法连接？---" + (i + 1));
+            qst.setAnswer("智能产品联网方式分为WiFi、ZigBee、蓝牙。不同的产品连接方式不一样。" +
+                    "可尝试WiFi、蓝牙模式进行连接，即可正常联网。" +
+                    "或致电联系安装人员远程协助，联系电话：0396-3335557。");
+            list.add(qst);
+        }
+        return  list;
+    }
+
+    @RequestMapping("/queryGui")
+    @ResponseBody
+    public List<Guide> queryGui(String fstLevName,String scdLevName){
+    //传了一级二级的fstLevName、scdLevName，当做关键字。
+    //注意！！！这里Guide需要添加一个手册封面img字段。我暂时用了保留字段来当这个img属性。
+        return getGui();
+    }
+
+    //--------------------------------------------------------测试数据，需要改成真的
+    public List<Guide> getGui(){
+        List<Guide> list = new ArrayList<Guide>(10);
+        for(int i = 0;i<10;i++){
+            Guide gui = new Guide();
+            gui.setGuideName("筒灯A" + (i + 1) + "款");
+            gui.setGuideLink("http://www.zmdxd.cn/gwAction_toProduct.action?product.uuid=32");
+            gui.setGuideReserve("http://www.zmdxd.cn:8089//xddz/ueditor/2020/11/5/eeb94e7fed66407998860b9e83a6ff91.jpg");
+            list.add(gui);
+        }
+        return list;
+    }
+
+    @RequestMapping("/queryVideo")
+    @ResponseBody
+    public List<Video> queryVideo(String fstLevName,String scdLevName){
+        //传了一级二级的fstLevName、scdLevName，当做关键字。
+        return getVideo();
+    }
+    //--------------------------------------------------------测试数据，需要改成真的
+    public List<Video> getVideo(){
+        List<Video> list = new ArrayList<Video>(10);
+        for(int i = 0;i<11;i++){
+            Video video = new Video();
+            video.setVideoName("迅达智能电子锁S" + (i + 1));
+            video.setVideoLink("http://www.zmdxd.cn:8089/xddz/video/about/videoxd2.mp4");
+            video.setVideoAddTime(new Timestamp(1612937158L));
+            list.add(video);
+        }
+        return list;
+    }
+
+    @RequestMapping("/goto111")
+    public String goto111(){
+        return "dsg/111";
+    }
 }

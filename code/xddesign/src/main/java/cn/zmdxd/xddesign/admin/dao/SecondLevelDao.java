@@ -17,9 +17,9 @@ import java.util.Map;
 public interface SecondLevelDao extends BaseMapper<SecondLevel> {
 
 
-    int insertSecondLevel(Map<String, Object> map);
+    int insertSecondLevel(SecondLevel secondLevel);
 
-    IPage<SecondLevel> findSecondLevels(Page<SecondLevel> page, @Param("firstId") Integer firstId);
+    IPage<SecondLevel> findSecondLevels(Page<SecondLevel> page, @Param("second") SecondLevel secondLevel);
 
     SecondLevel findSecondLevel(Integer secondId);
 

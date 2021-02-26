@@ -15,11 +15,35 @@
             <id column="type_id" property="typeId" />
             <result column="type_name" property="typeName" />
         </association>
+        <association property="customer" javaType="Customer">
+            <id column="id" property="id" />
+            <result column="username" property="username" />
+        </association>
         <collection property="solutionsList" ofType="Solutions" resultMap="cn.zmdxd.xddesign.design.dao.SolutionsDao.SolutionsAndRoom" />
     </resultMap>
 
     <insert id="insertHouse" useGeneratedKeys="true" keyProperty="houseId" keyColumn="house_id">
         insert into t_house(house_name, house_address, customer_id, type_id, house_reserve1, house_reserve2, house_reserve3) VALUES (#{houseName},#{houseAddress},#{customerId},#{houseType.typeId},#{houseReserve1},#{houseReserve2},#{houseReserve3})
     </insert>
+
+    <select id="selectHouse" parameterType="House" resultMap="HouseAndSolutions">
+        select house.house_id, house.house_name, house.house_address, house.house_reserve1, house.house_reserve2, house.house_reserve3
+        ,customer.username
+        ,type.type_name,type.type_id
+        from t_house house
+        left join t_customer customer on house.customer_id = customer.id
+        left join t_house_type type on house.type_id = type.type_id
+        <where>
+            <if test="house.customerId != null">
+                house.customer_id = #{house.customerId}
+            </if>
+            <if test="house.customer != null">
+                and customer.username like '%${house.customer.username}%'
+            </if>
+            <if test="house.houseType.typeId != 0">
+                and house.type_id = #{house.houseType.typeId}
+            </if>
+        </where>
+    </select>
 
 </mapper>

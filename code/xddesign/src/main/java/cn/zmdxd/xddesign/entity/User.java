@@ -1,5 +1,6 @@
 package cn.zmdxd.xddesign.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
@@ -20,6 +21,7 @@ public class User {
     private Timestamp addTime; //管理员添加此账号时间
     private Timestamp lastTime;//上次登陆时间
     private Boolean delSign;   //删除标志
+    @TableField(exist = false)
     private Role role;         //用户角色
     private String reserve1;   //保留字段
     private String reserve2;   //保留字段

@@ -30,11 +30,23 @@
 
     <select id="selectSolutionsList" resultMap="SolutionsAndRoom">
         select solutions.*,design.id as uid,design.username as uname
-        from t_solutions solutions,t_user design
+        from t_solutions solutions
+        left join  t_user design on solutions.designer_id=design.id
+        left join t_house house on solutions.house_id=house.house_id
+        left join t_customer cus on cus.id=house.customer_id
         <where>
             solutions.designer_id=design.id
-            <if test="designId != null">
-                and designer_id=#{designId}
+            <if test="solutions.design.id != 0">
+                and solutions.designer_id=#{solutions.design.id}
+            </if>
+            <if test="solutions.soluName != null and solutions.soluName !=''">
+                and solutions.solu_name like '%${solutions.soluName}%'
+            </if>
+            <if test="solutions.houseId != null and solutions.houseId != 0">
+                and solutions.house_id =#{solutions.houseId}
+            </if>
+            <if test="solutions.customerId != null and solutions.customerId != 0">
+                and cus.id = #{solutions.customerId}
             </if>
         </where>
     </select>
@@ -56,13 +68,11 @@
     </select>
 
     <select id="selectSolutionsByHouseId" resultMap="SolutionsAndRoom">
-        select solu.solu_id,solu.solu_desc,solu.add_time,solu.solu_name,solu.state,solu.solu_reserve1,solu.solu_reserve2,solu.solu_reserve3,
-               design.username as uname,design.mobile as umobile
+        select solu.solu_id,solu.solu_desc,solu.add_time,solu.solu_name,solu.state,solu.solu_reserve1,solu.solu_reserve2,solu.solu_reserve3
         from t_solutions solu,t_house house,t_user design
         where house.house_id=#{houseId}
           and house.house_id=solu.house_id
           and solu.designer_id=design.id
-          and (solu.state='施工完毕' or solu.state='设计完毕' or solu.state='施工中')
     </select>
 
 </mapper>

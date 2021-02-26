@@ -27,12 +27,6 @@
       <version>7.0</version>
     </dependency>
 
-    <dependency>
-      <groupId>jstl</groupId>
-      <artifactId>jstl</artifactId>
-      <version>1.2</version>
-    </dependency>
-
 
     <dependency>
       <groupId>org.thymeleaf</groupId>
@@ -268,7 +262,7 @@
     </dependency>
     <!-- jstl的jar包 2个-->
     <dependency>
-      <groupId>javax.servlet</groupId>
+      <groupId>jstl</groupId>
       <artifactId>jstl</artifactId>
       <version>1.2</version>
     </dependency>

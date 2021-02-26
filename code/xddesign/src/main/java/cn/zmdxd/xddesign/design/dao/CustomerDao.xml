@@ -37,12 +37,22 @@
     </resultMap>
 
     <select id="selectCustomers" resultMap="CustomerAndUser">
-        select c.*,u.id as uid,u.username as uname from t_customer c ,t_user u
+        select c.*,u.id as uid,u.username as uname from t_customer c left join t_user u
+        on c.design_id=u.id
         <where>
-            c.design_id=u.id
-            <if test="designId != null">
-                and c.design_id=#{designId}
+            <if test="customer.design.id != 0">
+                and c.design_id=#{customer.design.id}
             </if>
+            <if test="customer.code != 0">
+                and c.code=#{customer.code}
+            </if>
+            <if test="customer.username != null and customer.username != ''">
+                and c.username like '%${customer.username}%'
+            </if>
+            <if test="customer.mobile != null and customer.mobile != ''">
+                and c.mobile like '%${customer.mobile}%'
+            </if>
+                and c.del_sign=false
         </where>
     </select>
 

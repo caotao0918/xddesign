@@ -31,18 +31,32 @@
         </association>
     </resultMap>
 
-    <select id="findUser" resultMap="UserAndRole">
+    <select id="findUser" parameterType="User" resultMap="UserAndRole">
         select u.*,r.id,r.name from t_user u ,t_role r
         <where>
             u.role_id=r.id and u.del_sign=false
-            <if test="id != null">
-                and u.id = #{id}
+            <if test="user.id != null">
+                and u.id = #{user.id}
+            </if>
+            <if test="user.username != null and user.username != ''">
+                and u.username like '%${user.username}%'
+            </if>
+            <if test="user.mobile != null and user.mobile != ''">
+                and u.mobile like '%${user.mobile}%'
+            </if>
+            <if test="user.role.id != 0">
+                and u.role_id = #{user.role.id}
             </if>
         </where>
     </select>
 
     <select id="findByMobile" resultMap="UserAndRole">
         select u.id,u.username, u.pwd, u.last_time ,r.name from t_user u,t_role r where u.role_id=r.id and mobile=#{mobile}
+    </select>
+
+    <select id="selectDesignList" resultType="User">
+        select user.id,user.username from t_user user,t_role role
+        where user.role_id=role.id and role.name='设计人员'
     </select>
 
 </mapper>

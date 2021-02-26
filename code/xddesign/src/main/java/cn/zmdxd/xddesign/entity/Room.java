@@ -28,5 +28,9 @@ public class Room {
     private String roomReserve3;
 
     private Integer soluId;                    //方案id
+    @TableField(exist = false)
+    private Integer houseId;                   //房子id
+    @TableField(exist = false)
+    private Integer customerId;                //客户id
 
 }

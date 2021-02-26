@@ -3,6 +3,8 @@ package cn.zmdxd.xddesign.admin.service;
 import cn.zmdxd.xddesign.admin.dao.PropertyDao;
 import cn.zmdxd.xddesign.entity.Property;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,12 +24,14 @@ public class PropertyServiceImpl extends ServiceImpl<PropertyDao, Property> impl
     private PropertyDao propertyDao;
 
     @Override
-    public Boolean saveProperty(Integer secondId, Property property) {
-        Map<String,Object> map = new HashMap<>();
-        map.put("secondId",secondId);
-        map.put("property",property);
-        int insertProperty = propertyDao.insertProperty(map);
+    public Boolean saveProperty(Property property) {
+        int insertProperty = propertyDao.insertProperty(property);
         return insertProperty ==1;
 
+    }
+
+    @Override
+    public IPage<Property> findPropertyList(Page<Property> page, Property property) {
+        return propertyDao.selectProperty(page, property);
     }
 }

@@ -2,8 +2,8 @@ package cn.zmdxd.xddesign.design.service;
 
 import cn.zmdxd.xddesign.design.dao.*;
 import cn.zmdxd.xddesign.entity.*;
-import cn.zmdxd.xddesign.utils.CookieUtil;
-import cn.zmdxd.xddesign.utils.ReturnResult;
+import cn.zmdxd.xddesign.util.CookieUtil;
+import cn.zmdxd.xddesign.util.ReturnResult;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -42,8 +42,8 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
 //    }
 
     @Override
-    public IPage<Solutions> findSolutionsList(Page<Solutions> page, Integer designId) {
-        return solutionsDao.selectSolutionsList(page,designId);
+    public IPage<Solutions> findSolutionsList(Page<Solutions> page, Solutions solutions) {
+        return solutionsDao.selectSolutionsList(page,solutions);
     }
 
     @Override

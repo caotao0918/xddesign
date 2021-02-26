@@ -16,20 +16,24 @@ var pageSizeDflt = 10;
 var showSolu_td_asButton_text = "查看方案";
 var showRnd_td_asButton_text = "查看效果图";
 var showQuote_td_asButton_text = "查看报表";
-
+var cusName = window.localStorage.getItem("cusName");
+var cusId = window.localStorage.getItem("cusId");
 $(function(){
     function getData(pageNum,pageSize){
         var list;
+        var houseId = UrlParam.param("houseId");
+        console.log(houseId);
+
         $.ajax({
             //----------------------------------------------------------url查询每个house对应的soulu列表
-            url:ctx +"/queryHouseSolu",
-            data:{'pageNum':pageNum,'pageSize':pageSize},
+            url:"/public/customer/house/solutions",
+            data:{'houseId':houseId,'pageNum':pageNum,'pageSize':pageSize},
             dataType:"json",
-            type:"get",
+            type:"GET",
             async:false,
             success:function(json) {
-                countReal = json.count;
-                list =  json.list;
+                countReal = json.total;
+                list =  json.records;
             }
         })
         return list;
@@ -79,18 +83,15 @@ $(function(){
             var td_showRnd = $(this).children().eq(-2);
             var td_showQuote = $(this).children().eq(-1);
             td_showSolu.click(function(){
-                location.href = ctx +
-                    "/gotoShowCusSolu" +"?soluId=" +soluId ;
+                window.location.href = "/customer/showcussolu.html?soluId=" +soluId ;
                 //----------------------------------------------------------------查看方案
             })
             td_showRnd.click(function(){
-                location.href = ctx +
-                    "/gotoShowRnd" +"?soluId=" +soluId ;
+                window.location.href = "/customer/showrnd.html?soluId=" +soluId ;
                 //--------------------------------------------------------------查看效果图
             })
             td_showQuote.click(function(){
-                location.href = ctx +
-                    "/gotoShowQuote" +"?soluId=" +soluId ;
+                window.location.href = "/customer/showquote.html?soluId=" +soluId ;
                 //----------------------------------------------------------------查看报表
             })
         })
@@ -120,7 +121,7 @@ $(function(){
     pageRender('div_pagerender',countDflt);
 
     $('#img_back').click(function(){
-        //      location.href("客户住宅列表-----------------------------");
+        history.go(-1);
     })
 
 })
