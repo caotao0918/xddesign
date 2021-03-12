@@ -91,7 +91,7 @@
         $(function () {
 
             $.ajax({
-                url:"/design/customers/nopage"
+                url:"/xddesign/design/customers/nopage"
                 ,type:"GET"
                 ,dataType:"json"
                 ,async: false
@@ -137,7 +137,7 @@
         });
         form.on('select(inithouse)', function (data) {
             $.ajax({
-                url:"/design/customer/house/nopage"
+                url:"/xddesign/design/customer/house/nopage"
                 ,type:"GET"
                 ,data:{"customerId":data.value}
                 ,dataType:"json"
@@ -175,11 +175,11 @@
                 //     return false;
                 //   }
                 //   layer.close(index);
-                layer.confirm('确定删除吗？', function(index) {
+                layer.confirm('确定删除吗？', {icon:3, title: '提示'}, function(index) {
 
                     //执行 Ajax 后重载
                     $.ajax({
-                        url: '/design/customer/solutions/batchdelete'
+                        url: '/xddesign/design/customer/solutions/batchdelete'
                         ,type: 'POST'
                         ,data: JSON.stringify(checkData)
                         ,dataType: 'json'

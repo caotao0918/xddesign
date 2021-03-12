@@ -51,12 +51,16 @@
     </select>
 
     <select id="findByMobile" resultMap="UserAndRole">
-        select u.id,u.username, u.pwd, u.last_time ,r.name from t_user u,t_role r where u.role_id=r.id and mobile=#{mobile}
+        select u.id,u.username,u.mobile, u.pwd, u.last_time ,r.name, r.id as role_id from t_user u,t_role r where u.role_id=r.id and mobile=#{mobile}
     </select>
 
     <select id="selectDesignList" resultType="User">
         select user.id,user.username from t_user user,t_role role
         where user.role_id=role.id and role.name='设计人员'
+    </select>
+
+    <select id="selectRoleIdUserByUserId" resultType="Integer">
+        select r.id from t_user u , t_role r where u.role_id=r.id and u.id=#{id}
     </select>
 
 </mapper>

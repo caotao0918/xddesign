@@ -43,7 +43,7 @@
             <if test="customer.design.id != 0">
                 and c.design_id=#{customer.design.id}
             </if>
-            <if test="customer.code != 0">
+            <if test="customer.code != 0 and customer.code != null">
                 and c.code=#{customer.code}
             </if>
             <if test="customer.username != null and customer.username != ''">

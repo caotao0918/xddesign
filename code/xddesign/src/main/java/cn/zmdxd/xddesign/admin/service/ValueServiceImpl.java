@@ -1,12 +1,17 @@
 package cn.zmdxd.xddesign.admin.service;
 
 import cn.zmdxd.xddesign.admin.dao.ValueDao;
+import cn.zmdxd.xddesign.entity.ProductProperty;
+import cn.zmdxd.xddesign.entity.ProductVo;
 import cn.zmdxd.xddesign.entity.PropertyValue;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,5 +31,15 @@ public class ValueServiceImpl extends ServiceImpl<ValueDao, PropertyValue> imple
 //        map.put("valueName",propertyValue.getValueName());
 //        map.put("propertyId",propertyValue.getProperty().getPropertyId());
         return valueDao.insertValue(propertyValue);
+    }
+
+    @Override
+    public IPage<ProductVo> findProductPropertyValueList(Page<ProductVo> page, ProductVo productVo) {
+        return valueDao.selectProductPropertyValueList(page, productVo);
+    }
+
+    @Override
+    public List<ProductProperty> findByProductIdAndPropertyId(ProductVo productVo) {
+        return valueDao.selectByProductIdAndPropertyId(productVo);
     }
 }

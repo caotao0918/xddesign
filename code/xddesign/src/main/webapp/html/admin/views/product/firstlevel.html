@@ -51,7 +51,7 @@
           return layer.msg('请选择数据');
         }
         
-        layer.confirm('确定删除吗？', function(index) {
+        layer.confirm('确定删除吗？', {icon:3, title: '提示'}, function(index) {
             
           //执行 Ajax 后重载
           $.ajax({

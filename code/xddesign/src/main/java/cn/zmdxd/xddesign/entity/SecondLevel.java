@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import java.util.List;
@@ -27,5 +28,16 @@ public class SecondLevel {
 
     @TableField(exist = false)
     private List<Property> propertyList;//属性列表
+
+    @Override
+    public String toString() {
+        return "{" +
+                "secondId:" + secondId +
+                ", secondName:'" + secondName + '\'' +
+                ", secondDesc:'" + secondDesc + '\'' +
+                ", firstLevel:" + firstLevel +
+                ", propertyList:" + propertyList +
+                '}';
+    }
 
 }

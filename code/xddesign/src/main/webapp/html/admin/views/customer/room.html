@@ -98,7 +98,7 @@
 
         $(function(){
             $.ajax({
-                url:"/design/customers/nopage"
+                url:"/xddesign/design/customers/nopage"
                 ,type:"GET"
                 ,dataType:"json"
                 ,async: false
@@ -120,7 +120,7 @@
         });
         form.on('select(inithouse)', function (data) {
             $.ajax({
-                url:"/design/customer/house/nopage"
+                url:"/xddesign/design/customer/house/nopage"
                 ,type:"GET"
                 ,data:{"customerId":data.value}
                 ,dataType:"json"
@@ -140,7 +140,7 @@
         });
         form.on('select(initsolutions)', function (data) {
             $.ajax({
-                url:"/design/customer/solutions/nopage"
+                url:"/xddesign/design/customer/solutions/nopage"
                 ,type:"GET"
                 ,data:{"houseId":data.value}
                 ,dataType:"json"
@@ -178,11 +178,11 @@
                 //     return false;
                 //   }
                 //   layer.close(index);
-                layer.confirm('确定删除吗？', function(index) {
+                layer.confirm('确定删除吗？', {icon:3, title: '提示'}, function(index) {
 
                     //执行 Ajax 后重载
                     $.ajax({
-                        url: '/design/customer/house/batchdel'
+                        url: '/xddesign/design/customer/room/batchdel'
                         ,type: 'POST'
                         ,data: JSON.stringify(checkData)
                         ,dataType: 'json'
@@ -219,7 +219,7 @@
                             let field = data.field; //获取提交的字段
                             //提交 Ajax 成功后，静态更新表格中的数据
                             $.ajax({
-                                url: '/design/customer/room/saveorupdate'
+                                url: '/xddesign/design/customer/room/saveorupdate'
                                 ,type: 'POST'
                                 ,data: field
                                 ,dataType: 'json'

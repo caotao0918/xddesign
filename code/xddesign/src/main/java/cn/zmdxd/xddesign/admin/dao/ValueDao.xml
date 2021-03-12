@@ -8,4 +8,35 @@
         insert into t_property_value(value_name, property_id) VALUES (#{valueName},#{property.propertyId})
     </insert>
 
+    <select id="selectProductPropertyValueList" resultType="ProductVo">
+        select pv.value_id, pv.value_name
+        , property.property_name
+        , product.product_name
+        from t_property_value pv
+        left join t_product_property pp on pv.value_id = pp.value_id
+        left join t_property property on pv.property_id = property.property_id
+        left join t_product product on pp.product_id = product.product_id
+        left join t_secondlevel second on property.second_id = second.second_id
+        left join t_firstlevel first on second.first_id = first.first_id
+        <where>
+            <if test="productVo.firstId != null and productVo.firstId != 0">
+                first.first_id = #{productVo.firstId}
+            </if>
+            <if test="productVo.secondId != null and productVo.secondId != 0">
+                and second.second_id = #{productVo.secondId}
+            </if>
+            <if test="productVo.productId != null and productVo.productId != 0">
+                and product.product_id = #{productVo.productId}
+            </if>
+            <if test="productVo.productName != null and productVo.productName != ''">
+                and product.product_name like '%${productVo.productName}%'
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByProductIdAndPropertyId" parameterType="ProductVo" resultType="ProductProperty">
+        SELECT pp.id FROM t_product_property pp, t_property_value pv
+        where pp.value_id=pv.value_id and pp.product_id = #{productId} and pv.property_id = #{propertyId}
+    </select>
+
 </mapper>

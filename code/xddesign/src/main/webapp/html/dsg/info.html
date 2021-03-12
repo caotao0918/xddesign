@@ -1,0 +1,150 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>设置我的资料</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="../admin/layuiadmin/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="../admin/layuiadmin/style/admin.css" media="all">
+  <script src="/cmn/jquery/jquery-1.8.3.js"></script>
+  <script src="/js/login/logout.js"></script>
+</head>
+<body>
+<ul class="layui-nav" style="z-index: 1998">
+  <li class="layui-nav-item"><a href="main.html" style="font-size: 17px">迅达智能家居设计系统-设计人员</a></li>
+  <li class="layui-nav-item layui-col-md-offset3"><a href="listmycus.html">客户管理</a></li>
+  <li class="layui-nav-item">
+    <a href="javascript:">方案管理</a>
+    <dl class="layui-nav-child"> <!-- 二级菜单 -->
+      <dd><a href="">客户方案</a></dd>
+      <dd><a href="">我的模板</a></dd>
+      <dd><a href="">公共模板</a></dd>
+      <dd><a href="">快速方案</a></dd>
+    </dl>
+  </li>
+  <li class="layui-nav-item"><a href="../customer/goodslist.html">产品中心</a></li>
+  <li class="layui-nav-item"><a href="../customer/aftersalecnt.html">售后支持</a></li>
+  <li class="layui-nav-item layui-col-md-offset4">
+    <a href="javascript:">我</a>
+    <dl class="layui-nav-child"> <!-- 二级菜单 -->
+      <dd><a href="info.html">个人详情</a></dd>
+      <dd><a href="password.html">修改密码</a></dd>
+      <dd><a href="javascript:" onclick="userlogout()">退出</a></dd>
+    </dl>
+  </li>
+</ul>
+
+  <div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-md12">
+        <div class="layui-card">
+          <div class="layui-card-header">设置我的资料</div>
+          <div class="layui-card-body" pad15>
+            
+            <div class="layui-form" lay-filter="">
+              <div class="layui-form-item">
+                <label class="layui-form-label">我的角色</label>
+                <div class="layui-input-inline">
+                  <div class="layui-input-inline">
+                    <label>
+                      <input type="text" name="role.name" readonly class="layui-input">
+                    </label>
+                  </div>
+                </div>
+<!--                <div class="layui-form-mid layui-word-aux">当前角色不可更改为其它角色</div>-->
+              </div>
+              <div class="layui-form-item" hidden>
+                <label class="layui-form-label">roleId</label>
+                <div class="layui-input-inline">
+                  <label>
+                    <input type="text" name="role.id" class="layui-input">
+                  </label>
+                </div>
+              </div>
+              <div class="layui-form-item" hidden>
+                <label class="layui-form-label">userId</label>
+                <div class="layui-input-inline">
+                  <label>
+                    <input type="text" name="id" class="layui-input">
+                  </label>
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">用户名</label>
+                <div class="layui-input-inline">
+                  <label>
+                    <input type="text" name="username" lay-verify="required" class="layui-input">
+                  </label>
+                </div>
+<!--                <div class="layui-form-mid layui-word-aux">不可修改。一般用于后台登入名</div>-->
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">手机</label>
+                <div class="layui-input-inline">
+                  <label>
+                    <input type="text" name="mobile" value="" lay-verify="phone" autocomplete="off" class="layui-input">
+                  </label>
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <div class="layui-input-block">
+                  <button class="layui-btn" lay-submit lay-filter="setmyinfo">确认修改</button>
+<!--                  <button type="reset" class="layui-btn layui-btn-primary">重新填写</button>-->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../admin/layuiadmin/layui/layui.js"></script>
+  <script>
+  layui.config({
+    base: '../admin/layuiadmin/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index', 'set', 'element', 'form', 'layer'], function () {
+    const element = layui.element;
+    const $ = layui.$;
+    const form = layui.form;
+    const layer = layui.layer;
+
+    $(function () {
+      let rolename = window.localStorage.getItem("rolename");
+      let username = window.localStorage.getItem("username");
+      let mobile = window.localStorage.getItem("mobile");
+      $("input[name='role.name']").val(rolename);
+      $("input[name='username']").val(username);
+      $("input[name='mobile']").val(mobile);
+      $("input[name='id']").val(window.localStorage.getItem("userId"));
+      $("input[name='role.id']").val(window.localStorage.getItem("roleId"));
+    });
+    form.on('submit(setmyinfo)', function (data) {
+
+      $.ajax({
+        url:"/admin/user/saveorupdate",
+        data: data.field,
+        dataType:"text",
+        type:"POST",
+        success:function(res) {
+          layer.msg(res);
+          if (res === "操作成功") {
+            window.localStorage.setItem("mobile", data.field.mobile);
+            window.localStorage.setItem("username", data.field.username);
+            window.location.reload();
+          }
+        }
+      })
+
+    });
+
+  });
+  </script>
+</body>
+</html>

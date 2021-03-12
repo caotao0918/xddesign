@@ -19,4 +19,13 @@ public class FirstLevel {
     private String firstName;   //一级分类名称
     private String firstDesc;   //描述
 
+    @Override
+    public String toString() {
+        return "{" +
+                "firstId:" + firstId +
+                ", firstName:'" + firstName + '\'' +
+                ", firstDesc:'" + firstDesc + '\'' +
+                '}';
+    }
+
 }

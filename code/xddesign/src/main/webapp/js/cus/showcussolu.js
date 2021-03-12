@@ -25,7 +25,7 @@ $(function(){
             soluName = data.soluName;
             roomList = data.roomList;
         }
-    })
+    });
     $('#div_soluname span').html(soluName);
 
     bindRoom();
@@ -37,19 +37,18 @@ $(function(){
         var indexCurr = $(this).index();
         $('#div_tab>div').eq(indexCurr).show();
         $('#div_tab>div').eq(indexCurr).siblings().hide();
-    })
+    });
     $('#div_roomlist div').eq(0).click();
 
     $('#div_tab>div div').click(function(){
         var prodId = $(this).children('span:last-child').html();
         location.href = "showprod.html?prodId=" + prodId;
-    })
-
+    });
 
     $('#img_back').click(function(){
         history.go(-1);
-    })
-})
+    });
+});
 /**
  *----------------------------------------------------------------------------方案详情
  */

@@ -84,7 +84,7 @@
         //查询客户类别列表和设计人员列表
         $(function () {
             $.ajax({
-                url:"/design/customer/category"
+                url:"/xddesign/design/customer/category"
                 ,type:"GET"
                 ,dataType:"json"
                 ,async: false
@@ -148,11 +148,11 @@
                 //     return false;
                 //   }
                 //   layer.close(index);
-                layer.confirm('确定删除吗？', function(index) {
+                layer.confirm('确定删除吗？', {icon:3, title: '提示'}, function(index) {
 
                     //执行 Ajax 后重载
                     $.ajax({
-                        url: '/design/customer/batchdel'
+                        url: '/xddesign/design/customer/batchdel'
                         ,type: 'POST'
                         ,data: JSON.stringify(checkData)
                         ,dataType: 'json'
@@ -189,7 +189,7 @@
                             let field = data.field; //获取提交的字段
                             //提交 Ajax 成功后，静态更新表格中的数据
                             $.ajax({
-                                url: '/design/customer/saveOrUpdate'
+                                url: '/xddesign/design/customer/saveOrUpdate'
                                 ,type: 'POST'
                                 ,data: field
                                 ,dataType: 'json'

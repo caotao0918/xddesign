@@ -4,7 +4,7 @@
     layui.form;
     i.render({
         elem: "#LAY-customer-manage",
-        url: "/design/customers",
+        url: "/xddesign/design/customers",
         cols: [[{type: "checkbox", fixed: "left"}, {field: "id", width: 100, title: "ID", sort: !0},
             {field: "username", title: "客户名称", minWidth: 100, templet: '<div><a href="house.html?id={{d.id}}">{{d.username}}</a></div>'}, {field: "mobile", title: "电话"},
             {field: "desc", title: "客户类别"}, {field: "demand", title: "客户需求", sort: !0},{field: "address", title: "联系地址"},
@@ -31,6 +31,13 @@
                     'count': 0, //数据长度
                     'data': [] //数据列表，是直接填充进表格中的数组
                 }
+            }else if (res.records.length == 0) {
+                return {
+                    'code': 201, //接口状态
+                    'msg': '无数据', //提示文本
+                    'count': 0, //数据长度
+                    'data': [] //数据列表，是直接填充进表格中的数组
+                }
             }else {
                 return {
                     "code": 0,
@@ -47,9 +54,9 @@
             // layer.prompt({formType: 1, title: "敏感操作，请验证口令"}
             // , function (t, i) {
             // layer.close(i),
-            layer.confirm("真的删除行么", function (t) {
+            layer.confirm("真的删除行么", {icon:3, title: '提示'}, function (t) {
                 layui.$.ajax({
-                    url: '/design/customer/del'
+                    url: '/xddesign/design/customer/del'
                     ,type: 'POST'
                     ,data: {"id":e.data.id}
                     ,dataType: 'json'
@@ -83,7 +90,7 @@
                         let field = data.field; //获取提交的字段
                         //提交 Ajax 成功后，静态更新表格中的数据
                         layui.$.ajax({
-                            url: '/design/customer/saveOrUpdate'
+                            url: '/xddesign/design/customer/saveOrUpdate'
                             ,type: 'POST'
                             ,data: field
                             ,dataType: 'json'
@@ -116,7 +123,7 @@
         }
     }), i.render({
             elem: "#LAY-house-manage",
-            url: "/design/customer/house",
+            url: "/xddesign/design/customer/house",
             cols: [[{type: "checkbox", fixed: "left"}, {field: "houseId", width: 100, title: "ID", sort: !0},
                 {field: "houseName", title: "房子名称", minWidth: 100, templet: '<div><a href="solutions.html?houseId={{d.houseId}}">{{d.houseName}}</a></div>'}
                 ,{field: "houseAddress", title: "地址"}, {field: "customer", title: "所属客户",templet: '<div>{{ d.customer.username }}</div>'},
@@ -142,6 +149,13 @@
                         'count': 0, //数据长度
                         'data': [] //数据列表，是直接填充进表格中的数组
                     }
+                }else if (res.records.length == 0) {
+                    return {
+                        'code': 201, //接口状态
+                        'msg': '无数据', //提示文本
+                        'count': 0, //数据长度
+                        'data': [] //数据列表，是直接填充进表格中的数组
+                    }
                 }else {
                     return {
                         "code": 0,
@@ -158,9 +172,9 @@
             // layer.prompt({formType: 1, title: "敏感操作，请验证口令"}
             // , function (t, i) {
             // layer.close(i),
-            layer.confirm("真的删除行么", function (t) {
+            layer.confirm("真的删除行么", {icon:3, title: '提示'}, function (t) {
                 layui.$.ajax({
-                    url: '/design/customer/house/del'
+                    url: '/xddesign/design/customer/house/del'
                     ,type: 'POST'
                     ,data: {"houseId":e.data.houseId}
                     ,dataType: 'json'
@@ -192,12 +206,17 @@
                     //监听提交
                     iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
                         let field = data.field; //获取提交的字段
+                        let houseType = {};
+                        houseType['typeName'] = field.typeName;
+                        houseType['typeId'] = field.typeId;
+                        field['houseType'] = houseType;
                         //提交 Ajax 成功后，静态更新表格中的数据
                         layui.$.ajax({
-                            url: '/design/customer/house/saveorupdate'
+                            url: '/xddesign/design/customer/house/saveorupdate'
                             ,type: 'POST'
-                            ,data: field
+                            ,data: JSON.stringify(field)
                             ,dataType: 'json'
+                            ,contentType:'application/json'
                             ,success: function (res) {
                                 if (res.status == 0) {
                                     layer.msg(res.msg, {icon:5});
@@ -219,12 +238,13 @@
                     $("input[name='houseId']").val(e.data.houseId);
                     $("input[name='houseName']").val(e.data.houseName);
                     $("input[name='houseAddress']").val(e.data.houseAddress);
+                    $("input[name='typeName']").val(e.data.houseType.typeName);
                 }
             })
         }
     }), i.render({
         elem: "#LAY-solutions-manage",
-        url: "/design/customer/solutions",
+        url: "/xddesign/design/customer/solutions",
         cols: [[{type: "checkbox", fixed: "left"}, {field: "soluId", width: 100, title: "ID", sort: !0},
             {field: "soluName", title: "方案名称", minWidth: 100, templet: '<div><a href="room.html?soluId={{d.soluId}}">{{d.soluName}}</a></div>'}
             ,{field: "soluDesc", title: "方案描述"},{field: "state", title: "方案状态"}, {field: "addTime", title: "方案上次修改时间"},
@@ -251,6 +271,13 @@
                     'count': 0, //数据长度
                     'data': [] //数据列表，是直接填充进表格中的数组
                 }
+            }else if (res.records.length == 0) {
+                return {
+                    'code': 201, //接口状态
+                    'msg': '无数据', //提示文本
+                    'count': 0, //数据长度
+                    'data': [] //数据列表，是直接填充进表格中的数组
+                }
             }else {
                 return {
                     "code": 0,
@@ -263,9 +290,9 @@
         text: "对不起，加载出现异常！"
     }), i.on("tool(LAY-solutions-manage)", function (e) {
         e.data;
-        if ("del" === e.event) layer.confirm("确定删除此方案？", function (t) {
+        if ("del" === e.event) layer.confirm("确定删除此方案？", {icon:3, title: '提示'}, function (t) {
             layui.$.ajax({
-                url: '/design/customer/solutions/delete'
+                url: '/xddesign/design/customer/solutions/delete'
                 ,type: 'POST'
                 ,data: {"soluId":e.data.soluId}
                 ,dataType: 'json'
@@ -350,6 +377,13 @@
                         'count': 0, //数据长度
                         'data': [] //数据列表，是直接填充进表格中的数组
                     }
+                }else if (res.records.length == 0) {
+                    return {
+                        'code': 201, //接口状态
+                        'msg': '无数据', //提示文本
+                        'count': 0, //数据长度
+                        'data': [] //数据列表，是直接填充进表格中的数组
+                    }
                 }else {
                     return {
                         "code": 0,
@@ -362,7 +396,7 @@
             text: "对不起，加载出现异常！"
         }), i.on("tool(LAY-room-manage)", function (e) {
         e.data;
-        if ("del" === e.event) layer.confirm("确定删除此方案？", function (t) {
+        if ("del" === e.event) layer.confirm("确定删除此房间？", {icon:3, title: '提示'}, function (t) {
             layui.$.ajax({
                 url: '/admin/customer/room/delete'
                 ,type: 'POST'
@@ -378,6 +412,9 @@
                     }
                     e.del();
                     layui.table.reload('LAY-room-manage');
+                }
+                ,error: function () {
+                    layer.msg("服务器错误，请重试", {icon:5});
                 }
             });
             layer.close(t);
@@ -452,6 +489,13 @@
                     'count': 0, //数据长度
                     'data': [] //数据列表，是直接填充进表格中的数组
                 }
+            }else if (res.records.length == 0) {
+                return {
+                    'code': 201, //接口状态
+                    'msg': '无数据', //提示文本
+                    'count': 0, //数据长度
+                    'data': [] //数据列表，是直接填充进表格中的数组
+                }
             }else {
                 return {
                     "code": 0,
@@ -464,7 +508,7 @@
         text: "对不起，加载出现异常！"
     }), i.on("tool(LAY-pn-manage)", function (e) {
         e.data;
-        if ("del" === e.event) layer.confirm("确定删除此行？", function (t) {
+        if ("del" === e.event) layer.confirm("确定删除此行？", {icon:3, title: '提示'}, function (t) {
             layui.$.ajax({
                 url: '/admin/customer/pn/delete'
                 ,type: 'POST'

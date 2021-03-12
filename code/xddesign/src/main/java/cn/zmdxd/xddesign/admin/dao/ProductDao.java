@@ -17,17 +17,17 @@ import java.util.Map;
  */
 public interface ProductDao extends BaseMapper<Product> {
 
-    Integer insertProduct(Map<String, Object> map);
-
     Integer insertProductProerty(@Param("productId") Integer productId, @Param("valueId") Integer valueId);
 
     Integer insertProduct(ProductVo productVo);
 
-    IPage<Product> findProducts(Page<Product> page, @Param("offset") Integer offset, @Param("size")Integer size);
+    IPage<Product> findProducts(Page<Product> page, @Param("offset") Integer offset, @Param("size")Integer size, @Param("productVo") ProductVo productVo);
     List<Product> findProductList();
     Product findProduct(Integer productId);
 
     int removeProductProperty(Integer valueId);
 
-    IPage<Product> findProductsBySecond(Page<Product> page, @Param("secondId") Integer secondId, @Param("offset") Integer offset, @Param("size")Integer size);
+    int countProduct(ProductVo productVo);
+
+    List<Product> findProductsBySecond(Integer secondId);
 }

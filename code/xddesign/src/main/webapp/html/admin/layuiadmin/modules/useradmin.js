@@ -26,6 +26,13 @@
                     'count': 0, //数据长度
                     'data': [] //数据列表，是直接填充进表格中的数组
                 }
+            }else if (res.records.length == 0) {
+                return {
+                    'code': 201, //接口状态
+                    'msg': '无数据', //提示文本
+                    'count': 0, //数据长度
+                    'data': [] //数据列表，是直接填充进表格中的数组
+                }
             }else {
                 return {
                     "code": 0,
@@ -42,7 +49,7 @@
             // layer.prompt({formType: 1, title: "敏感操作，请验证口令"}
             // , function (t, i) {
             // layer.close(i),
-            layer.confirm("真的删除行么", function (t) {
+            layer.confirm("真的删除么", {icon:3, title: '提示'}, function (t) {
                 layui.$.ajax({
                     url: '/admin/user/del'
                     ,type: 'POST'
@@ -84,10 +91,10 @@
                             ,dataType: 'text'
                             ,success: function (res) {
                                 layer.msg(res);
+                                layui.table.reload('LAY-user-manage'); //数据刷新
+                                layer.close(index); //关闭弹层
                             }
                         });
-                        layui.table.reload('LAY-user-manage'); //数据刷新
-                        layer.close(index); //关闭弹层
                     });
 
                     submit.trigger('click');
@@ -133,6 +140,13 @@
                     'count': 0, //数据长度
                     'data': [] //数据列表，是直接填充进表格中的数组
                 }
+            }else if (res.records.length == 0) {
+                return {
+                    'code': 201, //接口状态
+                    'msg': '无数据', //提示文本
+                    'count': 0, //数据长度
+                    'data': [] //数据列表，是直接填充进表格中的数组
+                }
             }else {
                 return {
                     "code": 0,
@@ -144,7 +158,7 @@
         text: "对不起，加载出现异常！"
     }), i.on("tool(LAY-user-back-role)", function (e) {
         e.data;
-        if ("del" === e.event) layer.confirm("确定删除此角色？", function (t) {
+        if ("del" === e.event) layer.confirm("确定删除此角色？", {icon:3, title: '提示'}, function (t) {
             layui.$.ajax({
                 url: '/admin/role/del'
                 ,type: 'POST'

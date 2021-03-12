@@ -7,6 +7,16 @@ body{
     padding: 0;
 }
 /*----------------------------------------------------------------------------主页面*/
+.div_cusname{
+    background-color: #FFFFFF;
+    float: left;
+    margin-left: 50px;
+    margin-top:23px;
+    text-align: center;
+    font-family: 隶书;
+    font-size: 29px;
+    font-weight: bold;
+}
 .div_cusopt{
     background-color: #FFFFFF;
     line-height:42px;padding:0;border:0}

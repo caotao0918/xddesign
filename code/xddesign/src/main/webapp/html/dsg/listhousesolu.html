@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>住宅对应方案列表</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <!-- we code these -->
+    <link rel="stylesheet" href="/cmn/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/css/dsg/listhousesolu.css" />
+    <script type="text/javascript" src="/cmn/jquery/jquery-1.8.3.js"></script>
+    <script type="text/javascript" src="/js/utils/getUrlParam.js"></script>
+    <script charset="utf-8" src="/cmn/layui/layui.js" ></script>
+    <script type="text/javascript" src="/cmn/mylayui/mylayui.js"></script>
+    <script type="text/javascript" src="/js/dsg/listhousesolu.js"></script>
+    <script src="/js/login/logout.js"></script>
+</head>
+<body>
+<ul class="layui-nav" style="z-index: 1998">
+    <li class="layui-nav-item"><a href="main.html" style="font-size: 17px">迅达智能家居设计系统-设计人员</a></li>
+    <li class="layui-nav-item layui-col-md-offset3"><a href="listmycus.html">客户管理</a></li>
+    <li class="layui-nav-item">
+        <a href="javascript:;">方案管理</a>
+        <dl class="layui-nav-child"> <!-- 二级菜单 -->
+            <dd><a href="">客户方案</a></dd>
+            <dd><a href="">我的模板</a></dd>
+            <dd><a href="">公共模板</a></dd>
+            <dd><a href="">快速方案</a></dd>
+        </dl>
+    </li>
+    <li class="layui-nav-item"><a href="../customer/goodslist.html">产品中心</a></li>
+    <li class="layui-nav-item"><a href="../customer/aftersalecnt.html">售后支持</a></li>
+    <li class="layui-nav-item layui-col-md-offset4">
+        <a href="javascript:;">我</a>
+        <dl class="layui-nav-child"> <!-- 二级菜单 -->
+            <dd><a href="info.html">个人详情</a></dd>
+            <dd><a href="password.html">修改密码</a></dd>
+            <dd><a href="javascript:;" onclick="userlogout()">退出</a></dd>
+        </dl>
+    </li>
+</ul>
+<script>
+    layui.use('element', function () {
+        var element = layui.element;
+    });
+</script>
+<div>
+
+    <div>
+        <img id = "img_back" class = "img_back" src="/img/back.svg"/>
+    </div>
+    <div id = "div_plus" class = "div_plus">
+        <img src = "/img/plus_.svg"/>
+        <img src = "/img/plus1.svg"/>
+    </div>
+
+
+    <div>
+        <table id = "t_solu" class = "t_solu">
+        </table>
+    </div>
+    <div id = "div_pagernd" class = "div_pagernd">
+
+    </div>
+
+
+
+</div>
+</body>
+</html>

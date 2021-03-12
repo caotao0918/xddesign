@@ -18,12 +18,12 @@ public interface ProductService extends IService<Product> {
 
     boolean saveProductProperty(Integer productId, Integer valueId);
 
-    IPage<Product> findProducts(Page<Product> page,Integer current, Integer size);
+    IPage<Product> findProducts(Page<Product> page,Integer current, Integer size, ProductVo productVo);
     List<Product> findProducts();
 
     boolean removeProductProperty(Integer valueId);
 
-    IPage<Product> findProductsBySecond(Page<Product> page, Integer secondId, Integer current, Integer size);
+    List<Product> findProductsBySecond(Integer secondId);
 
     Product findProduct(Integer productId);
 }

@@ -5,7 +5,6 @@
     background-size:714px 778px; overflow:hidden;
 }
 .div_logo{
-    /*width:322px;*/
     height:203px;
     margin-top:70px;
     position: relative;
@@ -48,7 +47,6 @@
 }
 .div_cuslogin>div:last-of-type{
     margin-top:60px;
-    /*margin-left:42%;*/
     float: none;
     border:0;
     line-height: 40px;

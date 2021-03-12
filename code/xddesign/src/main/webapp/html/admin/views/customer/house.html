@@ -81,7 +81,7 @@
         $(function () {
 
             $.ajax({
-                url:"/design/customer/houseType"
+                url:"/xddesign/design/customer/houseType"
                 ,type:"GET"
                 ,dataType:"json"
                 ,async: false
@@ -128,11 +128,11 @@
                 //     return false;
                 //   }
                 //   layer.close(index);
-                layer.confirm('确定删除吗？', function(index) {
+                layer.confirm('确定删除吗？', {icon:3, title: '提示'}, function(index) {
 
                     //执行 Ajax 后重载
                     $.ajax({
-                        url: '/design/customer/house/batchdel'
+                        url: '/xddesign/design/customer/house/batchdel'
                         ,type: 'POST'
                         ,data: JSON.stringify(checkData)
                         ,dataType: 'json'
@@ -167,12 +167,17 @@
                         //监听提交
                         iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
                             let field = data.field; //获取提交的字段
+                            let houseType = {};
+                            houseType['typeName'] = field.typeName;
+                            houseType['typeId'] = field.typeId;
+                            field['houseType'] = houseType;
                             //提交 Ajax 成功后，静态更新表格中的数据
                             $.ajax({
-                                url: '/design/customer/house/saveorupdate'
+                                url: '/xddesign/design/customer/house/saveorupdate'
                                 ,type: 'POST'
-                                ,data: field
+                                ,data: JSON.stringify(field)
                                 ,dataType: 'json'
+                                ,contentType:'application/json'
                                 ,success: function (res) {
                                     if (res.status==0) {
                                         layer.msg(res.msg, {icon:5});

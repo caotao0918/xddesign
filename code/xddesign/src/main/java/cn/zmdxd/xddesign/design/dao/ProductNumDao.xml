@@ -10,6 +10,7 @@
         <association property="product" javaType="Product">
             <id column="product_id" property="productId" />
             <result column="product_name" property="productName" />
+            <result column="price" property="price" />
             <collection property="pictureList" ofType="Picture">
                 <id column="picture_id" property="pictureId" />
                 <result column="picture_name" property="pictureName" />

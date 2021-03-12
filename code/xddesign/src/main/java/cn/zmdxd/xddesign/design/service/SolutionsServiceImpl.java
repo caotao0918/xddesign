@@ -4,11 +4,14 @@ import cn.zmdxd.xddesign.design.dao.*;
 import cn.zmdxd.xddesign.entity.*;
 import cn.zmdxd.xddesign.util.CookieUtil;
 import cn.zmdxd.xddesign.util.ReturnResult;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
@@ -21,6 +24,7 @@ import java.util.*;
  * @description:
  */
 @Service
+@Transactional
 public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> implements SolutionsService {
 
     @Autowired
@@ -33,13 +37,8 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
     private QuoteDao quoteDao;
     @Autowired
     private TemplateDao templateDao;
-
-//    @Override
-//    public Integer saveSolutions(Solutions solutions) {
-//        solutions.setState(SolutionsStateEnum.DESIGNING.getMsg());
-//        solutions.setAddTime(Timestamp.valueOf(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
-//        return solutionsDao.insertSolutions(solutions);
-//    }
+    @Autowired
+    private RenderingsDao renderingsDao;
 
     @Override
     public IPage<Solutions> findSolutionsList(Page<Solutions> page, Solutions solutions) {
@@ -78,10 +77,13 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
     public ReturnResult saveOrUpdateSolution(Solutions solutions, HttpServletRequest request) {
         ReturnResult result = new ReturnResult();
         Template template = null;
-        if (solutions.getSoluId() != null) {
+        Integer oldSoluId = null;
+        if (solutions.getSoluId() != null) {   //修改方案
 
             //删除方案之前要先得到该方案对应的模板方案信息
             template = templateDao.selectTemplateBySoluId(solutions.getSoluId());
+            //得到方案id，以更新效果图t_renderings表
+            oldSoluId = solutions.getSoluId();
 
             /*
             删除此id对应的方案
@@ -89,6 +91,7 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
              */
             int removeById = solutionsDao.deleteById(solutions.getSoluId());
             if (removeById != 1) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
                 result.setStatus(0);
                 result.setMsg("添加失败，请稍后重试");
                 return result;
@@ -111,12 +114,24 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
             map.put("designId",template.getDesign().getId());
             int insertTemplate = templateDao.insertTemplate(map);
             if (insertTemplate != 1) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
                 result.setStatus(0);
                 result.setMsg("添加失败，请稍后重试");
                 return result;
             }
         }
+
+        //将更新后的方案id同步更新到方案效果图表里
+        if (oldSoluId != null) {
+            Renderings renderings = new Renderings();
+            renderings.setSoluId(solutions.getSoluId());
+            int updateRenderingsBySoluId = renderingsDao.update(renderings, new UpdateWrapper<Renderings>().eq("solu_id", oldSoluId));
+            System.out.println(updateRenderingsBySoluId);
+            System.out.println("=========================");
+        }
+
         if (saveSolutions != 1) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
             result.setMsg("添加失败，请稍后重试");
             result.setStatus(0);
             return result;
@@ -128,6 +143,7 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
             room.setSoluId(solutions.getSoluId());
             saveRoom = roomDao.insertRoom(room);//将房间信息插入表t_room
             if (saveRoom != 1) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
                 result.setMsg("添加失败，请稍后重试");
                 result.setStatus(0);
                 return result;
@@ -139,12 +155,14 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
                 productNum.setRoomId(room.getRoomId());
                 saveProductNum = productNumDao.insertProductNum(productNum);//将房间内的产品及数量插入表t_product_num
                 quote.setSoluId(solutions.getSoluId());
+                quote.setRoomId(room.getRoomId());
                 quote.setRoomName(room.getRoomName());
                 quote.setProductName(productNum.getProduct().getProductName());
                 quote.setProductNum(productNum.getPnNum());
                 quote.setPrice(productNum.getProduct().getPrice());
                 saveQuote = quoteDao.insert(quote);//将报价单保存到t_quote
                 if (saveProductNum != 1 || saveQuote != 1) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
                     result.setMsg("添加失败，请稍后重试");
                     result.setStatus(0);
                     return result;

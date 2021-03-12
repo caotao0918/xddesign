@@ -3,9 +3,12 @@ package cn.zmdxd.xddesign.common.handler;
 import cn.zmdxd.xddesign.entity.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -99,14 +102,18 @@ public class MyController {
         house_1.setHouseId(1);
         house_1.setHouseName("我的老家");
         house_1.setHouseAddress("朝阳区1环1巷1号");
-//        house_1.setHouseType("一房一厅");
+        //------------------------------------------------------------------wzz20210218
+        HouseType houseType = new HouseType();
+        houseType.setTypeName("一房一厅");
+        house_1.setHouseType(houseType);
         house_1.setSolutionsList(solutionsList);
 
         House house_2 = new House();
         house_2.setHouseId(2);
         house_2.setHouseName("上班住房");
         house_2.setHouseAddress("清水湾复式单元11号");
-//        house_2.setHouseType("两房一厅");
+        houseType.setTypeName("两房一厅");
+        house_2.setHouseType(houseType);
         house_2.setSolutionsList(solutionsList);
 
         List<House> houseList = new ArrayList<House>(10);
@@ -433,7 +440,7 @@ public class MyController {
 
     @RequestMapping("/gotoAfterSaleCnt")
     public String gotoAfterSaleCnt() {
-        return "/customer/aftersalecnt.html";
+        return "cus/aftersalecnt";
     }
 
     @RequestMapping("/queryLeftNav")
@@ -453,7 +460,8 @@ public class MyController {
         for (int i = 0; i < 10; i++) {
             SecondLevel secondLevel = new SecondLevel();
             secondLevel.setFirstLevel(firstLevel_1);
-            secondLevel.setSecondName("照明" + (i + 1) );
+            secondLevel.setSecondName("照明" + (i + 1));
+            secondLevel.setSecondId(202+i);
             list_1.add(secondLevel);
         }
         List<SecondLevel> list_2 = new ArrayList<SecondLevel>(10);
@@ -461,6 +469,7 @@ public class MyController {
             SecondLevel secondLevel = new SecondLevel();
             secondLevel.setFirstLevel(firstLevel_2);
             secondLevel.setSecondName("开关" + (i + 1));
+            secondLevel.setSecondId(252+i);
             list_2.add(secondLevel);
         }
 
@@ -514,8 +523,9 @@ public class MyController {
 
     @RequestMapping("/queryVideo")
     @ResponseBody
-    public List<Video> queryVideo(String fstLevName,String scdLevName){
+    public List<Video> queryVideo(String fstLevName,String scdLevName) throws UnsupportedEncodingException {
         //传了一级二级的fstLevName、scdLevName，当做关键字。
+        System.out.println("--------------------------" + fstLevName + "----" + URLDecoder.decode(scdLevName, "UTF-8"));
         return getVideo();
     }
     //--------------------------------------------------------测试数据，需要改成真的
@@ -530,9 +540,171 @@ public class MyController {
         }
         return list;
     }
+    /**
+     * ---------------------------------------------------------------------------设计师
+     */
+    @RequestMapping("/chkUserLogin")
+    @ResponseBody
+    public Map<String,Object> chkUserLogin(String username,String password){
+        System.out.println(username + password);
+        Map<String,Object> map = new HashMap<String, Object>(5);
+        map.put("123",123);
+        return map;
+    }
 
-    @RequestMapping("/goto111")
-    public String goto111(){
-        return "dsg/111";
+//    @RequestMapping("/design/customers")
+//    @ResponseBody
+//    public Object customers(Integer current,Integer size,Integer id){
+//        if(null == id) {
+//            return getCusList();
+//        }else{
+//            return getCus();
+//        }
+//    }
+
+    //-------------------------------------------------------------------------测试数据
+    public Map<String,Object> getCusList(){
+        List<Customer> list = new ArrayList<Customer>(10);
+        for(int i = 0;i<5;i++){
+            Customer cus = new Customer();
+            User user = new User();
+            user.setUsername("设计师001");
+            cus.setDesign(user);
+            cus.setId(411 + i);
+            cus.setUsername("张一山_"+i);
+            cus.setDesc("个人_" + i);
+            cus.setMobile("1555555555" + i);
+            cus.setAddress("朝阳区1栋1单元" + i + "号");
+            list.add(cus);
+        }
+
+        Map<String,Object> map = new HashMap<String, Object>(10);
+        map.put("records",list);
+        map.put("total", 5);
+        return map;
+    }
+
+    //-------------------------------------------------------------------------测试数据
+    public Customer getCus(){
+       Customer cus = new Customer();
+       User user = new User();
+       user.setUsername("设计师001");
+       cus.setDesign(user);
+       cus.setId(411);
+       cus.setUsername("张一山_");
+        cus.setPwd("6543210");
+       cus.setDesc("个人_");
+        cus.setMobile("15555555555");
+        cus.setAddress("朝阳区1栋1单元" + 1 + "号");
+        cus.setHouseList(getMyHouseList());
+        return cus;
+    }
+
+    @RequestMapping("/design/customer/saveOrUpdate")
+    @ResponseBody
+    public Map<String,Object> saveOrUpdate(Customer cus){
+        //如果cus有id是更新数据，没有id是插入新数据
+        Map<String,Object> map = new HashMap<String, Object>(5);
+        map.put("status", 1);
+        if(null  == cus.getId()) {
+            //-----------------------------------------------------------没有id是插入新数据
+            map.put("msg", "添加客户信息成功！");
+        }else {
+            //--------------------------------------------------------如果cus有id是更新数据
+            map.put("msg","修改客户信息成功！");
+        }
+        //-------------------------------------------------添加成功后需要返回一个cusId
+        map.put("cusId", 666666);
+        return map;
+    }
+
+//    @RequestMapping("/design/customer/house/saveorupdate")
+//    @ResponseBody
+//    public Map<String,Object> addHouse(@RequestBody House house){
+//        Map<String,Object> map = new HashMap<String, Object>(5);
+//        map.put("status",1);
+//        if(null == house.getHouseId()) {
+//            map.put("msg", "已成功添加住宅！");
+//        }else {
+//            map.put("msg", "修改住宅成功！");
+//        }
+//        //----------------------------------------------添加成功后需要返回一个houseId
+//        map.put("houseId",new Random().nextInt(100) +1);
+//        return map;
+//    }
+
+    @RequestMapping("/design/customer/house/delete")
+    @ResponseBody
+    public Map<String,Object> delHouse(Integer houseId){
+        Map<String,Object> map = new HashMap<String, Object>(5);
+        map.put("status",1);
+        map.put("msg","删除成功！");
+        return map;
+    }
+
+    @RequestMapping("/design/customers/del")
+     @ResponseBody
+     public Map<String,Object> delCus(Integer id){
+        Map<String,Object> map = new HashMap<String, Object>(5);
+        map.put("status",1);
+        map.put("msg","删除成功！");
+        return map;
+    }
+
+    @RequestMapping("/queryAllProdList")
+    @ResponseBody
+    public Map<String,Object> queryAllProdList(){
+        Map<String,Object> map = new HashMap<String, Object>(5);
+        map.put("status",1);
+        map.put("records",getAllProdList());
+        return map;
+    }
+
+    public List<Map<SecondLevel, List<Product>>> getAllProdList(){
+        List<List<SecondLevel>> listLeftNav = getLeftNav();
+        List<Product> listProd = new ArrayList<Product>(10);
+        for(int i = 0;i<31;i++) {
+            Product prod = new Product();
+
+            Picture picture_1 = new Picture();
+            picture_1.setPictureId(601);
+            picture_1.setPictureLink("http://www.zmdxd.cn:8089//xddz/ueditor/2020/11/5/eeb94e7fed66407998860b9e83a6ff91.jpg");
+            Picture picture_2 = new Picture();
+            picture_2.setPictureId(602);
+            picture_2.setPictureLink("http://www.zmdxd.cn:8089//xddz/ueditor/2020/11/5/21f35f840c8a46099288fbcc80080a29.jpg");
+            Picture picture_3 = new Picture();
+            picture_3.setPictureId(603);
+            picture_3.setPictureLink("http://www.zmdxd.cn:8089//xddz/ueditor/2020/11/5/d58e092e89054e1bbd60580f1c604d37.jpg");
+
+            List<Picture> pictureList_1 = new ArrayList<Picture>(10);
+            pictureList_1.add(picture_1);
+            pictureList_1.add(picture_2);
+            pictureList_1.add(picture_3);
+            prod.setPictureList(pictureList_1);
+
+            prod.setProductId(10086 + i);
+            prod.setProductName("迅达_智能产品A款" + (i + 1) + "号");
+            listProd.add(prod);
+        }
+
+        List<Map<SecondLevel, List<Product>>> list = new ArrayList<Map<SecondLevel, List<Product>>>(5);
+        for (List<SecondLevel> listScdLev : listLeftNav) {
+            Map<SecondLevel, List<Product>> map = new LinkedHashMap<SecondLevel, List<Product>>(20);
+            for (SecondLevel key : listScdLev) {
+                map.put(key, listProd);
+            }
+            list.add(map);
+        }
+        return list;
+    }
+
+    @RequestMapping("/addHouseSolu")
+    @ResponseBody
+    public Map<String,Object> addHouseSolu(@RequestBody Solutions solu){
+        System.out.println(solu);
+        Map<String,Object> map = new HashMap<String, Object>(5);
+        map.put("status",1);
+        map.put("msg","新增方案成功!");
+        return map;
     }
 }

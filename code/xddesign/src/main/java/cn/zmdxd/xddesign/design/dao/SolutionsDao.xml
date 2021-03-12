@@ -56,7 +56,7 @@
                room.room_id,room.room_name,room.room_desc,
                user.id as uid,user.username as uname,
                pn.product_id,pn.pn_num,pn.pn_id,
-               product.product_id,product.product_name,
+               product.product_id,product.product_name,product.price,
                picture.picture_id,picture.picture_link,picture.picture_name
         from t_solutions solutions
             left join t_user user on solutions.designer_id = user.id

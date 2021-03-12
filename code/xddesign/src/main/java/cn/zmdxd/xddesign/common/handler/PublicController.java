@@ -118,7 +118,7 @@ public class PublicController {
         out.close();
     }
 
-    //查询二级分类列表
+    //查询二级分类列表(售后中心左边侧栏)
     @RequestMapping(value = "secondlevels/products")
     public Map<String, List<Product>> findSecondLevelList() {
         List<SecondLevel> secondLevelList = secondLevelService.list(new QueryWrapper<SecondLevel>().select("second_id", "second_name"));
@@ -131,7 +131,6 @@ public class PublicController {
             }
             map.put(secondLevel.getSecondName(), productList);
         }
-        System.out.println(map);
         return map;
     }
 
@@ -158,7 +157,10 @@ public class PublicController {
     //根据方案id查询方案详情
     @RequestMapping(value = "customer/solution")
     public Solutions findSolution(Integer soluId) {
-        return solutionsService.findSolutions(soluId);
+        Solutions solutions = solutionsService.findSolutions(soluId);
+        System.out.println(solutions);
+        System.out.println("=====");
+        return solutions;
     }
 
     //根据方案id查看方案报价单
@@ -279,9 +281,9 @@ public class PublicController {
     }
 
     //查看产品列表（不分页）
-    @RequestMapping(value = "products")
-    public List<Product> findProducts() {
-        return productService.findProducts();
-    }
+//    @RequestMapping(value = "products")
+//    public List<Product> findProducts() {
+//        return productService.findProducts();
+//    }
 
 }

@@ -1,0 +1,246 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>添加产品信息</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="/html/admin/layuiadmin/layui/css/layui.css" media="all">
+</head>
+<body>
+
+  <div class="layui-form" lay-filter="layuiadmin-product-manage" id="layuiadmin-product-manage" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+      <div class="layui-form-item">
+        <label class="layui-form-label">产品名称</label>
+        <div class="layui-input-inline">
+          <input type="text" name="productName" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+        <label class="layui-form-label">产品型号</label>
+        <div class="layui-input-inline">
+          <input type="text" name="productModels" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+        <label class="layui-form-label">产品价格</label>
+        <div class="layui-input-inline">
+          <input type="text" name="price" lay-verify="required|number" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">官网链接</label>
+        <div class="layui-input-block">
+          <input type="text" name="productLink" placeholder="http(s)://" lay-verify="url" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">产品描述</label>
+        <div class="layui-input-block">
+          <textarea type="text" name="productDesc" placeholder="请输入" lay-verify="required" autocomplete="off" class="layui-textarea"></textarea>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">一级分类</label>
+        <div class="layui-input-inline">
+          <select name="firstId" lay-search lay-filter="initsecondlevel">
+          </select>
+        </div>
+        <label class="layui-form-label">二级分类</label>
+        <div class="layui-input-inline">
+          <select name="secondId" lay-search lay-filter="initproperty">
+          </select>
+        </div>
+      </div>
+      <div class="layui-form-item" id="product_property">
+      </div>
+      <div class="layui-form-item">
+        <input type="file" name="file" value="上传产品图片" multiple="multiple">
+      </div>
+<!--      <div class="layui-upload">-->
+<!--        <button type="button" class="layui-btn" id="selectpic">选择产品图片</button>-->
+<!--        <button type="button" class="layui-btn" id="uploadpic">上传图片并添加产品</button>-->
+<!--        <div class="layui-progress layui-progress-big" lay-filter="progress" lay-showPercent="true">-->
+<!--          <div class="layui-progress-bar" lay-percent="0%"></div>-->
+<!--        </div>-->
+<!--        <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">-->
+<!--          预览图：-->
+<!--          <div class="layui-upload-list" id="showpic"></div>-->
+<!--        </blockquote>-->
+<!--      </div>-->
+    </div>
+    <div class="layui-form-item layui-hide">
+      <button class="layui-btn" lay-submit lay-filter="LAY-product-front-submit" id="LAY-product-front-submit" onclick="setProductInfo()">提交</button>
+    </div>
+  </div>
+
+  <script src="/cmn/jquery/jquery-1.8.3.js"></script>
+  <script src="/html/admin/layuiadmin/layui/layui.js"></script>
+  <script>
+  layui.config({
+    base: '/html/admin/layuiadmin/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index', 'form', 'upload', 'element'], function(){
+    var $ = layui.$
+    ,form = layui.form
+    ,upload = layui.upload
+    ,element = layui.element;
+
+    $(function () {
+      $.ajax({
+        url:"/admin/firstlevel/nopage"
+        ,type:"GET"
+        ,dataType:"json"
+        ,async: false
+        ,success:function(res) {
+          let select = $("select[name='firstId']");
+          select.empty();
+          let con = '<option value="0">-请选择-</option>';
+          for (let i = 0; i < res.length; i++) {
+            con += '<option value='+'"'+res[i].firstId+'"'+'>'+res[i].firstName+'</option>';
+          }
+          select.html(con);
+          //这一步必不可少
+          form.render("select");
+        }
+      });
+
+    });
+
+    form.on('select(initsecondlevel)', function(data){
+      $.ajax({
+        url:"/admin/secondlevel/nopage"
+        ,type:"GET"
+        ,data: {"firstId": data.value}
+        ,dataType:"json"
+        ,async: false
+        ,success:function(res) {
+          let select = $("select[name='secondId']");
+          select.empty();
+          let con = '<option value="0">-请选择-</option>';
+          for (let i = 0; i < res.length; i++) {
+            con += '<option value='+'"'+res[i].secondId+'"'+'>'+res[i].secondName+'</option>';
+          }
+          select.html(con);
+          //这一步必不可少
+          form.render("select");
+        }
+      });
+    });
+
+    form.on('select(initproperty)', function(data){
+      $.ajax({
+        url:"/admin/secondlevel/property/nopage"
+        ,type:"GET"
+        ,data: {"secondId": data.value}
+        ,dataType:"json"
+        ,async: false
+        ,success:function(res) {
+          let propertyhtml = $("#product_property");
+          propertyhtml.empty();
+          let con = "";
+          for (let i = 0; i < res.length; i++) {
+            con += '<label class="layui-form-label">' + res[i].propertyName + '</label><div class="layui-input-inline"><input type="text" name="propertyId" id="propertyId'+i+'" value="'+res[i].propertyId+'" hidden>' +
+                    '<input type="text" id="valueName'+i+'" name="valueName" lay-verify="required" placeholder="请输入或选择" autocomplete="off" class="layui-input">' +
+                    '<div class="layui-input-inline"><select id="commonValue'+i+'" lay-search lay-filter="setValueName"></select></div></div>';
+
+          }
+          propertyhtml.html(con);
+          //这一步必不可少
+          form.render();
+
+          bindCommonValueList(res);
+        }
+      });
+      function bindCommonValueList(list) {
+        let commonValueList;
+        for (let j = 0; j < list.length; j++) {
+          let cont = '';
+          let valuesele = $("#"+"commonValue"+j+"");
+          commonValueList = list[j].commonValueList;
+          valuesele.empty();
+          for (let l = 0; l < commonValueList.length; l++) {
+            cont += '<option value="'+j+'">'+commonValueList[l]+'</option>';
+            valuesele.html(cont);
+          }
+        }
+        form.render("select");
+      }
+    });
+    form.on('select(setValueName)', function (data) {
+      let text = $(this).text();
+      $("#"+"valueName"+data.value).val(text);
+    });
+
+    var loadindex;
+    //多图片上传
+    upload.render({
+      elem: '#selectpic'
+      ,url: '/admin/test'
+      ,auto: false
+      ,data: {
+        name: function(){
+          return $('input[name="productName"]').val();
+        }
+      }
+      ,multiple: true
+      ,size: 10*1024
+      ,bindAction: '#uploadpic'
+      ,choose: function (obj) {
+        //将每次选择的文件追加到文件队列
+        var files = obj.pushFile();
+        obj.preview(function(index, file, result){
+          $('#showpic').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img" width="200px" height="200px">')
+        });
+      }
+      ,before: function(obj){
+        console.log(form.VerifyForm("layuiadmin-product-manage"));
+        if (!form.VerifyForm("layuiadmin-product-manage")) {
+          layer.stopPropagation();
+        }
+        loadindex = layer.load();//上传loading
+      }
+      ,progress: function(n, elem){
+        var percent = n + '%' //获取进度百分比
+        element.progress('progress', percent); //配合 layui 进度条元素使用
+      }
+      ,done: function (res, index, upload) {
+        //添加产品失败
+        if (res.status == 0) {
+          return layer.msg(res.msg, {icon:5});
+          //上传图片失败
+        }else if (res.status == 2) {
+          return layer.msg(res.msg, {icon:5});
+        }else {
+        }
+      }
+      ,allDone: function(obj){ //当文件全部被提交后，才触发
+        layer.msg("上传了"+obj.total+"张图片 成功"+obj.successful+"张 失败"+obj.aborted+"张");
+        layer.close(loadindex);
+      }
+      ,error: function(index, upload){
+        return layer.msg("服务器出现错误，请重试", {icon:5});
+      }
+    });
+
+  })
+  function setProductInfo() {
+    let propertylist = [];       //创建数组
+    let propertyId;              //属性id
+    $("input[name='valueName']").each(function (index, element) {
+      let propertymap = new Map(); //创建map
+      propertyId = $("#propertyId"+index).val();//得到属性id
+      console.log(this.value);
+      console.log(propertyId);
+      propertymap.set("valueName", this.value); //属性值
+      propertymap.set("propertyId", propertyId);//属性id
+      console.log(propertymap);
+      propertylist.push(propertymap);
+    });
+    console.log("------------");
+    console.log(propertylist);
+  }
+  </script>
+</body>
+</html>

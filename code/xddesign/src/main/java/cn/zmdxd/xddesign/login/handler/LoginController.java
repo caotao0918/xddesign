@@ -106,7 +106,7 @@ public class LoginController {
     public ReturnResult modifyUserPassword(String oldPassword, String password, HttpServletRequest request) {
         Integer userId = Integer.valueOf(CookieUtil.getCookieValue(request, "userId"));
         User user = userService.getOne(new QueryWrapper<User>().eq("id",userId).select("pwd"));
-        if (!MD5Utils.verify(oldPassword, user.getPwd())) return ReturnResult.returnResult(false);
+        if (!MD5Utils.verify(oldPassword, user.getPwd())) return ReturnResult.returnResult(false, "当前密码输入有误");
         password = MD5Utils.generate(password);
         boolean update = userService.update(new UpdateWrapper<User>().eq("id", userId).set("pwd", password));
         return ReturnResult.returnResult(update);
@@ -170,7 +170,7 @@ public class LoginController {
     public ReturnResult modifyCustomerPassword(String oldPassword, String password,HttpServletRequest request) {
         Integer customerId = Integer.valueOf(CookieUtil.getCookieValue(request, "customerId"));
         Customer customer = customerService.getOne(new QueryWrapper<Customer>().eq("id", customerId).select("pwd"));
-        if (!MD5Utils.verify(oldPassword,customer.getPwd())) return ReturnResult.returnResult(false);
+        if (!MD5Utils.verify(oldPassword,customer.getPwd())) return ReturnResult.returnResult(false, "当前密码输入有误");
         password = MD5Utils.generate(password);
         boolean update = customerService.update(new UpdateWrapper<Customer>().eq("id", customerId).set("pwd", password));
         return ReturnResult.returnResult(update);

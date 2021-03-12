@@ -27,4 +27,6 @@ public interface UserDao extends BaseMapper<User> {
 
     List<User> selectDesignList();
 
+    Integer selectRoleIdUserByUserId(Integer id);
+
 }

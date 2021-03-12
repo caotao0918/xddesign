@@ -55,15 +55,17 @@ public class AdminController {
     @Autowired
     private PictureService pictureService;//产品图片接口
     @Autowired
-    private CustomerService customerService;
+    private CustomerService customerService;//客户接口
     @Autowired
-    private SolutionsService solutionsService;
+    private SolutionsService solutionsService;//方案接口
     @Autowired
-    private RoomService roomService;
+    private RoomService roomService;//房间接口
     @Autowired
-    private TemplateService templateService;
+    private TemplateService templateService;//模板方案接口
     @Autowired
-    private ProductNumService productNumService;
+    private ProductNumService productNumService;//产品数量接口
+    @Autowired
+    private QuoteService quoteService;//产品报价单接口
 
     @Value("${upload_path}")
     private String uploadPath;
@@ -198,7 +200,13 @@ public class AdminController {
         if (templateService.findTemplateBySoluId(room.getSoluId()) != null) {
             return ReturnResult.returnResult(false, "该房间关联了模板方案，不能删除");
         }
-        return ReturnResult.returnResult(roomService.removeById(room.getRoomId()));
+        boolean removeById = roomService.removeById(room.getRoomId());
+        boolean removeQuoteByRoomId = quoteService.remove(new QueryWrapper<Quote>().eq("room_id", room.getRoomId()));
+        if (!removeById || !removeQuoteByRoomId) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+            return ReturnResult.returnResult(false);
+        }
+        return ReturnResult.returnResult(true);
     }
 
     //批量删除客户房间
@@ -340,14 +348,7 @@ public class AdminController {
     //根据二级分类id查询二级分类信息
     @RequestMapping(value = "secondlevel")
     public SecondLevel findSecondLevel(Integer secondId) {
-        SecondLevel secondLevel = secondLevelService.findSecondLevel(secondId);
-        List<Property> propertyList = secondLevel.getPropertyList();
-        for (Property property:propertyList) {
-            String[] split = property.getCommonValue().split("，");
-            List<String> commonValueList = Arrays.asList(split);
-            property.setCommonValueList(commonValueList);
-        }
-        return secondLevel;
+        return secondLevelService.findSecondLevel(secondId);
     }
 
     //查询二级分类列表（不分页）
@@ -361,6 +362,12 @@ public class AdminController {
     public IPage<Property> findPropertyList(Property property, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
         Page<Property> page = new Page<>(current, size);
         return propertyService.findPropertyList(page, property);
+    }
+
+    //查询二级分类产品属性列表（不分页）
+    @RequestMapping(value = "secondlevel/property/nopage")
+    public List<Property> findPropertyList(Integer secondId) {
+        return propertyService.list(new QueryWrapper<Property>().eq("second_id", secondId).select("property_id", "property_name", "common_value"));
     }
 
     /**
@@ -418,6 +425,76 @@ public class AdminController {
             }
         }
         return ReturnResult.returnResult(true);
+    }
+
+    //根据二级分类id查询产品列表（不分页）
+    @RequestMapping(value = "secondlevel/products/nopage")
+    public List<Product> findProductsBySecondLevel(Integer secondId) {
+        return productService.list(new QueryWrapper<Product>().eq("second_id", secondId).select("product_id", "product_name"));
+    }
+
+    //查询产品属性信息
+    @RequestMapping(value = "product/property")
+    public IPage<ProductVo> findProductPropertyValueList(ProductVo productVo, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+        Page<ProductVo> page = new Page<>(current, size);
+        String productName = productVo.getProductName();
+        if (productName != null) {
+            productName = productName.trim();
+        }
+        productVo.setProductName(productName);
+        return valueService.findProductPropertyValueList(page, productVo);
+    }
+
+    //添加产品属性信息（单个添加）
+    @RequestMapping(value = "product/property/add", method = RequestMethod.POST)
+    public ReturnResult saveProductProperty(ProductVo productVo) {
+        if (productVo.getProductId() == null || productVo.getPropertyId() == null) {
+            return ReturnResult.returnResult(false, "必填项不能为空！");
+        }
+        List<ProductProperty> productPropertyList = valueService.findByProductIdAndPropertyId(productVo);
+        if (productPropertyList.isEmpty()) {
+            PropertyValue propertyValue = new PropertyValue();
+            Property property = new Property();
+            property.setPropertyId(productVo.getPropertyId());
+            propertyValue.setValueName(productVo.getValueName());
+            propertyValue.setProperty(property);
+            Integer save = valueService.saveValue(propertyValue);
+            if (save != 1) {
+                return ReturnResult.returnResult(false);
+            }
+            boolean state = productService.saveProductProperty(productVo.getProductId(), propertyValue.getValueId());//将产品id和属性值id保存到t_product_property中
+            if (!state) {
+                return ReturnResult.returnResult(false);
+            }
+            return ReturnResult.returnResult(true);
+
+        }else {
+            return ReturnResult.returnResult(false, "该产品已有此属性");
+        }
+    }
+
+
+    //修改产品某个属性信息
+    @RequestMapping(value = "product/property/update", method = RequestMethod.POST)
+    public ReturnResult updateProductProperty(PropertyValue propertyValue) {
+        boolean state = valueService.update(new UpdateWrapper<PropertyValue>().eq("value_id",propertyValue.getValueId()).set("value_name",propertyValue.getValueName()));
+        return ReturnResult.returnResult(state);
+    }
+
+    //删除产品某个属性
+    @RequestMapping(value = "/product/property/delete", method = RequestMethod.POST)
+    public ReturnResult deleteProductProperty(Integer valueId) {
+        ReturnResult result = new ReturnResult();
+        boolean state2 = productService.removeProductProperty(valueId);
+        boolean state1 = valueService.removeById(valueId);
+        if (state2 && state1) {
+            result.setStatus(1);
+            result.setMsg("删除成功");
+        }else {
+            result.setStatus(0);
+            result.setMsg("删除失败，请稍后重试");
+        }
+        return result;
     }
 
     /**
@@ -523,6 +600,7 @@ public class AdminController {
                 return result;
             }
         }
+
         boolean removeByIds = guideService.removeByIds(ids);
         return ReturnResult.returnResult(removeByIds);
     }
@@ -539,6 +617,14 @@ public class AdminController {
     public ReturnResult deleteQuestion(@RequestBody ArrayList<Integer> ids) {
         boolean removeByIds = questionService.removeByIds(ids);
         return ReturnResult.returnResult(removeByIds);
+    }
+
+    @RequestMapping(value = "test", method = RequestMethod.POST)
+    public ReturnResult uploadPic(ProductVo productVo, @RequestParam(value = "files", required = false) MultipartFile[] files, String name) {
+        System.out.println(productVo);
+        System.out.println(name);
+//        System.out.println(files.length);
+        return ReturnResult.returnResult(true, "上传成功");
     }
 
     /**
@@ -577,11 +663,9 @@ public class AdminController {
             }
 
             if (files != null) {
-
                 Picture picture = new Picture();
                 Picture picture1 = pictureService.getOne(new QueryWrapper<Picture>().eq("product_id", productVo.getProductId()).eq("default_picture", true), true);//查看该产品图片是否已经有默认图片
                 int i = 0;
-
                 for (MultipartFile file:files) {
                     if (file.getSize() == 0) {
                         result.setStatus(0);
@@ -603,16 +687,15 @@ public class AdminController {
                         result.setMsg("添加失败，请稍后重试");
                         return result;
                     }
+
                     i = i + 1;
                 }
             }
 
             result.setStatus(1);
             result.setMsg("添加成功");
-
         }
         return result;
-
     }
 
     /**
@@ -621,30 +704,15 @@ public class AdminController {
      * @param size:每页条数
      */
     @RequestMapping(value = "products", method = RequestMethod.GET)
-    public Object findProducts(@RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+    public Object findProducts(@RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size, ProductVo productVo) {
         //由于mybatis-plus对一表对多表left join查询的支持欠缺，所以不用它的分页查询
-        Page<Product> page = new Page<>(1,1000000000);
+        Page<Product> page = new Page<>(1,100000000);
         page.setSearchCount(false);
-        IPage<Product> iPage = productService.findProducts(page, current, size);
-        iPage.setSize(size);
-        iPage.setTotal(productService.count(new QueryWrapper<Product>().select("product_id")));
-        return iPage;
-    }
-
-    /**
-     * @description: 根据二级分类查找其下的产品列表
-     * @param secondId:二级分类id
-     * @param current:当前页数
-     * @param size:每页条数
-     */
-    @RequestMapping(value = "secondlevel/products", method = RequestMethod.GET)
-    public IPage<Product> findProductsBySecondLevel(Integer secondId,@RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
-        Page<Product> page = new Page<>(1,1000000000);
-        page.setSearchCount(false);
-        IPage<Product> iPage = productService.findProductsBySecond(page, secondId, current, size);
-        iPage.setSize(size);
-        iPage.setTotal(productService.count(new QueryWrapper<Product>().select("product_id").eq("second_id",secondId)));
-        return iPage;
+        String productName = productVo.getProductName();
+        if (productName != null) {
+            productVo.setProductName(productName.trim());
+        }
+        return productService.findProducts(page, current, size, productVo);
     }
 
     //修改产品基本信息
@@ -652,37 +720,6 @@ public class AdminController {
     public ReturnResult updateProduct(Product product) {
         boolean update = productService.update(new UpdateWrapper<Product>().eq("product_id", product.getProductId()).set("product_name", product.getProductName()).set("product_link", product.getProductLink()).set("product_models", product.getProductModels()).set("product_desc", product.getProductDesc()).set("price", product.getPrice()).set("product_reserve1", product.getProductReserve1()).set("product_reserve2", product.getProductReserve2()).set("product_reserve3", product.getProductReserve3()).set("product_reserve4", product.getProductReserve4()).set("product_reserve5", product.getProductReserve5()));
         return ReturnResult.returnResult(update);
-    }
-
-    //批量删除产品
-    @RequestMapping(value = "product/delete", method = RequestMethod.POST)
-    public ReturnResult deleteProduct(@RequestBody List<Integer> idList) {
-        boolean removeByIds = productService.removeByIds(idList);
-        return ReturnResult.returnResult(removeByIds);
-    }
-
-    //修改产品某个属性信息
-    @RequestMapping(value = "product/property/update", method = RequestMethod.POST)
-    public ReturnResult updateProperty(PropertyValue propertyValue) {
-        boolean state = valueService.update(new UpdateWrapper<PropertyValue>().eq("value_id",propertyValue.getValueId()).set("value_name",propertyValue.getValueName()));
-        return ReturnResult.returnResult(state);
-    }
-
-    //删除产品某个属性
-    @RequestMapping(value = "/product/property/delete")
-    public ReturnResult deleteProperty(PropertyValue propertyValue) {
-        ReturnResult result = new ReturnResult();
-        boolean state2 = productService.removeProductProperty(propertyValue.getValueId());
-        boolean state1 = valueService.removeById(propertyValue.getValueId());
-        System.out.println(state1+""+state2);
-        if (state2 && state1) {
-            result.setStatus(1);
-            result.setMsg("删除成功");
-        }else {
-            result.setStatus(0);
-            result.setMsg("删除失败，请稍后重试");
-        }
-        return result;
     }
 
     /**

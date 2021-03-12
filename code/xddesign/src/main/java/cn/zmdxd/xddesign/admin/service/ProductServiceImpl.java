@@ -40,9 +40,14 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product> impleme
     }
 
     @Override
-    public IPage<Product> findProducts(Page<Product> page, Integer current, Integer size) {
+    public IPage<Product> findProducts(Page<Product> page, Integer current, Integer size, ProductVo productVo) {
         Integer offset = (current-1)*size;
-        return productDao.findProducts(page, offset, size);
+        int total = productDao.countProduct(productVo);
+        IPage<Product> products = productDao.findProducts(page, offset, size, productVo);
+        products.setSize(size);
+        products.setTotal(total);
+        products.setCurrent(current);
+        return products;
     }
 
     @Override
@@ -57,9 +62,8 @@ public class ProductServiceImpl extends ServiceImpl<ProductDao, Product> impleme
     }
 
     @Override
-    public IPage<Product> findProductsBySecond(Page<Product> page, Integer secondId,Integer current, Integer size) {
-        Integer offset = (current-1)*size;
-        return productDao.findProductsBySecond(page,secondId, offset, size);
+    public List<Product> findProductsBySecond(Integer secondId) {
+        return productDao.findProductsBySecond(secondId);
     }
 
     @Override

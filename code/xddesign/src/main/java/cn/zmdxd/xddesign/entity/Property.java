@@ -3,8 +3,10 @@ package cn.zmdxd.xddesign.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -13,6 +15,7 @@ import java.util.List;
  * @description: 产品属性实体类
  */
 @Data
+@JsonIgnoreProperties({"commonValueList"})
 public class Property {
 
     @TableId(value = "property_id", type = IdType.AUTO)
@@ -28,5 +31,10 @@ public class Property {
     private SecondLevel secondLevel;
     @TableField(exist = false)
     private Integer firstId;
+
+    public List<String> getCommonValueList() {
+        String[] split = getCommonValue().split("，");
+        return Arrays.asList(split);
+    }
 
 }

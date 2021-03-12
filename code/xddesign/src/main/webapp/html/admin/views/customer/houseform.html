@@ -34,10 +34,10 @@
     <div class="layui-form-item">
         <label class="layui-form-label">户型</label>
         <div class="layui-input-inline">
-            <input type="text" name="houseType.typeName" lay-verify="required" placeholder="可以选择或输入" autocomplete="off" class="layui-input">
+            <input type="text" name="typeName" lay-verify="required" placeholder="可以选择或输入" autocomplete="off" class="layui-input">
         </div>
         <div class="layui-input-inline">
-            <select name="houseType.typeId" lay-filter="inittypename">
+            <select name="typeId" lay-filter="inittypename">
             </select>
         </div>
     </div>
@@ -82,12 +82,12 @@
         //查询角色
         $(function () {
             $.ajax({
-                url:"/design/customer/houseType"
+                url:"/xddesign/design/customer/houseType"
                 ,type:"GET"
                 ,dataType:"json"
                 ,async: false
                 ,success:function(res) {
-                    let select = $("select[name='houseType.typeId']");
+                    let select = $("select[name='typeId']");
                     select.empty();
                     let con;
                     for (let i = 0; i < res.length; i++) {
@@ -100,7 +100,7 @@
             });
             //查询所有客户
             $.ajax({
-                url:"/design/customers/nopage"
+                url:"/xddesign/design/customers/nopage"
                 ,type:"GET"
                 ,dataType:"json"
                 ,async: false
@@ -119,7 +119,7 @@
 
             //给选择框赋值
             let typeId = UrlParam.param("typeId");
-            let typeSele = $("select[name='houseType.typeId'] [value="+ typeId +"]");
+            let typeSele = $("select[name='typeId'] [value="+ typeId +"]");
             typeSele.prop("selected", true);
             form.render("select");
             if (UrlParam.hasParam("typeId")) {
@@ -128,8 +128,8 @@
 
         })
         form.on('select(inittypename)', function (data) {
-            let text = $("select[name='houseType.typeId'] option:selected").text();
-            $("input[name='houseType.typeName']").val(text);
+            let text = $("select[name='typeId'] option:selected").text();
+            $("input[name='typeName']").val(text);
         });
 
 

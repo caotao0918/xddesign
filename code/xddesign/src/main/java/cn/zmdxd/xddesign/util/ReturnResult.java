@@ -1,5 +1,8 @@
 package cn.zmdxd.xddesign.util;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 
 /**
@@ -12,6 +15,7 @@ public class ReturnResult implements Serializable {
     private static final long serialVersionUID = 1L;
     private int status;
     private String msg;
+    private Integer id;
     public int getStatus() {
         return status;
     }
@@ -23,6 +27,12 @@ public class ReturnResult implements Serializable {
     }
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+    public Integer getId() {
+        return id;
+    }
+    public void setId(Integer id) {
+        this.id = id;
     }
     @Override
     public String toString() {

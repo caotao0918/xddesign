@@ -20,13 +20,6 @@ public class ProductVo{
     private Double price;//产品价格
     private String productDesc;//产品描述
 
-    private Integer secondId;//产品二级分类id
-    private Integer guideId;//产品手册id
-    private Integer videoId;//产品视频id
-
-//    private Integer propertyId;//属性id
-//    private String valueName;//属性值
-
     private List<Map<String,Object>> propertyValueList;
 
     private Double productReserve1;//保留字段
@@ -34,4 +27,15 @@ public class ProductVo{
     private Double productReserve3;//保留字段
     private String productReserve4;//保留字段
     private String productReserve5;//保留字段
+
+    private Integer propertyId;    //属性id
+    private String propertyName;//属性名称
+    private Integer valueId;//属性值id
+    private String valueName;//属性值
+    private Integer firstId;//产品一级分类id
+    private Integer secondId;//产品二级分类id
+
+    private Integer guideId;//产品手册id
+    private Integer videoId;//产品视频id
+
 }

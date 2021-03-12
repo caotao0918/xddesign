@@ -1,0 +1,78 @@
+@charset "utf-8";
+body{
+    background-color: #F2F2F2;
+}
+*{
+    margin: 0;
+    padding: 0;
+}
+/*---------------------------------------------------------------------我的客户列表*/
+.img_back{
+    opacity: 0.39;
+    margin-top:50px;
+    margin-left:50px;
+}
+.img_back:hover{
+    cursor: pointer;
+    opacity: 1;
+}
+
+.div_pagernd{
+    background-color: #FFFFFF;
+    margin: 0px 0px 0px 50px;
+    text-align: center;
+}
+
+.t_cus tr td{
+    width:100px;
+    height: 30px;
+    text-align: center;
+}
+.t_cus tr td:nth-last-child(3){
+    width:200px;
+}
+
+.t_cus tr{
+    background-color: #FFFFFF;
+    display: block;
+    margin:0px 0px 14px 50px;
+}
+.t_cus tr:hover{
+    cursor: pointer;
+    background-color: #F59A23;
+}
+.t_cus tr:nth-child(1){
+    margin:52px 0px 14px 50px;
+}
+
+.t_cus tr td:last-of-type{
+    width: 44px;
+    height: 30px;
+    background: url(../../img/del.png) center no-repeat;
+}
+.t_cus tr td:last-of-type:hover{
+    background-image: url(../../img/delhover.png);
+}
+
+.div_plus{
+    margin-left: 749px;
+    position: absolute;
+    width: 44px;
+    height: 30px;
+    margin-top: -31px;
+}
+.div_plus:hover{
+    cursor: pointer;
+    background-color: #DCDCDC;
+}
+.div_plus img:first-child{
+    position: absolute;
+    margin-left: 14px;
+    top: 50%;
+}
+.div_plus img:last-child{
+    position: absolute;
+    left:50%;
+    top:25%;
+}
+/*---------------------------------------------------------------------我的客户列表*/

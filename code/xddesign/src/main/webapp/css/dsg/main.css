@@ -1,0 +1,83 @@
+@charset "utf-8";
+body{
+    background-color: #F2F2F2;
+}
+*{
+    margin: 0;
+    padding: 0;
+}
+/**--------------------------------------------------------------------设计师主页面*/
+.div_wcm{
+    background-color: #FFFFFF;
+    float: left;
+    margin-left: 50px;
+    margin-top:23px;
+    text-align: center;
+    font-family: 隶书;
+    font-size: 29px;
+    font-weight: bold;
+}
+
+.div_leftnav{
+    margin-top: 44px;
+    clear: both;
+    width: 500px;
+    margin-left: 50px;
+}
+.div_leftnav:hover{
+    box-shadow: 4px 4px 6px 0 rgba(255,255,255,0),
+    -4px -4px 6px 0 rgba(116,125,136,.3),
+    inset -4px -4px 6px 0 rgba(255,255,255,.2),
+    inset 4px 4px 6px 0 rgba(116,125,136,0);
+}
+.div_leftnav .layui-nav-tree{
+    width: 500px;
+    background-color: #FFFFFF!important;
+}
+.div_leftnav .layui-nav li>a{
+    font-size: 25px;
+    text-align: center;
+}
+.div_leftnav .layui-nav dd>a{
+    font-size: 20px;
+    text-align: center;
+}
+.div_leftnav .layui-nav-more{
+    display: none;
+}
+.div_leftnav a{
+    /*background-color: #FFFFFF;*/
+    color: #333!important;
+}
+.div_leftnav a:hover{
+    color: #FFFFFF!important;
+}
+.div_leftnav .layui-nav li>a:hover{
+    background-color: #03C8A8;
+}
+.div_leftnav .layui-nav-itemed>a{
+    background-color: #03C8A8;
+}
+.div_leftnav .layui-nav dd>a:hover{
+    background-color: #7ED7D0;
+    margin: 0 120px;
+}
+.div_leftnav .layui-this>a{
+    background-color: #7ED7D0!important;
+    color: #FFFFFF!important;
+    margin: 0 120px;
+}
+.div_leftnav dd.layui-this{
+    background-color: #FFFFFF!important;
+}
+.div_leftnav .layui-nav-itemed>.layui-nav-child{
+    background-color: #FFFFFF!important;
+}
+
+body>div{
+    float: left;
+}
+.div_leftnav{
+    float: left;
+}
+/**--------------------------------------------------------------------设计师主页面*/

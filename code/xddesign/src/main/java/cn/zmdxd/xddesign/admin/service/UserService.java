@@ -19,4 +19,6 @@ public interface UserService extends IService<User> {
 
     List<User> findDesignList();
 
+    Integer findRoleIdByUserId(Integer id);
+
 }

@@ -1,5 +1,8 @@
 package cn.zmdxd.xddesign.design.handler;
 
+import cn.zmdxd.xddesign.admin.service.FirstLevelService;
+import cn.zmdxd.xddesign.admin.service.ProductService;
+import cn.zmdxd.xddesign.admin.service.SecondLevelService;
 import cn.zmdxd.xddesign.design.service.*;
 import cn.zmdxd.xddesign.entity.*;
 import cn.zmdxd.xddesign.util.CookieUtil;
@@ -49,6 +52,12 @@ public class DesignController {
     private HouseTypeService houseTypeService;//户型接口
     @Autowired
     private TemplateService templateService;
+    @Autowired
+    private FirstLevelService firstLevelService;
+    @Autowired
+    private SecondLevelService secondLevelService;
+    @Autowired
+    private ProductService productService;
 
     @Value("${upload_path}")
     private String uploadPath;
@@ -68,7 +77,9 @@ public class DesignController {
             customer.setDesign(user);
         }
         //管理员添加客户时指定由哪个设计人员负责该客户
-        return customerService.saveOrUpdateCustomer(customer);
+        ReturnResult result = customerService.saveOrUpdateCustomer(customer);
+        result.setId(customer.getId());
+        return result;
 
     }
 
@@ -161,14 +172,14 @@ public class DesignController {
 
     /**
      * @description: 添加或修改客户房子信息，当house中的id为null时添加/不为null时修改
-     * @param customerId:客户id
      * @param house:房子信息(房子名称、房子地址)
      */
     @RequestMapping(value = "customer/house/saveorupdate")
-    public ReturnResult saveOrUpdateHouse(Integer customerId, House house) {
+    public ReturnResult saveOrUpdateHouse(@RequestBody House house) {
         ReturnResult result = new ReturnResult();
         Integer typeId;
         HouseType houseType = houseTypeService.getOne(new QueryWrapper<HouseType>().eq("type_name", house.getHouseType().getTypeName()), true);
+        System.out.println(houseType);
         if (houseType == null) {
             HouseType houseType1 = new HouseType();
             houseType1.setTypeName(house.getHouseType().getTypeName());
@@ -195,14 +206,16 @@ public class DesignController {
 
         if (house.getHouseId() == null) {
             //新增房子信息
-//            house.setCustomerId(customerId);
-            return houseService.saveHouse(house);
+            ReturnResult saveHouse = houseService.saveHouse(house);
+            saveHouse.setId(house.getHouseId());
+            return saveHouse;
 
         }else {
             //修改房子信息 可供修改的项有：房子名称、房子地址、房子户型
             boolean update = houseService.update(new UpdateWrapper<House>().eq("house_id", house.getHouseId()).set("house_name", house.getHouseName()).set("house_address", house.getHouseAddress()).set("type_id", typeId).set("house_reserve1",house.getHouseReserve1()).set("house_reserve2",house.getHouseReserve2()).set("house_reserve3",house.getHouseReserve3()));
-            return ReturnResult.returnResult(update);
-
+            ReturnResult returnResult = ReturnResult.returnResult(update);
+            returnResult.setId(house.getHouseId());
+            return returnResult;
         }
     }
 
@@ -379,6 +392,45 @@ public class DesignController {
         return solutionsService.saveOrUpdateSolution(solutions, request);
     }
 
+    //查询添加方案时对应的左侧分类栏
+    @RequestMapping(value = "customer/solutions/levels")
+    public List<List<SecondLevel>> findFirstLevelAndSecondLevel() {
+        List<FirstLevel> firstLevelList = firstLevelService.list(new QueryWrapper<FirstLevel>().select("first_id", "first_name"));
+        List<SecondLevel> secondLevelList;
+        List<List<SecondLevel>> levelList = new ArrayList<>();
+        for (FirstLevel firstLevel:firstLevelList) {
+            secondLevelList = secondLevelService.list(new QueryWrapper<SecondLevel>().eq("first_id", firstLevel.getFirstId()).select("second_id", "second_name"));
+            for (SecondLevel secondLevel:secondLevelList) {
+                secondLevel.setFirstLevel(firstLevel);
+            }
+            levelList.add(secondLevelList);
+        }
+        return levelList;
+    }
+
+    //根据二级分类查询对应产品列表
+    public List<Product> findProductBySecondId(Integer secondId) {
+        return productService.findProductsBySecond(secondId);
+    }
+
+    //查询全部二级分类下的全部产品
+    @RequestMapping(value = "customer/solutions/level/products")
+    public List<Map<SecondLevel, List<Product>>> findAllProducts() {
+        List<List<SecondLevel>> listLeftNav = findFirstLevelAndSecondLevel();
+        System.out.println(listLeftNav);
+        List<Map<SecondLevel, List<Product>>> list = new ArrayList<>();
+        Map<SecondLevel, List<Product>> map = new LinkedHashMap<>();
+        List<Product> listProduct;
+        for (List<SecondLevel> listScdLev : listLeftNav) {
+            for (SecondLevel key : listScdLev) {
+                listProduct = findProductBySecondId(key.getSecondId());
+                map.put(key, listProduct);
+            }
+            list.add(map);
+        }
+        return list;
+    }
+
     /**
      * @description: 添加和修改方案信息-自定义方案
      * (当solutions中的solu_id为null时，直接添加方案;不为null时，先删除方案，数据库中设置的级联删除，所以这个方案的房间信息、房间内的产品信息、报价单信息也一并删除，然后再重新添加方案)
@@ -466,64 +518,51 @@ public class DesignController {
      * @description: 上传方案效果图
      * @param soluId:方案id
      * @param soluName:方案名称
-     * @param files:上传的图片
+     * @param file:上传的图片
      * @return ReturnResult
      */
     @RequestMapping(value = "customer/renderings/save", method = RequestMethod.POST)
-    public ReturnResult saveRenderings(Integer soluId, String soluName, @RequestParam(value = "files",required = false) MultipartFile[] files) {
-        ReturnResult result = new ReturnResult();
+    public ReturnResult saveRenderings(Integer soluId, String soluName, @RequestParam(value = "file",required = false) MultipartFile file) {
         String saveFileName,rendPath,rendDesc,rendName;
         boolean save;
         Renderings renderings = new Renderings();
-        for (MultipartFile file:files) {
-            if (file.getSize() == 0) {
-                result.setStatus(0);
-                result.setMsg("没有上传任何图片");
-                return result;
-            }
-            saveFileName = FileUtil.saveFile(file,uploadPath+"/renderings/"+soluName);
-            rendPath = fileHost+saveFileName;
-            rendDesc = "这是"+soluName+"的效果图";
-            rendName = Objects.requireNonNull(file.getOriginalFilename()).substring(0, file.getOriginalFilename().lastIndexOf("."));
-            renderings.setRendName(rendName);
-            renderings.setRendDesc(rendDesc);
-            renderings.setRendPath(rendPath);
-            renderings.setSoluId(soluId);
-            save = renderingsService.save(renderings);
-            if (!save) {
-                result.setStatus(0);
-                result.setMsg("上传失败，请稍后重试");
-                return result;
-            }
+        if (file.getSize() == 0) {
+            return ReturnResult.returnResult(false, "没有上传图片");
         }
-        result.setMsg("上传成功");
-        result.setStatus(1);
-        return result;
-
+        saveFileName = FileUtil.saveFile(file,uploadPath+"/renderings/"+soluName);
+        rendPath = fileHost+saveFileName;
+        rendDesc = "这是"+soluName+"的效果图";
+        rendName = Objects.requireNonNull(file.getOriginalFilename()).substring(0, file.getOriginalFilename().lastIndexOf("."));
+        renderings.setRendName(rendName);
+        renderings.setRendDesc(rendDesc);
+        renderings.setRendPath(rendPath);
+        renderings.setSoluId(soluId);
+        save = renderingsService.save(renderings);
+        if (!save) {
+            return ReturnResult.returnResult(false, "上传失败，请稍后重试");
+        }
+        return ReturnResult.returnResult(true);
     }
 
     /**
-     * @description: 批量删除效果图
-     * @param idList:id集合
+     * @description: 删除效果图
+     * @param rendId:图片id
      * @return ReturnResult
      */
     @RequestMapping(value = "customer/renderings/delete", method = RequestMethod.POST)
-    public ReturnResult deleteRenderings(@RequestBody List<Integer> idList) {
-        ReturnResult result = new ReturnResult();
+    public ReturnResult deleteRenderings(Integer rendId) {
         String path;
         boolean deleteFile;
-        List<Renderings> renderingsList = renderingsService.listByIds(idList);
-        for (Renderings renderings:renderingsList) {
-            path = uploadPath + renderings.getRendPath().substring(fileHost.length());
-            deleteFile = FileUtil.deleteFile(path);
-            if (!deleteFile) {
-                result.setStatus(0);
-                result.setMsg("删除失败，请稍后重试");
-                return result;
-            }
+        Renderings renderings = renderingsService.getById(rendId);
+        path = uploadPath + renderings.getRendPath().substring(fileHost.length());
+        //删除本地的图片
+        deleteFile = FileUtil.deleteFile(path);
+        if (!deleteFile) {
+            return ReturnResult.returnResult(false, "删除失败，请稍后重试");
         }
-        boolean removeByIds = renderingsService.removeByIds(idList);
-        return ReturnResult.returnResult(removeByIds);
+        //删除数据库中的信息
+        boolean removeById = renderingsService.removeById(rendId);
+        return ReturnResult.returnResult(removeById);
     }
 
 

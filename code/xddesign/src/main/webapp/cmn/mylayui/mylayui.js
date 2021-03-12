@@ -244,3 +244,151 @@ function crsl_prodImg(divId) {
 /**
  * -----------------------------------------------------------------------crsl图片轮播
  */
+/**
+ * ---------------------------------------------------------------------------菜单导航
+ */
+function leftNavChk(ulId){
+    var $chkNode;
+    layui.use('element', function(){
+        //导航的hover效果、二级菜单等功能，需要依赖element模块
+        var element = layui.element;
+        //监听导航点击
+        element.on('nav(' +ulId+')', function(elem){
+            $chkNode = elem;
+            return $chkNode;
+    //      layer.msg(elem.text());
+        });
+    });
+    }
+/**
+ * ---------------------------------------------------------------------------菜单导航
+ */
+/**
+ * -----------------------------------------------------------------------客户类型灯箱
+ */
+var lightbox_area_cusType = ['300px', '170px'];
+var lightbox_offset_cusType = ['200px','83px'];
+function lightbox_cusType(add){
+    var index = layer.open({
+        type: 1,
+        skin: 'layui-layer-lan',
+        area: lightbox_area_cusType,
+        offset:lightbox_offset_cusType,
+        closeBtn: 0, //不显示关闭按钮
+        anim: 2,
+        shadeClose: true,
+        success: function(layero){
+            $('.layui-layer-title').remove();
+            $('.layui-layer-content').remove();
+            layero.append(add);
+            $('.layui-layer>div').click(function(){
+                cusType = $(this).text();
+                $('#div_custype').prev().text(cusType);
+                $('#div_custype').prev().addClass('div_custypechk');
+                layer.close(index);
+            })
+        }
+    });
+}
+/**
+ * -----------------------------------------------------------------------客户类型灯箱
+ */
+/**
+ * -----------------------------------------------------------------------删除确认灯箱
+ */
+var lightbox_area_delCfm = ['300px', '170px'];
+var del_tip = '确认删除？';
+var del_cfm_text = "删除";
+var del_cnl_text = "取消";
+function lightbox_delCfm(){
+    var myIndex = layer.open({
+        type: 1,
+        skin: 'layui-layer-lan',
+        area: lightbox_area_delCfm,
+        closeBtn: 0, //不显示关闭按钮
+        anim: 1,
+        btn:[del_cfm_text,del_cnl_text],
+        btn1: function(index, layero){
+            layer.close(myIndex);
+        },
+        btn2: function(index, layero){
+            layer.close(myIndex);
+        },
+        btnAlign: 'c',
+        content:del_tip,
+        shadeClose: true,
+        success: function(layero){
+            layero.find('.layui-layer-content').css('display', 'flex');
+            layero.find('.layui-layer-content').css('align-items', 'center');
+            layero.find('.layui-layer-content').css('justify-content', 'center');
+            layero.find('.layui-layer-content').css('text-align', 'left');
+            layero.find('.layui-layer-content').css('font-size', msgFontsize_tip);
+            layero.find('.layui-layer-btn').css('text-align', 'center');
+            layero.find('.layui-layer-btn').css('font-size', btnFontsize_tip);
+            layero.find('.layui-layer-btn').css('display', 'flex');
+            layero.find('.layui-layer-btn').css('align-items', 'center');
+            layero.find('.layui-layer-btn').css('justify-content', 'space-around');
+        }
+    });
+}
+/**
+ * -----------------------------------------------------------------------删除确认灯箱
+ */
+/**
+ * ----------------------------------------------------删除提示灯箱，提示后刷新页面
+ */
+function lightbox_tip_delAndRld(msg,isReload){
+    layer.msg(msg, {
+        //10s后自动关闭
+        time: 10000,
+        //time: 100000000,
+        btn: [ '知道了'],
+        shade:shade_tip,
+        area:area_tip,
+        success: function(layero){
+            layero.find('.layui-layer-content').css('display', 'flex');
+            layero.find('.layui-layer-content').css('align-items', 'center');
+            layero.find('.layui-layer-content').css('justify-content', 'center');
+            layero.find('.layui-layer-content').css('text-align', 'left');
+            layero.find('.layui-layer-content').css('font-size', msgFontsize_tip);
+            layero.find('.layui-layer-btn').css('text-align', 'center');
+            layero.find('.layui-layer-btn').css('font-size', btnFontsize_tip);
+        },
+        end:function(){
+            if(isReload) {
+                location.reload(true);
+            }
+        }
+    })
+}
+/**
+ * ----------------------------------------------------删除提示灯箱，提示后刷新页面
+ */
+/**
+ * ----------------------------------------------------------------产品添加单确认灯箱
+ */
+var lightbox_area_chkAddProdList = '700px';
+var lightbox_offset_chkAddProdList = '100px';
+function lightbox_chkAddProdList(add){
+    var index = layer.open({
+        type: 1,
+        skin: 'layui-layer-hei',
+        area: lightbox_area_chkAddProdList,
+        offset:lightbox_offset_chkAddProdList,
+        closeBtn: 0, //不显示关闭按钮
+        anim: 2,
+        shadeClose: true,
+        fixed:false,
+        success: function(layero){
+            $('.layui-layer-title').remove();
+            $('.layui-layer-content').remove();
+            layero.append(add);
+            $('.layui-layer-hei>div:last-of-type>div:first-of-type').click(function(){
+                layer.close(index);
+            })
+        }
+    });
+}
+/**
+ * ---------------------------------------------------------------产品添加单确认灯箱
+ */

@@ -24,10 +24,22 @@
     <mvc:resources mapping="/cmn/**" location="/cmn/" />
     <mvc:resources mapping="/**" location="/html/" />
 
-<!--    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">-->
-<!--        <property name="prefix" value="/WEB-INF/" />-->
-<!--        <property name="suffix" value=".jsp" />-->
-<!--        &lt;!&ndash;<property name="suffix" value=".html" />&ndash;&gt;-->
-<!--    </bean>-->
+    <!-- 拦截器 -->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**" />
+            <mvc:exclude-mapping path="/login/userlogin.html" />
+            <mvc:exclude-mapping path="/login/cuslogin.html" />
+            <mvc:exclude-mapping path="/customer/login" />
+            <mvc:exclude-mapping path="/user/login" />
+            <mvc:exclude-mapping path="/customer/goodslist.html" />
+            <mvc:exclude-mapping path="/admin/products" />
+            <mvc:exclude-mapping path="/customer/showprod.html" />
+            <mvc:exclude-mapping path="/public/product" />
+            <mvc:exclude-mapping path="/customer/aftersalecnt.html" />
+            <mvc:exclude-mapping path="/error/404.html" />
+            <bean class="cn.zmdxd.xddesign.common.interceptor.MyInterceptor" />
+        </mvc:interceptor>
+    </mvc:interceptors>
 
 </beans>

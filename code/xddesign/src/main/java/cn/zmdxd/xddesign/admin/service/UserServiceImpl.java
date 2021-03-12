@@ -65,11 +65,14 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             }else {
                 user.setPwd(null);
             }
-            if (customerDao.selectList(new QueryWrapper<Customer>().eq("design_id",user.getId())).size()!=0) return "不能修改该用户角色";
+            List<Customer> customerList = customerDao.selectList(new QueryWrapper<Customer>().eq("design_id", user.getId()));
+            if (customerList.size()!=0) {
+                if (!user.getRole().getId().equals(findRoleIdByUserId(user.getId()))) {
+                    return "不能修改该用户角色";
+                }
+            }
 
             integer = userDao.update(user, new UpdateWrapper<User>().eq("id", user.getId()).set("role_id",user.getRole().getId()));
-//            map.put("user",user);
-//            integer = userDao.updateUser(map);
         }
         if (integer != 1)
             return "操作失败，请稍后重试";
@@ -94,6 +97,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public List<User> findDesignList() {
         return userDao.selectDesignList();
+    }
+
+    @Override
+    public Integer findRoleIdByUserId(Integer id) {
+        return userDao.selectRoleIdUserByUserId(id);
     }
 
 }

@@ -59,8 +59,7 @@ public class Quote {
     @ColumnWidth(18)
     private Double totalPrice;//单个产品合计价格
 
-//    public Double getTotalPrice() {
-//        return productNum * price;
-//    }
+    @ExcelIgnore
+    private Integer roomId;//房间id
 
 }

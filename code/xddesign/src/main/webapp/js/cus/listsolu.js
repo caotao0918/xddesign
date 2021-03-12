@@ -22,7 +22,6 @@ $(function(){
     function getData(pageNum,pageSize){
         var list;
         var houseId = UrlParam.param("houseId");
-        console.log(houseId);
 
         $.ajax({
             //----------------------------------------------------------url查询每个house对应的soulu列表

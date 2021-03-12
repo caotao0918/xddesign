@@ -67,7 +67,7 @@ $(function() {
             clearTimeout(t);
         })
         $('#img_back').click(function(){
-            history.go(-1);
+            location.href = "main.html";
         })
     })
 })
