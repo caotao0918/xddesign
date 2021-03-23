@@ -58,28 +58,40 @@ public class PublicController {
     @Autowired
     private SecondLevelService secondLevelService;
 
-    //分页查询产品视频列表
-    @RequestMapping(value = "videos")
-    public IPage<Video> findVideos(@RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "100") Integer size) {
-        Page<Video> page = new Page<>(current,size);
-        return videoService.page(page);
-    }
-    @RequestMapping(value = "video")
-    public List<Video> findVideo(String productName) {
-        if (productName != null) return videoService.list(new QueryWrapper<Video>().like("video_name",productName));
-        return videoService.list();
+    // 售后中心-左边侧栏 二级分类&产品列表
+    @RequestMapping(value = "secondlevels/products")
+    public Map<String, List<Product>> findSecondLevelList() {
+        List<SecondLevel> secondLevelList = secondLevelService.list(new QueryWrapper<SecondLevel>().select("second_id", "second_name"));
+        List<Product> productList;
+        Map<String, List<Product>> map = new HashMap<>();
+        for (SecondLevel secondLevel:secondLevelList) {
+            productList = productService.list(new QueryWrapper<Product>().select("product_name","product_id").eq("second_id", secondLevel.getSecondId()));
+            for (Product product:productList) {
+                product.setSecondLevel(secondLevel);
+            }
+            map.put(secondLevel.getSecondName(), productList);
+        }
+        return map;
     }
 
-    //查看手册列表
-    @RequestMapping(value = "guides")
-    public IPage<Guide> findGuideList(@RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "100") Integer size) {
-        Page<Guide> page = new Page<>(current, size);
-        return guideService.page(page);
+    // 售后中心-常见问题
+    @RequestMapping(value = "questions")
+    public List<Question> findQuestionList(Integer productId) {
+        return questionService.list(new QueryWrapper<Question>().eq("product_id", productId));
     }
+    // 售后中心-安装视频
+    @RequestMapping(value = "video")
+    public List<Video> findVideo(Integer productId) {
+        if (productId != null) return videoService.list(new QueryWrapper<Video>().eq("product_id", productId));
+        return videoService.list();
+    }
+    //售后中心-产品手册
     @RequestMapping(value = "guide")
-    public List<Guide> findGuideList(String productName) {
-        if (productName != null) return guideService.list(new QueryWrapper<Guide>().like("guide_name",productName));
-        return guideService.list();
+    public List<Guide> findGuideList(Integer productId) {
+        if (productId == null) {
+            return guideService.list();
+        }
+        return guideService.list(new QueryWrapper<Guide>().eq("product_id", productId));
     }
 
     /**
@@ -118,52 +130,27 @@ public class PublicController {
         out.close();
     }
 
-    //查询二级分类列表(售后中心左边侧栏)
-    @RequestMapping(value = "secondlevels/products")
-    public Map<String, List<Product>> findSecondLevelList() {
-        List<SecondLevel> secondLevelList = secondLevelService.list(new QueryWrapper<SecondLevel>().select("second_id", "second_name"));
-        List<Product> productList;
-        Map<String, List<Product>> map = new HashMap<>();
-        for (SecondLevel secondLevel:secondLevelList) {
-            productList = productService.list(new QueryWrapper<Product>().select("product_name").eq("second_id", secondLevel.getSecondId()));
-            for (Product product:productList) {
-                product.setSecondLevel(secondLevel);
-            }
-            map.put(secondLevel.getSecondName(), productList);
-        }
-        return map;
-    }
-
-    @RequestMapping(value = "questions")
-    public List<Question> findQuestionList(@RequestParam(required = false) String productName) {
-        if (productName != null) return questionService.list(new QueryWrapper<Question>().like("question", productName).or().like("answer", productName));
-        return null;
-    }
-
-    //客户根据房子id找到其下的方案列表
-    @RequestMapping(value = "customer/house/solutions")
-    public IPage<Solutions> findSolutionsByHouseId(Integer houseId, @RequestParam(value = "pageNum",defaultValue = "1") Integer current, @RequestParam(value = "pageSize", defaultValue = "10") Integer size) {
-        Page<Solutions> page = new Page<>(current,size);
-        return solutionsService.page(page,new QueryWrapper<Solutions>().eq("house_id",houseId).select("solu_id","solu_name","state","add_time"));
-    }
-
-    //客户查询自己的信息
+    // 客户-查询自己的信息
     @RequestMapping("customer")
     public Customer findCustomer(HttpServletRequest request) {
         Integer id = Integer.valueOf(CookieUtil.getCookieValue(request, "customerId"));
         return customerService.findCustomer(id);
     }
 
-    //根据方案id查询方案详情
-    @RequestMapping(value = "customer/solution")
-    public Solutions findSolution(Integer soluId) {
-        Solutions solutions = solutionsService.findSolutions(soluId);
-        System.out.println(solutions);
-        System.out.println("=====");
-        return solutions;
+    // 客户-根据房子id找到方案列表
+    @RequestMapping(value = "customer/house/solutions")
+    public IPage<Solutions> findSolutionsByHouseId(Integer houseId, @RequestParam(value = "pageNum",defaultValue = "1") Integer current, @RequestParam(value = "pageSize", defaultValue = "10") Integer size) {
+        Page<Solutions> page = new Page<>(current,size);
+        return solutionsService.page(page,new QueryWrapper<Solutions>().eq("house_id",houseId).select("solu_id","solu_name","state","add_time"));
     }
 
-    //根据方案id查看方案报价单
+    // 根据方案id查询方案详情
+    @RequestMapping(value = "customer/solution")
+    public Solutions findSolution(Integer soluId) {
+        return solutionsService.findSolutions(soluId);
+    }
+
+    // 根据方案id查看方案报价单
     @RequestMapping(value = "customer/quotes")
     public List<Quote> findQuoteList(Integer soluId) {
         List<Quote> quoteList = quoteService.list(new QueryWrapper<Quote>().eq("solu_id", soluId));
@@ -173,7 +160,7 @@ public class PublicController {
         return quoteList;
     }
 
-    //根据报价单生成Excel
+    // 根据报价单生成Excel
     @RequestMapping(value = "customer/quote/toexcel")
     public void quoteToExcel(Integer soluId, HttpServletResponse response) throws IOException {
 
@@ -274,16 +261,26 @@ public class PublicController {
         return renderingsService.list(new QueryWrapper<Renderings>().eq("solu_id",soluId));
     }
 
-    //根据产品id查询单个产品详情
+    /**
+     * @description: 查看产品
+     * @param current:当前页
+     * @param size:每页条数
+     */
+    @RequestMapping(value = "products", method = RequestMethod.GET)
+    public Object findProducts(ProductVo productVo, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+        Page<Product> page = new Page<>(current, size);
+        String productName = productVo.getProductName();
+        if (productName != null) {
+            // 搜索时，去除输入的产品名称左右两边的空格
+            productVo.setProductName(productName.trim());
+        }
+        return productService.findProducts(page, productVo);
+    }
+
+    // 根据产品id查询产品详情
     @RequestMapping(value = "product")
     public Product findProduct(Integer productId) {
         return productService.findProduct(productId);
     }
-
-    //查看产品列表（不分页）
-//    @RequestMapping(value = "products")
-//    public List<Product> findProducts() {
-//        return productService.findProducts();
-//    }
 
 }

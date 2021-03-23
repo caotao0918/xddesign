@@ -23,6 +23,7 @@ public class Product {
     private String productLink;//产品官网链接
     private Double price;//产品价格
     private String productDesc;//产品描述
+    private String productDetail;//产品详情
 
     @TableField(exist = false)
     private List<Picture> pictureList;//产品对应的图片列表

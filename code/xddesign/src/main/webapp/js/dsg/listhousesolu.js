@@ -19,7 +19,7 @@ var showQuote_td_asButton_text = "修改报表";
 var houseId = window.localStorage.getItem("houseId");
 
 //---------------------------------------------------------url查询每个house对应的soulu列表
-var url_queryHouseSolu = "/public/customer/house/solutions";
+var url_queryHouseSolu = "/xddesign/public/customer/house/solutions";
 //----------------------------------------------------------------------------查看方案
 var url_showCusSolu = "addhousesolu.html";
 //----------------------------------------------------------------------------查看设计图
@@ -27,7 +27,7 @@ var url_showRnd = "editrnd.html";
 //----------------------------------------------------------------------------查看报表
 var url_showQuote = "quote_edit.html";
 //----------------------------------------------------------------------------新增方案
-var url_addHouseSlou = "/dsg/addhousesolu.html";
+var url_addHouseSlou = "addhousesolu.html";
 //只是回退页面
 var url_back = "";
 

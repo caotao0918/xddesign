@@ -126,8 +126,6 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
             Renderings renderings = new Renderings();
             renderings.setSoluId(solutions.getSoluId());
             int updateRenderingsBySoluId = renderingsDao.update(renderings, new UpdateWrapper<Renderings>().eq("solu_id", oldSoluId));
-            System.out.println(updateRenderingsBySoluId);
-            System.out.println("=========================");
         }
 
         if (saveSolutions != 1) {

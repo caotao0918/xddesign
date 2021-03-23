@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <title>迅达智能家居-与您一起见证智能家居的发展</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="admin/layuiadmin/layui/css/layui.css" media="all">
+</head>
+<body>
+
+<div>
+    <ul class="layui-nav" style="z-index: 1998">
+        <li class="layui-nav-item"><img alt="logo" src="../img/logo.png" height="40px" width="50px" /></li>
+        <li class="layui-nav-item"><a href="index.html" style="font-size: 17px">迅达智能家居</a></li>
+        <li class="layui-nav-item layui-col-md-offset0"><a href="http://zmdxd.cn/gwAction_toIntroduce1.action">公司简介</a></li>
+        <li class="layui-nav-item"><a href="customer/goodslist.html">产品中心</a></li>
+        <li class="layui-nav-item"><a href="customer/aftersalecnt.html">售后支持</a></li>
+        <li class="layui-nav-item"><a href="http://zmdxd.cn/gwAction_toIntroduce4.action">联系我们</a></li>
+        <li class="layui-nav-item"><a href="http://zmdxd.cn">官网首页</a></li>
+        <li class="layui-nav-item layui-col-md-offset3"><a href="login/cuslogin.html" style="background-color: orange; line-height: 30px; display: block;text-align: center;border-radius:10px">客户登录</a></li>
+        <li class="layui-nav-item"><a href="login/userlogin.html" style="margin-left: 10px;background-color: orange; line-height: 30px; display: block;text-align: center;border-radius:10px">设计员登录</a></li>
+
+    </ul>
+</div>
+<div class="layui-carousel" id="test1">
+    <div carousel-item>
+        <div><img src="../img/carousel/carousel01.png" width="100%" height="100%" alt="轮播图" /></div>
+        <div><img src="../img/carousel/carousel02.png" width="100%" height="100%" alt="轮播图" /></div>
+        <div><img src="../img/carousel/carousel03.png" width="100%" height="100%" alt="轮播图" /></div>
+        <div><img src="../img/carousel/carousel04.png" width="100%" height="100%" alt="轮播图" /></div>
+    </div>
+</div>
+<!-- 条目中可以是任意内容，如：<img src=""> -->
+
+<script src="admin/layuiadmin/layui/layui.js"></script>
+<script>
+    layui.use('carousel', function(){
+        var carousel = layui.carousel;
+        //建造实例
+        carousel.render({
+            elem: '#test1'
+            ,width: '100%' //设置容器宽度
+            ,height: '800px'
+            ,arrow: 'always' //始终显示箭头
+            //,anim: 'updown' //切换动画方式
+        });
+    });
+</script>
+</body>
+</html>

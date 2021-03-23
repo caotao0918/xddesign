@@ -14,7 +14,7 @@ $(function(){
     var form = layui.form;
     i.render({
         elem: "#LAY-dsg-renderings",
-        url: "/public/customer/renderings",
+        url: "/xddesign/public/customer/renderings",
         cols: [[{type: "checkbox", fixed: "left"}, {field: "rendId", width: 80, title: "ID", sort: !0},
             {field: "rendName", title: "名称"}, {field: "rendPath", title: "图片", templet: "#imgTpl"}, {field: "rendDesc", title: "描述"},
             {title: "操作", width: 150, align: "center", fixed: "right", toolbar: "#table-useradmin-webuser"}]],

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -63,6 +64,8 @@ public class DesignController {
     private String uploadPath;
     @Value("${file_host}")
     private String fileHost;
+    @Value("${upload_path_2}")
+    private String uploadPath2;
 
     /**
      * @description: 添加或修改客户信息，customer中id若为null，则添加客户信息，添加时区分是管理员添加还是设计人员添加；否则修改客户信息
@@ -146,7 +149,6 @@ public class DesignController {
         return ReturnResult.returnResult(update);
     }
 
-
     //批量删除客户
     @RequestMapping(value = "customer/batchdel",method = RequestMethod.POST)
     public ReturnResult deleteCustomer(@RequestBody List<Customer> customerList) {
@@ -159,7 +161,10 @@ public class DesignController {
 
         for (Customer customer:customerList) {
             boolean update = customerService.update(new UpdateWrapper<Customer>().eq("id", customer.getId()).set("del_sign", true));
-            if (!update) return ReturnResult.returnResult(false);
+            if (!update) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                return ReturnResult.returnResult(false);
+            }
         }
         return ReturnResult.returnResult(true);
     }
@@ -179,7 +184,6 @@ public class DesignController {
         ReturnResult result = new ReturnResult();
         Integer typeId;
         HouseType houseType = houseTypeService.getOne(new QueryWrapper<HouseType>().eq("type_name", house.getHouseType().getTypeName()), true);
-        System.out.println(houseType);
         if (houseType == null) {
             HouseType houseType1 = new HouseType();
             houseType1.setTypeName(house.getHouseType().getTypeName());
@@ -188,6 +192,7 @@ public class DesignController {
             if (!save) {
                 result.setStatus(0);
                 result.setMsg("添加失败");
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
                 return result;
             }
             house.setHouseType(houseType1);
@@ -198,6 +203,7 @@ public class DesignController {
             if (!updateById) {
                 result.setStatus(0);
                 result.setMsg("添加失败");
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
                 return result;
             }
             house.setHouseType(houseType);
@@ -255,7 +261,10 @@ public class DesignController {
     public ReturnResult deleteHouse(@RequestBody List<House> houseList) {
         for (House house:houseList) {
             ReturnResult result = deleteHouse(house.getHouseId());
-            if (result.getStatus() == 0) return ReturnResult.returnResult(false, result.getMsg());
+            if (result.getStatus() == 0) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                return ReturnResult.returnResult(false, result.getMsg());
+            }
         }
         return ReturnResult.returnResult(true);
     }
@@ -358,7 +367,10 @@ public class DesignController {
             design.setId(designId);
             customer.setDesign(design);
             ReturnResult result = customerService.saveOrUpdateCustomer(customer);//添加客户
-            if (result.getStatus()==0) return result;
+            if (result.getStatus()==0) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                return result;
+            }
         }
         Integer customerId = customer.getId();//得到客户id
         House house = new House();
@@ -369,7 +381,10 @@ public class DesignController {
         house.setHouseAddress(templateVo.getAddress());
         house.setHouseType(houseType);
         ReturnResult result = houseService.saveHouse(house);//添加客户房子
-        if (result.getStatus() == 0) return result;
+        if (result.getStatus() == 0) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+            return result;
+        }
         Integer houseId = house.getHouseId();//得到房子id
 
         //根据方案id查询方案详情
@@ -417,7 +432,6 @@ public class DesignController {
     @RequestMapping(value = "customer/solutions/level/products")
     public List<Map<SecondLevel, List<Product>>> findAllProducts() {
         List<List<SecondLevel>> listLeftNav = findFirstLevelAndSecondLevel();
-        System.out.println(listLeftNav);
         List<Map<SecondLevel, List<Product>>> list = new ArrayList<>();
         Map<SecondLevel, List<Product>> map = new LinkedHashMap<>();
         List<Product> listProduct;
@@ -476,7 +490,10 @@ public class DesignController {
     public ReturnResult deleteSolutions(@RequestBody List<Solutions> solutionsList) {
         for (Solutions solutions:solutionsList) {
             ReturnResult result = deleteSolutions(solutions.getSoluId());
-            if (result.getStatus() == 0) return ReturnResult.returnResult(false, "其中一些方案关联了模板方案，不能删除");
+            if (result.getStatus() == 0) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                return ReturnResult.returnResult(false, "其中一些方案关联了模板方案，不能删除");
+            }
         }
         return ReturnResult.returnResult(true);
     }
@@ -529,8 +546,8 @@ public class DesignController {
         if (file.getSize() == 0) {
             return ReturnResult.returnResult(false, "没有上传图片");
         }
-        saveFileName = FileUtil.saveFile(file,uploadPath+"/renderings/"+soluName);
-        rendPath = fileHost+saveFileName;
+        saveFileName = FileUtil.saveFile(file,uploadPath + uploadPath2 +"/renderings/"+soluName, uploadPath);
+        rendPath = fileHost + saveFileName;
         rendDesc = "这是"+soluName+"的效果图";
         rendName = Objects.requireNonNull(file.getOriginalFilename()).substring(0, file.getOriginalFilename().lastIndexOf("."));
         renderings.setRendName(rendName);
@@ -539,6 +556,7 @@ public class DesignController {
         renderings.setSoluId(soluId);
         save = renderingsService.save(renderings);
         if (!save) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
             return ReturnResult.returnResult(false, "上传失败，请稍后重试");
         }
         return ReturnResult.returnResult(true);
@@ -558,6 +576,7 @@ public class DesignController {
         //删除本地的图片
         deleteFile = FileUtil.deleteFile(path);
         if (!deleteFile) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
             return ReturnResult.returnResult(false, "删除失败，请稍后重试");
         }
         //删除数据库中的信息

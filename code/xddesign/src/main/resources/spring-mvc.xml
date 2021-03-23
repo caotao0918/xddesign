@@ -18,26 +18,30 @@
 		<property name="maxUploadSize" value="209715200" />
     </bean>
 
-    <mvc:resources mapping="/img/**" location="/img/" />
-    <mvc:resources mapping="/css/**" location="/css/" />
-    <mvc:resources mapping="/js/**" location="/js/" />
-    <mvc:resources mapping="/cmn/**" location="/cmn/" />
-    <mvc:resources mapping="/**" location="/html/" />
+<!--    <mvc:resources mapping="/img/**" location="/img/" />-->
+<!--    <mvc:resources mapping="/css/**" location="/css/" />-->
+<!--    <mvc:resources mapping="/js/**" location="/js/" />-->
+<!--    <mvc:resources mapping="/cmn/**" location="/cmn/" />-->
+    <mvc:resources mapping="/html/**" location="/html/" />
 
     <!-- 拦截器 -->
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/**" />
-            <mvc:exclude-mapping path="/login/userlogin.html" />
-            <mvc:exclude-mapping path="/login/cuslogin.html" />
+            <mvc:exclude-mapping path="/html/login/userlogin.html" />
+            <mvc:exclude-mapping path="/html/login/cuslogin.html" />
             <mvc:exclude-mapping path="/customer/login" />
             <mvc:exclude-mapping path="/user/login" />
-            <mvc:exclude-mapping path="/customer/goodslist.html" />
-            <mvc:exclude-mapping path="/admin/products" />
-            <mvc:exclude-mapping path="/customer/showprod.html" />
+            <mvc:exclude-mapping path="/html/customer/goodslist.html" />
+            <mvc:exclude-mapping path="/public/products" />
+            <mvc:exclude-mapping path="/html/customer/showprod.html" />
             <mvc:exclude-mapping path="/public/product" />
-            <mvc:exclude-mapping path="/customer/aftersalecnt.html" />
-            <mvc:exclude-mapping path="/error/404.html" />
+            <mvc:exclude-mapping path="/public/secondlevels/products" />
+            <mvc:exclude-mapping path="/public/questions" />
+            <mvc:exclude-mapping path="/public/video" />
+            <mvc:exclude-mapping path="/public/guide" />
+            <mvc:exclude-mapping path="/html/customer/aftersalecnt.html" />
+            <mvc:exclude-mapping path="/html/error/error404.html" />
             <bean class="cn.zmdxd.xddesign.common.interceptor.MyInterceptor" />
         </mvc:interceptor>
     </mvc:interceptors>

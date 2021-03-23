@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>layedit demo</title>
+    <link rel="stylesheet" href="../../../admin/layuiadmin/layui/css/layui.css" media="all">
+    <script src="../../../admin/layuiadmin/layui/layui.js"></script>
+    <script src="../../../../js/ace/ace.js"></script>
+</head>
+<body>
+    <div>
+        <input id="productId" hidden />
+        <textarea id="layeditDemo">
+        </textarea>
+    </div>
+    <div class="layui-form-item layui-hide">
+        <input type="button" lay-submit lay-filter="LAY-productdetail-front-submit" id="LAY-productdetail-front-submit" value="确认">
+    </div>
+
+    <script>
+        layui.use(['layedit', 'layer', 'jquery'], function () {
+            var $ = layui.jquery;
+            var layedit = layui.layedit;
+            layedit.set({
+                uploadImage: {
+                    url: '/xddesign/admin/product/detail/uploadpicture',
+                    accept: 'image',
+                    acceptMime: 'image/*',
+                    exts: 'jpg|png|gif|bmp|jpeg',
+                    size: '10240'
+                    ,error: function () {
+                        layer.msg("服务器出错啦", {icon:2});
+                    }
+                }
+                , uploadVideo: {
+                    url: '/xddesign/admin/product/detail/uploadvideo',
+                    accept: 'video',
+                    acceptMime: 'video/*',
+                    exts: 'mp4|flv|avi|rm|rmvb',
+                    size: '20480'
+                    ,error: function () {
+                        layer.msg("服务器出错啦", {icon:2});
+                    }
+                }
+                //右键删除图片/视频时的回调参数，post到后台删除服务器文件等操作，
+                //传递参数：
+                //图片： imgpath --图片路径
+                //视频： filepath --视频路径 imgpath --封面路径
+                , calldel: {
+                    url: '/xddesign/admin/product/detail/calldel',
+                    done: function (data) {
+                        if (data.status === 0) {
+                            layer.msg(data.msg);
+                        }
+                    }
+                }
+                //开发者模式 --默认为false
+                , devmode: true
+                //插入代码设置
+                , codeConfig: {
+                    hide: true,  //是否显示编码语言选择框
+                    default: 'javascript' //hide为true时的默认语言格式
+                }
+                , tool: [
+                    'html', 'code', 'strong', 'italic', 'underline', 'del', 'addhr', '|', 'fontFomatt', 'fontSize', 'colorpicker', 'fontfamily'
+                    , 'face' , '|', 'left', 'center', 'right', '|', 'link', 'unlink', 'images', 'image_alt', 'video', 'anchors'
+                    , '|', 'table', 'fullScreen', 'preview'
+                ]
+                , height: '651px'
+                , autoSync: true
+            });
+            var ieditor = layedit.build('layeditDemo');
+        })
+    </script>
+</body>
+</html>

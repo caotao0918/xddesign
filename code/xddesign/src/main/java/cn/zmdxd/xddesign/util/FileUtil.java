@@ -1,11 +1,13 @@
 package cn.zmdxd.xddesign.util;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 public class FileUtil {
-
 
     private FileUtil() {
 
@@ -29,7 +31,7 @@ public class FileUtil {
      * @throws IllegalStateException
      * @throws IOException
      */
-    public static String saveFile(MultipartFile file, String destination) throws IllegalStateException {
+    public static String saveFile(MultipartFile file, String destination, String uploadPath) throws IllegalStateException {
         // 获取上传的文件名称，并结合存放路径，构建新的文件名称
         String filename = file.getOriginalFilename();
         File filepath = new File(destination, filename);
@@ -46,7 +48,7 @@ public class FileUtil {
         } catch (IOException e) {
             throw new RuntimeException("上传文件异常，请稍后重试");
         }
-        return destination.substring(7) + File.separator + substring + filename;
+        return destination.substring(uploadPath.length()) + File.separator + substring + filename;
     }
 
 }

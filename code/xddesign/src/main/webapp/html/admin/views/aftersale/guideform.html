@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title>添加或修改产品手册</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="../../../admin/layuiadmin/layui/css/layui.css" media="all">
+  <style>
+    .btnAndInp{
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="layui-form" lay-filter="layuiadmin-question-manage" id="layuiadmin-question-manage" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+      <div class="layui-form-item" hidden>
+        <label class="layui-form-label">ID</label>
+        <div class="layui-input-block">
+          <input type="text" name="guideId" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item" id="level">
+        <label class="layui-form-label">一级分类</label>
+        <div class="layui-input-inline">
+          <select name="firstId" lay-search lay-filter="initsecondlevel">
+          </select>
+        </div>
+        <label class="layui-form-label">二级分类</label>
+        <div class="layui-input-inline">
+          <select name="secondId" lay-search lay-filter="initproduct">
+          </select>
+        </div>
+        <label class="layui-form-label">产品</label>
+        <div class="layui-input-inline">
+          <select name="productId" lay-search>
+          </select>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="btnAndInp">
+          <button type="button" class="layui-btn" id="insertGuide" style="width: 110px;position: relative;z-index: 10;"><i class="layui-icon layui-icon-upload"></i>上传手册</button>
+          <input type="text" name="guideLink" placeholder="请上传文件或输入文件链接" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="btnAndInp">
+          <button type="button" class="layui-btn" id="insertPicture" style="width: 110px;position: relative;z-index: 10;"><i class="layui-icon layui-icon-upload"></i>上传封面</button>
+          <input type="text" name="pictureLink" placeholder="请上传图片或输入图片链接" class="layui-input">
+        </div>
+      </div>
+    </div>
+    <div class="layui-form-item layui-hide">
+      <button class="layui-btn" lay-submit lay-filter="LAY-question-front-submit" id="LAY-question-front-submit">提交</button>
+    </div>
+  </div>
+  <script src="../../../admin/layuiadmin/layui/layui.js"></script>
+  <script src="../../../../js/utils/getUrlParam.js"></script>
+  <script>
+  layui.config({
+    base: '../../../admin/layuiadmin/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index', 'form', 'upload', 'element'], function(){
+    var $ = layui.$
+    ,form = layui.form
+    ,upload = layui.upload
+    ,element = layui.element;
+
+    $(function () {
+      $.ajax({
+        url:"/xddesign/admin/firstlevel/nopage"
+        ,type:"GET"
+        ,dataType:"json"
+        ,async: false
+        ,success:function(res) {
+          let select = $("select[name='firstId']");
+          select.empty();
+          let con = '<option value="0">-请选择-</option>';
+          for (let i = 0; i < res.length; i++) {
+            con += '<option value='+'"'+res[i].firstId+'"'+'>'+res[i].firstName+'</option>';
+          }
+          select.html(con);
+          //这一步必不可少
+          form.render("select");
+        }
+      });
+    });
+
+    form.on('select(initsecondlevel)', function(data){
+      $.ajax({
+        url:"/xddesign/admin/secondlevel/nopage"
+        ,type:"GET"
+        ,data: {"firstId": data.value}
+        ,dataType:"json"
+        ,async: false
+        ,success:function(res) {
+          let select = $("select[name='secondId']");
+          select.empty();
+          let con = '<option value="0">-请选择-</option>';
+          for (let i = 0; i < res.length; i++) {
+            con += '<option value='+'"'+res[i].secondId+'"'+'>'+res[i].secondName+'</option>';
+          }
+          select.html(con);
+          //这一步必不可少
+          form.render("select");
+        }
+      });
+    });
+
+    form.on('select(initproduct)', function(data){
+      $.ajax({
+        url:"/xddesign/admin/secondlevel/products/nopage"
+        ,type:"GET"
+        ,data: {"secondId": data.value}
+        ,dataType:"json"
+        ,async: false
+        ,success:function(res) {
+          let select = $("select[name='productId']");
+          select.empty();
+          let con = '';
+          for (let i = 0; i < res.length; i++) {
+            con += '<option value='+'"'+res[i].productId+'"'+'>'+res[i].productName+'</option>';
+          }
+          select.html(con);
+          //这一步必不可少
+          form.render("select");
+        }
+      });
+    });
+
+    var loadindex;
+    // 上传产品手册
+    upload.render({
+      elem: '#insertGuide'
+      ,url: '/xddesign/admin/guide/upload'
+      ,accept: "file"
+      ,exts: 'pdf'
+      ,multiple: false
+      ,size: 20*1024
+      ,before: function(obj){
+        loadindex = layer.load();//上传loading
+      }
+      ,error: function(index, upload){
+        return layer.msg("服务器出现错误，请重试", {icon:5});
+      }
+      ,done: function (res, index, upload) {
+        layer.close(loadindex);
+        //上传失败
+        if (res.status === 0) {
+          return layer.msg(res.msg, {icon:5});
+        }
+        $('input[name="guideLink"]').val(res.data.src);
+      }
+    });
+
+    var loadindex2;
+    // 上传产品手册封面
+    upload.render({
+      elem: '#insertPicture'
+      ,url: '/xddesign/admin/guide/upload'
+      ,accept: "images"
+      ,multiple: false
+      ,size: 5*1024
+      ,before: function(obj){
+        loadindex2 = layer.load();//上传loading
+      }
+      ,error: function(index, upload){
+        return layer.msg("服务器出现错误，请重试", {icon:5});
+      }
+      ,done: function (res, index, upload) {
+        layer.close(loadindex2);
+        //上传失败
+        if (res.status === 0) {
+          return layer.msg(res.msg, {icon:5});
+        }
+        $('input[name="pictureLink"]').val(res.data.src);
+      }
+    });
+
+  });
+  </script>
+</body>
+</html>

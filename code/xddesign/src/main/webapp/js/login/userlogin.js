@@ -52,7 +52,7 @@ $(function(){
             $.ajax({
                 type: "POST",
                 //url: "----------------------------------------------------------------登录",
-                url: "/user/login",
+                url: "/xddesign/user/login",
                 data:{'mobile': $('#div_userlogin>div input:first-of-type').val(),
                     'password': $('#div_userlogin>div input:password').val()},
                 async: false,
@@ -71,9 +71,9 @@ $(function(){
                         window.localStorage.setItem("roleId", data.data.role.id);
                         window.localStorage.setItem("lastTime", data.data.lastTime);
                         if (roleName === "设计人员") {
-                            window.location.href = "/dsg/main.html";
+                            window.location.href = "../dsg/main.html";
                         }else if (roleName === "管理员") {
-                            window.location.href = "/admin/views/index.html";
+                            window.location.href = "../admin/views/index.html";
                         }else {
                             lightbox_tip("敬请期待");
                         }

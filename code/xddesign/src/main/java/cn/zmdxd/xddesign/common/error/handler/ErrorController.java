@@ -14,13 +14,11 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping(value = "/error")
 public class ErrorController {
 
-    private static final String BASE_DIR = "/error/";
-
+    private static final String BASE_DIR = "/html/error/";
 
     @RequestMapping("/404")
     public String handle(HttpServletRequest request){
         return BASE_DIR + "error404.html";
     }
-
 
 }

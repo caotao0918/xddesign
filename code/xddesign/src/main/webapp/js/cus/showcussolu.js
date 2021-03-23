@@ -15,7 +15,7 @@ $(function(){
 
     $.ajax({
         //----------------------------------------------------------url查询每个house对应的soulu列表
-        url:"/public/customer/solution",
+        url:"/xddesign/public/customer/solution",
         data:{'soluId':soluId},
         dataType:"json",
         type:"GET",

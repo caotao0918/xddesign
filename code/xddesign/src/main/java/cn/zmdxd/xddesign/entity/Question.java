@@ -16,4 +16,6 @@ public class Question {
     private String keyword;      //关键字
     private String reserve;      //保留字段
 
+    private Integer productId;   //产品id
+
 }

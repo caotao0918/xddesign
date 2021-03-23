@@ -3,23 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>编辑方案</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <!-- we code these -->
-    <link rel="stylesheet" href="/cmn/layui/css/layui.css"  media="all">
-    <link rel="stylesheet" type="text/css" href="/css/dsg/addhousesolu.css" />
-    <script type="text/javascript" src="/cmn/jquery/jquery-1.8.3.js"></script>
-    <script charset="utf-8" src="/cmn/layui/layui.js" ></script>
-    <script type="text/javascript" src="/cmn/mylayui/mylayui.js"></script>
-    <script src="/js/utils/getUrlParam.js"></script>
-    <script type="text/javascript" src="/js/dsg/addhousesolu.js"></script>
-    <script src="/js/login/logout.js"></script>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="../../cmn/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="../../css/dsg/addhousesolu.css" />
+    <script type="text/javascript" src="../../cmn/jquery/jquery-1.8.3.js"></script>
+    <script charset="utf-8" src="../../cmn/layui/layui.js" ></script>
+    <script type="text/javascript" src="../../cmn/mylayui/mylayui.js"></script>
+    <script src="../../js/utils/getUrlParam.js"></script>
+    <script type="text/javascript" src="../../js/dsg/addhousesolu.js"></script>
+    <script src="../../js/login/logout.js"></script>
 </head>
 <body>
 <ul class="layui-nav" style="z-index: 1998">
+    <li class="layui-nav-item"><img alt="logo" src="../../img/logo.png" height="40px" width="50px" /></li>
     <li class="layui-nav-item"><a href="main.html" style="font-size: 17px">迅达智能家居设计系统-设计人员</a></li>
-    <li class="layui-nav-item layui-col-md-offset3"><a href="listmycus.html">客户管理</a></li>
+    <li class="layui-nav-item layui-col-md-offset2 layui-this"><a href="listmycus.html">客户管理</a></li>
     <li class="layui-nav-item">
-        <a href="javascript:;">方案管理</a>
+        <a href="javascript:">方案管理</a>
         <dl class="layui-nav-child"> <!-- 二级菜单 -->
             <dd><a href="">客户方案</a></dd>
             <dd><a href="">我的模板</a></dd>
@@ -29,23 +31,26 @@
     </li>
     <li class="layui-nav-item"><a href="../customer/goodslist.html">产品中心</a></li>
     <li class="layui-nav-item"><a href="../customer/aftersalecnt.html">售后支持</a></li>
-    <li class="layui-nav-item layui-col-md-offset4">
-        <a href="javascript:;">我</a>
+    <li class="layui-nav-item layui-col-md-offset3">欢迎设计员：</li>
+    <li class="layui-nav-item">
+        <a id="me" href="javascript:">我</a>
         <dl class="layui-nav-child"> <!-- 二级菜单 -->
             <dd><a href="info.html">个人详情</a></dd>
             <dd><a href="password.html">修改密码</a></dd>
-            <dd><a href="javascript:;" onclick="userlogout()">退出</a></dd>
+            <dd><a href="javascript:" onclick="userlogout()">退出</a></dd>
         </dl>
     </li>
 </ul>
 <script>
-    layui.use(['element', 'layer'], function () {
-        var element = layui.element;
+    layui.use('element', function () {
+        const element = layui.element;
+        const $ = layui.$;
+        $("#me").html(window.localStorage.getItem("username") + "<span class='layui-nav-more'></span>");
     });
 </script>
 <div id = "div_1" class = "div_1">
     <div class = "div_top_1">
-        <img class = "img_back_1" src="/img/back.svg"/>
+        <img class = "img_back_1" src="../../img/back.svg"/>
         <div id = "div_savesolu" class = "div_savesolu">
         </div>
     </div>
@@ -74,8 +79,8 @@
 
     <div id = "div_roomlist" class = "div_roomlist">
         <div id = "div_plus" class = "div_plus">
-            <img src = "/img/plus_.svg"/>
-            <img src = "/img/plus1.svg"/>
+            <img src = "../../img/plus_.svg"/>
+            <img src = "../../img/plus1.svg"/>
         </div>
     </div>
     <div id = "div_tab_1" class = "div_tab_1">
@@ -86,7 +91,7 @@
 
 <div id = "div_2" class = "div_2">
     <div class = "div_top_2">
-        <img class = "img_back_2" src="/img/back.svg"/>
+        <img class = "img_back_2" src="../../img/back.svg"/>
         <div></div>
         <div></div>
         <div></div>

@@ -13,10 +13,10 @@ $(function() {
     $('#div_housemgt').html(cusOpt_text_1);
     $('#div_aftersalesp').html(cusOpt_text_2);
     $('#div_housemgt').click(function () {
-        location.href = "/customer/myhouselist.html";
+        location.href = "myhouselist.html";
     })
     $('#div_aftersalesp').click(function () {
-        location.href = "/customer/aftersalecnt.html";
+        location.href = "aftersalecnt.html";
     })
 
     $('.div_cusname').html(cusOpt_welcome+cusName);

@@ -1,15 +1,13 @@
-
-
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
   <meta charset="utf-8">
   <title>产品管理</title>
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
-  <link rel="stylesheet" href="/html/admin/layuiadmin/layui/css/layui.css" media="all">
-  <link rel="stylesheet" href="/html/admin/layuiadmin/style/admin.css" media="all">
+  <link rel="stylesheet" href="../../../admin/layuiadmin/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="../../../admin/layuiadmin/style/admin.css" media="all">
 </head>
 <body>
 
@@ -52,22 +50,25 @@
       
         <table id="LAY-product-manage" lay-filter="LAY-product-manage"></table>
         <script type="text/html" id="table-useradmin-admin">
-          <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+          <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>基本信息</a>
+          <a class="layui-btn layui-btn-radius layui-btn-xs" lay-event="detail"><i class="layui-icon layui-icon-note"></i>产品详情</a>
           <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
         </script>
       </div>
     </div>
   </div>
 
- <script src="/html/admin/layuiadmin/layui/layui.js"></script>
+  <script src="../../../admin/layuiadmin/layui/layui.js"></script>
   <script>
 
-  function getProductInfo(list, f) {
-    console.log(list);
-    console.log(f);
-  }
+    var propertyList;
+    var pictureList;
+    function getProductInfo(list, picturelist) {
+      propertyList = list;
+      pictureList = picturelist;
+    }
   layui.config({
-    base: '/html/admin/layuiadmin/' //静态资源所在路径
+    base: '../../../admin/layuiadmin/' //静态资源所在路径
   }).extend({
     index: 'lib/index' //主入口模块
   }).use(['index', 'productadmin', 'table'], function(){
@@ -85,7 +86,7 @@
     $(function () {
 
       $.ajax({
-        url:"/admin/firstlevel/nopage"
+        url:"/xddesign/admin/firstlevel/nopage"
         ,type:"GET"
         ,dataType:"json"
         ,async: false
@@ -105,7 +106,7 @@
     });
     form.on('select(initsecondlevel)', function(data){
       $.ajax({
-        url:"/admin/secondlevel/nopage"
+        url:"/xddesign/admin/secondlevel/nopage"
         ,type:"GET"
         ,data: {"firstId": data.value}
         ,dataType:"json"
@@ -138,7 +139,7 @@
       //
       //     //执行 Ajax 后重载
       //     $.ajax({
-      //       url: '/admin/property/batchdelete'
+      //       url: '/xddesign/admin/property/batchdelete'
       //       ,type: 'POST'
       //       ,data: JSON.stringify(checkData)
       //       ,dataType: 'json'
@@ -169,29 +170,48 @@
             iframeWindow.layui.form.on('submit(LAY-product-front-submit)', function(data){
               let field = data.field; //获取提交的字段
 
+              let formData = new FormData();
+              formData.append("productName", field.productName);
+              formData.append("productModels", field.productModels);
+              formData.append("price", field.price);
+              formData.append("productLink", field.productLink);
+              formData.append("productDesc", field.productDesc);
+              formData.append("secondId", field.secondId);
+              for (let i = 0; i < propertyList.length; i++) {
+                formData.append("propertyValueList["+i+"]['valueName']", propertyList[i].get('valueName'));
+                formData.append("propertyValueList["+i+"]['propertyId']", propertyList[i].get('propertyId'));
+              }
+              for (let j = 0; j < pictureList.length; j++) {
+                formData.append("files", pictureList[j]);
+              }
+
               //提交 Ajax 成功后，静态更新表格中的数据
               $.ajax({
-                url: '/admin/test'
+                url: '/xddesign/admin/product/save'
                 ,type: 'POST'
-                ,data: {"productName": field.productName, "name": "eee"}
+                ,data: formData
+                ,processData: false
+                ,contentType: false
                 ,dataType: 'json'
+                ,cache: false
                 ,success: function (res) {
                   if (res.status == 0) {
                     layer.msg(res.msg,{icon:5});
                     return false;
                   }
                   table.reload('LAY-product-manage');
-                  // layer.close(index); //关闭弹层
+                  layer.close(index); //关闭弹层
+                }
+                ,error: function () {
+                  layer.msg("服务器出错啦", {icon:2});
                 }
               });
-
-            });  
-            
+            });
             submit.trigger('click');
           }
         }); 
       }
-    }  
+    }
     $('.layui-btn.layuiadmin-btn-product').on('click', function(){
       var type = $(this).data('type');
       active[type] ? active[type].call(this) : '';

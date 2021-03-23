@@ -22,7 +22,7 @@ $(function(){
     function queryQuoteList(){
         $.ajax({
             //---------------------------------------------------------------url查询报价单
-            url:"/public/customer/quotes",
+            url:"/xddesign/public/customer/quotes",
             data: {"soluId" : soluId},
             dataType:"json",
             type:"GET",
@@ -72,7 +72,7 @@ $(function(){
     }
 
     $('#div_downquote').click(function() {
-        window.location.href = "/public/customer/quote/toexcel?soluId=" + soluId;
+        window.location.href = "/xddesign/public/customer/quote/toexcel?soluId=" + soluId;
     })
     $('#img_back').click(function() {
         history.go(-1);

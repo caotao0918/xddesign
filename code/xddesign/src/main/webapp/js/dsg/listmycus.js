@@ -25,7 +25,7 @@ $(function() {
 
     $('#div_plus').click(function(){
         //----------------------------------------------------------跳转到添加客户页面
-        location.href = '/dsg/addcus.html ';
+        location.href = 'addcus.html ';
     })
 
     function getData(pageNum,pageSize){
@@ -80,7 +80,7 @@ $(function() {
             window.localStorage.setItem("cusId",cusId);
             window.localStorage.setItem("cusName",cusName);
             //------------------------------------------------------------修改客户信息页
-            location.href = "/dsg/updcus.html";
+            location.href = "updcus.html";
         })
 
 

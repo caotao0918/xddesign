@@ -11,15 +11,17 @@
         <result column="product_desc" property="productDesc" />
         <result column="product_link" property="productLink" />
         <result column="price" property="price" />
+        <result column="product_detail" property="productDetail" />
         <result column="product_reserve1" property="productReserve1" />
         <result column="product_reserve2" property="productReserve2" />
         <result column="product_reserve3" property="productReserve3" />
         <result column="product_reserve4" property="productReserve4" />
         <result column="product_reserve5" property="productReserve5" />
-        <association property="secondLevel" javaType="SecondLevel">
-            <id column="second_id" property="secondId" />
-            <result column="second_name" property="secondName" />
-        </association>
+<!--        <association property="secondLevel" javaType="SecondLevel">-->
+<!--            <id column="second_id" property="secondId" />-->
+<!--            <result column="second_name" property="secondName" />-->
+<!--        </association>-->
+        <association property="secondLevel" javaType="SecondLevel" resultMap="cn.zmdxd.xddesign.admin.dao.SecondLevelDao.SecondAndFirst" />
         <association property="guide" javaType="Guide">
             <id column="guide_id" property="guideId" />
             <result column="guide_name" property="guideName" />
@@ -34,18 +36,7 @@
             <result column="video_desc" property="videoDesc" />
             <result column="video_add_time" property="videoAddTime" />
         </association>
-        <collection property="productPropertyList" ofType="ProductProperty">
-            <id column="id" property="id" />
-            <association property="value" javaType="PropertyValue">
-                <id column="value_id" property="valueId" />
-                <result column="value_name" property="valueName" />
-                <association property="property" javaType="Property">
-                    <id column="property_id" property="propertyId" />
-                    <result column="property_name" property="propertyName" />
-                    <result column="property_desc" property="propertyDesc" />
-                </association>
-            </association>
-        </collection>
+        <collection property="productPropertyList" ofType="ProductProperty" resultMap="cn.zmdxd.xddesign.admin.dao.ProductDao.ProductPropertyAndValue" />
         <collection property="pictureList" ofType="Picture">
             <id column="picture_id" property="pictureId" />
             <result column="picture_name" property="pictureName" />
@@ -53,6 +44,19 @@
             <result column="picture_add_time" property="pictureAddTime" />
             <result column="default_picture" property="defaultPicture" />
         </collection>
+    </resultMap>
+
+    <resultMap id="ProductPropertyAndValue" type="ProductProperty">
+        <id column="id" property="id" />
+        <association property="value" javaType="PropertyValue">
+            <id column="value_id" property="valueId" />
+            <result column="value_name" property="valueName" />
+            <association property="property" javaType="Property">
+                <id column="property_id" property="propertyId" />
+                <result column="property_name" property="propertyName" />
+                <result column="property_desc" property="propertyDesc" />
+            </association>
+        </association>
     </resultMap>
 
     <insert id="insertProduct" useGeneratedKeys="true" keyProperty="productId">
@@ -64,25 +68,49 @@
         insert into t_product_property(product_id, value_id) VALUES (#{productId},#{valueId})
     </insert>
 
+<!--    <select id="findProducts" resultMap="ProductAndPropertyAndPicture">-->
+<!--        SELECT product.product_name,product.product_id,product.product_models,product.price,product.product_link,product.product_desc,product.product_reserve1,product.product_reserve2,product.product_reserve3,product.product_reserve4,product.product_reserve5,-->
+<!--               sec.second_name,sec.second_id,-->
+<!--               picture.picture_id, picture.picture_name, picture.picture_link, picture.picture_add_time, picture.picture_reserve,picture.default_picture-->
+<!--        FROM t_product product-->
+<!--                 left join t_secondlevel sec on sec.second_id=product.second_id-->
+<!--                 left join t_firstlevel first on sec.first_id = first.first_id-->
+<!--                 left join t_picture picture on picture.product_id=product.product_id-->
+<!--        <where>-->
+<!--            product.product_id in(SELECT product1.product_id from(SELECT product2.product_id from t_product as product2 limit #{offset},#{size})as product1)-->
+<!--            <if test="productVo.productName != null and productVo.productName != '' ">-->
+<!--                and product.product_name like '%${productVo.productName}%'-->
+<!--            </if>-->
+<!--            <if test="productVo.firstId != null and productVo.firstId !=0 ">-->
+<!--                and first.first_id = #{productVo.firstId}-->
+<!--            </if>-->
+<!--            <if test="productVo.secondId != null and productVo.secondId !=0 ">-->
+<!--                and sec.second_id = #{productVo.secondId}-->
+<!--            </if>-->
+<!--        </where>-->
+<!--    </select>-->
+
     <select id="findProducts" resultMap="ProductAndPropertyAndPicture">
-        SELECT product.product_name,product.product_id,product.product_models,product.price,product.product_link,product.product_desc,product.product_reserve1,product.product_reserve2,product.product_reserve3,product.product_reserve4,product.product_reserve5,
-               sec.second_name,sec.second_id,
-               picture.picture_id, picture.picture_name, picture.picture_link, picture.picture_add_time, picture.picture_reserve,picture.default_picture
+        SELECT product.product_name,product.product_id,product.product_models,product.price,product.product_link,product.product_desc, product.product_detail
+               ,product.product_reserve1,product.product_reserve2,product.product_reserve3,product.product_reserve4,product.product_reserve5,
+        sec.second_name,sec.second_id,
+        fir.first_name, fir.first_id,
+        picture.picture_name,picture.picture_link,picture.picture_id
         FROM t_product product
-                 left join t_secondlevel sec on sec.second_id=product.second_id
-                 left join t_firstlevel first on sec.first_id = first.first_id
-                 left join t_picture picture on picture.product_id=product.product_id
+        left join t_secondlevel sec on sec.second_id=product.second_id
+        left join t_firstlevel fir on sec.first_id = fir.first_id
+        left join t_picture picture on product.product_id = picture.product_id
         <where>
-            product.product_id in(SELECT product1.product_id from(SELECT product2.product_id from t_product as product2 limit #{offset},#{size})as product1)
             <if test="productVo.productName != null and productVo.productName != '' ">
-                and product.product_name like '%${productVo.productName}%'
+                product.product_name like '%${productVo.productName}%'
             </if>
             <if test="productVo.firstId != null and productVo.firstId !=0 ">
-                and first.first_id = #{productVo.firstId}
+                and fir.first_id = #{productVo.firstId}
             </if>
             <if test="productVo.secondId != null and productVo.secondId !=0 ">
                 and sec.second_id = #{productVo.secondId}
             </if>
+            and picture.default_picture = 1
         </where>
     </select>
 
@@ -105,7 +133,8 @@
     </select>
 
     <select id="findProduct" resultMap="ProductAndPropertyAndPicture">
-        SELECT product.product_name,product.product_id,product.product_models,product.price,product.product_link,product.product_desc,product.product_reserve1,product.product_reserve2,product.product_reserve3,product.product_reserve4,product.product_reserve5,
+        SELECT product.product_name,product.product_id,product.product_models,product.price,product.product_link,product.product_desc, product.product_detail
+               ,product.product_reserve1,product.product_reserve2,product.product_reserve3,product.product_reserve4,product.product_reserve5,
         sec.second_name,sec.second_id,sec.second_desc,
         pp.id, pp.product_id,pp.value_id,
         property.property_name,property.property_id,property.property_desc,
@@ -145,6 +174,14 @@
 
     <delete id="removeProductProperty">
         delete from t_product_property where value_id=#{valueId}
+    </delete>
+
+    <select id="selectProductPropertyByProductId" resultMap="ProductPropertyAndValue">
+        select id, value_id from t_product_property where product_id = #{productId}
+    </select>
+
+    <delete id="deleteProductPropertyByProductId">
+        delete from t_product_property where product_id = #{productId}
     </delete>
 
     <select id="findProductsBySecond" resultMap="ProductAndPropertyAndPicture">

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>产品图片管理</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="../../../admin/layuiadmin/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="../../../admin/layuiadmin/style/admin.css" media="all">
+  <style type="text/css">
+    .layui-table-cell {
+      height: auto;
+      line-height: 20px;
+    }
+    .layui-table-cell img {
+      height: 70%;
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body>
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">产品名称</label>
+          <div class="layui-input-block">
+            <input type="text" name="productName" placeholder="请输入" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">一级分类</label>
+          <div class="layui-input-block">
+            <select name="firstId" lay-search lay-filter="initsecondlevel">
+            </select>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">二级分类</label>
+          <div class="layui-input-block">
+            <select name="secondId" lay-search lay-filter="initproduct">
+            </select>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">产品</label>
+          <div class="layui-input-block">
+            <select name="productId" lay-search>
+            </select>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-picture-front-search">
+            <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="layui-card-body">
+      <div style="padding-bottom: 10px;">
+<!--        <button class="layui-btn layuiadmin-btn-useradmin" data-type="batchdel">删除</button>-->
+        <button class="layui-btn layuiadmin-btn-useradmin" data-type="add">添加</button>
+      </div>
+      <table id="LAY-picture-manage" lay-filter="LAY-picture-manage"></table>
+              <script type="text/html" id="imgTpl">
+                <img alt="{{d.pictureName}}" style="display: inline-block; width: 650px; height: 250px;" src= {{ d.pictureLink }}>
+              </script>
+              <script type="text/html" id="switchTpl">
+                {{#  if(d.defaultPicture == true){ }}
+                <input type="checkbox" name="{{d.pictureId}}" value="{{d.defaultPicture}}" lay-skin="switch" disabled lay-text="是|否" lay-filter="updatedefault" {{ d.defaultPicture == true ? 'checked' : '' }}>
+                {{#  } else { }}
+                <input type="checkbox" name="{{d.pictureId}}" value="{{d.defaultPicture}}" lay-skin="switch" lay-text="是|否" lay-filter="updatedefault" {{ d.defaultPicture == true ? 'checked' : '' }}>
+                {{#  } }}
+              </script>
+      <script type="text/html" id="table-useradmin-admin">
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-picture"></i>查看</a>
+        {{#  if(d.defaultPicture == true){ }}
+        <a class="layui-btn layui-btn-disabled layui-btn-xs"><i class="layui-icon layui-icon-delete"></i>删除</a>
+        {{#  } else { }}
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+        {{#  } }}
+      </script>
+    </div>
+  </div>
+</div>
+
+<script src="../../layuiadmin/layui/layui.js"></script>
+<script>
+  layui.config({
+    base: '../../../admin/layuiadmin/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index', 'productadmin', 'table'], function(){
+    var $ = layui.$
+            ,form = layui.form
+            ,table = layui.table;
+
+    form.on('submit(LAY-picture-front-search)', function(data){
+      //执行重载
+      table.reload('LAY-picture-manage', {
+        where: data.field
+      });
+    });
+
+    $(function () {
+
+      $.ajax({
+        url:"/xddesign/admin/firstlevel/nopage"
+        ,type:"GET"
+        ,dataType:"json"
+        ,async: false
+        ,success:function(res) {
+          let select = $("select[name='firstId']");
+          select.empty();
+          let con = '<option value="0">全部</option>';
+          for (let i = 0; i < res.length; i++) {
+            con += '<option value='+'"'+res[i].firstId+'"'+'>'+res[i].firstName+'</option>';
+          }
+          select.html(con);
+          //这一步必不可少
+          form.render("select");
+        }
+      });
+
+    });
+    form.on('select(initsecondlevel)', function(data){
+      $.ajax({
+        url:"/xddesign/admin/secondlevel/nopage"
+        ,type:"GET"
+        ,data: {"firstId": data.value}
+        ,dataType:"json"
+        ,async: false
+        ,success:function(res) {
+          let select = $("select[name='secondId']");
+          select.empty();
+          let con = '<option value="0">全部</option>';
+          for (let i = 0; i < res.length; i++) {
+            con += '<option value='+'"'+res[i].secondId+'"'+'>'+res[i].secondName+'</option>';
+          }
+          select.html(con);
+          //这一步必不可少
+          form.render("select");
+        }
+      });
+    });
+    form.on('select(initproduct)', function(data){
+      $.ajax({
+        url:"/xddesign/admin/secondlevel/products/nopage"
+        ,type:"GET"
+        ,data: {"secondId": data.value}
+        ,dataType:"json"
+        ,async: false
+        ,success:function(res) {
+          let select = $("select[name='productId']");
+          select.empty();
+          let con = '<option value="0">全部</option>';
+          for (let i = 0; i < res.length; i++) {
+            con += '<option value='+'"'+res[i].productId+'"'+'>'+res[i].productName+'</option>';
+          }
+          select.html(con);
+          //这一步必不可少
+          form.render("select");
+        }
+      });
+    });
+
+    form.on('switch(updatedefault)', function (obj) {
+      if (this.value === 'true') {
+        layer.msg("禁止修改", {icon:2});
+        return;
+      }
+      $.ajax({
+        url:"/xddesign/admin/product/picture/updatedefault"
+        ,type:"POST"
+        ,data: {"pictureId": this.name}
+        ,dataType:"json"
+        ,success:function(res) {
+          if (res.status === 0) {
+            layer.msg(res.msg, {icon:5});
+            return false;
+          }
+          table.reload('LAY-picture-manage');
+        }
+        ,error: function () {
+          layer.msg("服务器出错啦", {icon:2});
+        }
+      });
+    });
+
+    //事件
+    var active = {
+      add: function(){
+        layer.open({
+          type: 2
+          ,title: '添加效果图'
+          ,content: 'addpicture.html'
+          ,maxmin: true
+          ,area: ['960px', '800px']
+        });
+      }
+    };
+
+    $('.layui-btn.layuiadmin-btn-useradmin').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+  });
+</script>
+</body>
+</html>

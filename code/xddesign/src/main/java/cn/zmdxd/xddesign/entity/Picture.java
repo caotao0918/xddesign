@@ -27,6 +27,8 @@ public class Picture {
 
     private String pictureReserve;//保留字段
 
+    private Integer productId;   // 对应的产品id
+
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     public Timestamp getPictureAddTime() {
         return pictureAddTime;

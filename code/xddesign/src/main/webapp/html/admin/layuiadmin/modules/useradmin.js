@@ -1,10 +1,9 @@
 /** layuiAdmin.std-v1.4.0 LPPL License By https://www.layui.com/admin/ */
 ;layui.define(["table", "form"], function (e) {
     var t = layui.$, i = layui.table;
-    layui.form;
     i.render({
         elem: "#LAY-user-manage",
-        url: "/admin/user",
+        url: "/xddesign/admin/user",
         cols: [[{type: "checkbox", fixed: "left"}, {field: "id", width: 100, title: "ID", sort: !0},
             {field: "username", title: "用户名", minWidth: 100}, {field: "mobile", title: "手机号"}, {field: "role", title: "角色",templet:'<div>{{d.role.name}}</div>'},
             {field: "lastTime", title: "上次登陆时间"}, {field: "addTime", title: "加入时间", sort: !0},
@@ -40,7 +39,17 @@
                     "data": res.records //解析数据列表
                 }
             }
-    },
+        },
+        done: function(res, curr, count) {
+            let datalist = res.data;
+            layui.$('.layui-table th[data-field="0"] input[type="checkbox"]').prop('disabled', true); // 禁止全选
+            for (let i = 0; i < datalist.length; i++) {
+                if (datalist[i].role.name === '管理员') {
+                    let index = datalist[i]['LAY_TABLE_INDEX'];
+                    layui.$(".layui-table tr[data-index="+index+"] input[type='checkbox']").prop('disabled',true);
+                }
+            }
+        },
         height: "full-220",
         text: "对不起，加载出现异常！"
     }), i.on("tool(LAY-user-manage)", function (e) {
@@ -51,7 +60,7 @@
             // layer.close(i),
             layer.confirm("真的删除么", {icon:3, title: '提示'}, function (t) {
                 layui.$.ajax({
-                    url: '/admin/user/del'
+                    url: '/xddesign/admin/user/del'
                     ,type: 'POST'
                     ,data: JSON.stringify(e.data)
                     ,dataType: 'json'
@@ -85,7 +94,7 @@
                         let field = data.field; //获取提交的字段
                         //提交 Ajax 成功后，静态更新表格中的数据
                         layui.$.ajax({
-                            url: '/admin/user/saveorupdate'
+                            url: '/xddesign/admin/user/saveorupdate'
                             ,type: 'POST'
                             ,data: field
                             ,dataType: 'text'
@@ -113,7 +122,7 @@
         }
     }), i.render({
         elem: "#LAY-user-back-role",
-        url: "/admin/roles",
+        url: "/xddesign/admin/roles",
         cols: [[{type: "checkbox", fixed: "left"}, {field: "id", width: 80, title: "ID", sort: !0}, {
             field: "name",
             title: "角色名"
@@ -155,12 +164,22 @@
                 }
             }
         },
+        done: function(res, curr, count) {
+            let datalist = res.data;
+            layui.$('.layui-table th[data-field="0"] input[type="checkbox"]').prop('disabled', true); // 禁止全选
+            for (let i = 0; i < datalist.length; i++) {
+                if (datalist[i].name === '管理员') {
+                    let index = datalist[i]['LAY_TABLE_INDEX'];
+                    layui.$(".layui-table tr[data-index="+index+"] input[type='checkbox']").prop('disabled',true);
+                }
+            }
+        },
         text: "对不起，加载出现异常！"
     }), i.on("tool(LAY-user-back-role)", function (e) {
         e.data;
         if ("del" === e.event) layer.confirm("确定删除此角色？", {icon:3, title: '提示'}, function (t) {
             layui.$.ajax({
-                url: '/admin/role/del'
+                url: '/xddesign/admin/role/del'
                 ,type: 'POST'
                 ,data: {"id":e.data.id}
                 ,dataType: 'json'
@@ -190,7 +209,7 @@
                         let field = data.field; //获取提交的字段
                         //提交 Ajax 成功后，静态更新表格中的数据
                         layui.$.ajax({
-                            url: '/admin/role/saveorupdate'
+                            url: '/xddesign/admin/role/saveorupdate'
                             ,type: 'POST'
                             ,data: field
                             ,dataType: 'json'

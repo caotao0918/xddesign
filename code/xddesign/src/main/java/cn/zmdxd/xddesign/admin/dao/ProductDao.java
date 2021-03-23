@@ -1,6 +1,7 @@
 package cn.zmdxd.xddesign.admin.dao;
 
 import cn.zmdxd.xddesign.entity.Product;
+import cn.zmdxd.xddesign.entity.ProductProperty;
 import cn.zmdxd.xddesign.entity.ProductVo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -21,7 +22,8 @@ public interface ProductDao extends BaseMapper<Product> {
 
     Integer insertProduct(ProductVo productVo);
 
-    IPage<Product> findProducts(Page<Product> page, @Param("offset") Integer offset, @Param("size")Integer size, @Param("productVo") ProductVo productVo);
+//    IPage<Product> findProducts(Page<Product> page, @Param("offset") Integer offset, @Param("size")Integer size, @Param("productVo") ProductVo productVo);
+    IPage<Product> findProducts(Page<Product> page, @Param("productVo") ProductVo productVo);
     List<Product> findProductList();
     Product findProduct(Integer productId);
 
@@ -30,4 +32,8 @@ public interface ProductDao extends BaseMapper<Product> {
     int countProduct(ProductVo productVo);
 
     List<Product> findProductsBySecond(Integer secondId);
+
+    int deleteProductPropertyByProductId(Integer productId);
+
+    List<ProductProperty> selectProductPropertyByProductId(Integer productId);
 }

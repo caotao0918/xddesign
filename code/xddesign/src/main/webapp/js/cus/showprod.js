@@ -13,7 +13,7 @@ $(function(){
     function queryProdProp(){
         $.ajax({
             //---------------------------------------------------------------url查询产品
-            url:"/public/product",
+            url:"/xddesign/public/product",
             data: {"productId" : prodId},
             dataType:"json",
             type:"GET",
@@ -38,6 +38,7 @@ $(function(){
     function bindProdInfo(){
         $('#div_proddesc pre').html(prod.productDesc);
         $("#prodnamevalue").html(prod.productName);
+        $("#product_detail").html(prod.productDetail);
     }
 
     function bindProdProp(){

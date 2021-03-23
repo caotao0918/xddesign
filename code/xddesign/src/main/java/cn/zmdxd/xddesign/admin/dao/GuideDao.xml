@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zmdxd.xddesign.admin.dao.GuideDao">
+
+    <select id="selectGuides" resultType="Guide">
+        select
+        guide.guide_id, guide_name, guide_link, guide_add_time, guide_desc, guide.picture_link, guide_reserve
+        from t_guide guide
+        left join t_product product on product.product_id=guide.product_id
+        left join t_secondlevel sec on product.second_id = sec.second_id
+        left join t_firstlevel fir on sec.first_id = fir.first_id
+        <where>
+            <if test="productVo.productName != null and productVo.productName != '' ">
+                product.product_name like '%${productVo.productName}%'
+            </if>
+            <if test="productVo.firstId != null and productVo.firstId !=0 ">
+                and fir.first_id = #{productVo.firstId}
+            </if>
+            <if test="productVo.secondId != null and productVo.secondId !=0 ">
+                and sec.second_id = #{productVo.secondId}
+            </if>
+            <if test="productVo.productId != null and productVo.productId !=0 ">
+                and product.product_id = #{productVo.productId}
+            </if>
+        </where>
+    </select>
+
+</mapper>

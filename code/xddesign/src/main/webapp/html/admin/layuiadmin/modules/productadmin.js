@@ -4,12 +4,12 @@
     layui.form;
     i.render({
         elem: "#LAY-product-manage",
-        url: "/admin/products",
+        url: "/xddesign/public/products",
         cols: [[{field: "productId", width: 80, title: "ID", sort: !0},
-            {field: "productName", title: "用户名", minWidth: 100}, {field: "productModels", title: "产品型号"}
+            {field: "productName", title: "产品名", minWidth: 100}, {field: "productModels", title: "产品型号"}
             , {field: "productLink", title: "产品官网链接",templet:'<div><a href="{{d.productLink}}">{{d.productLink}}</a></div>'},
             {field: "price", title: "产品价格", sort: !0}, {field: "productDesc", title: "产品描述"},
-            {title: "操作", width: 150, align: "center", fixed: "right", toolbar: "#table-useradmin-admin"}]],
+            {title: "操作", width: 280, align: "center", fixed: "right", toolbar: "#table-useradmin-admin"}]],
         request:{
           pageName: 'current'
             ,limitName: 'size'
@@ -44,37 +44,33 @@
         height: "full-220",
         text: "对不起，加载出现异常！"
     }), i.on("tool(LAY-product-manage)", function (e) {
-        e.data;
-        if ("del" === e.event)
-            // layer.prompt({formType: 1, title: "敏感操作，请验证口令"}
-            // , function (t, i) {
-            // layer.close(i),
-            layer.confirm("真的删除么", {icon:3, title: '提示'}, function (t) {
+        if ("del" === e.event) {
+            layer.confirm("真的删除么", {icon: 3, title: '提示'}, function (t) {
                 layui.$.ajax({
-                    url: '/admin/product/del'
-                    ,type: 'POST'
-                    ,data: JSON.stringify(e.data)
-                    ,dataType: 'json'
-                    ,contentType: 'application/json;charset=utf-8'
-                    ,success: function (res) {
+                    url: '/xddesign/admin/product/del'
+                    , type: 'POST'
+                    , data: {"productId": e.data.productId}
+                    , dataType: 'json'
+                    , success: function (res) {
                         if (res.status === 0) {
-                            layer.msg(res.msg, {icon:5});
+                            layer.msg(res.msg, {icon: 5});
                             return false;
                         }
                         e.del();
                     }
+                    ,error: function () {
+                        layer.msg("出错啦", {icon:2});
+                    }
                 });
                 layer.close(t);
             });
-        // });
-        else if ("edit" === e.event) {
-            t(e.tr);
+        }else if ("edit" === e.event) {
             layer.open({
                 type: 2,
-                title: "编辑用户",
-                content: "productform.html?roleId=" + e.data.role.id,
+                title: "修改产品信息",
+                content: "addproduct.html?firstId=" + e.data.secondLevel.firstLevel.firstId + "&secondId=" + e.data.secondLevel.secondId + "&secondName=" + e.data.secondLevel.secondName,
                 maxmin: !0,
-                area: ["500px", "450px"],
+                area: ["1000px", "700px"],
                 btn: ["确定", "取消"]
                 ,yes: function(index, layero){
                     let iframeWindow = window['layui-layer-iframe'+ index]
@@ -85,7 +81,7 @@
                         let field = data.field; //获取提交的字段
                         //提交 Ajax 成功后，静态更新表格中的数据
                         layui.$.ajax({
-                            url: '/admin/product/update'
+                            url: '/xddesign/admin/product/update'
                             ,type: 'POST'
                             ,data: field
                             ,dataType: 'json'
@@ -106,16 +102,67 @@
                     // 获取子页面的iframe
                     let iframe = window['layui-layer-iframe' + index];
                     let $ = iframe.layui.$;
-                    $("input[name='id']").val(e.data.id);
-                    $("input[name='productname']").val(e.data.productname);
-                    $("input[name='mobile']").val(e.data.mobile);
-                    $("input[name='pwd']").attr("placeholder","不修改密码时不必输入");
+                    $("#productproperty").prop("hidden", true);
+                    $("input[name='file']").prop("hidden", true);
+                    $("input[name='productId']").val(e.data.productId);
+                    $("input[name='productName']").val(e.data.productName);
+                    $("input[name='productModels']").val(e.data.productModels);
+                    $("input[name='price']").val(e.data.price);
+                    $("input[name='productLink']").val(e.data.productLink);
+                    $("textarea[name='productDesc']").val(e.data.productDesc);
+                }
+            })
+        } else if ("detail" === e.event) {
+            layer.open({
+                type: 2,
+                title: "编辑产品详情",
+                content: "productdetail.html",
+                maxmin: !0,
+                area: ["1000px", "800px"],
+                btn: ["确定", "取消"]
+                ,yes: function(index, layero){
+                    let iframeWindow = window['layui-layer-iframe'+ index]
+                        ,submitID = 'LAY-productdetail-front-submit'
+                        ,submit = layero.find('iframe').contents().find('#'+ submitID);
+                    //监听提交
+                    iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
+                        let iframe = window['layui-layer-iframe' + index];
+                        let $ = iframe.layui.$;
+                        let productId = $("#productId").val();
+                        let value = $("#layeditDemo").val();
+                        layui.$.ajax({
+                            url: '/xddesign/admin/product/detail/saveorupdate'
+                            ,type: 'POST'
+                            ,data: {
+                                "productId": productId
+                                ,"productDetail": value
+                            }
+                            ,dataType: 'json'
+                            ,success: function (res) {
+                                if (res.status === 0) {
+                                    layer.msg(res.msg, {icon:5});
+                                    return false;
+                                }
+                                layui.table.reload('LAY-product-manage'); //数据刷新
+                                layer.close(index); //关闭弹层
+                            }
+                        });
+                    });
+
+                    submit.trigger('click');
+                }
+                , success: function (layero,index) {
+                    // 获取子页面的iframe
+                    let iframe = window['layui-layer-iframe' + index];
+                    let $ = iframe.layui.$;
+                    $("#productId").val(e.data.productId);
+                    $("#layeditDemo").val(e.data.productDetail);
                 }
             })
         }
     }), i.render({
         elem: "#LAY-firstlevel-manage",
-        url: "/admin/firstlevel",
+        url: "/xddesign/admin/firstlevel",
         cols: [[{type: "checkbox", fixed: "left"}, {field: "firstId", width: 80, title: "ID", sort: !0}, {
             field: "firstName",
             title: "分类名", templet: '<div><a href="secondlevel.html?firstId={{d.firstId}}">{{ d.firstName }}</a></div>'
@@ -163,7 +210,7 @@
         e.data;
         if ("del" === e.event) layer.confirm("确定删除？", {icon:3, title: '提示'}, function (t) {
             layui.$.ajax({
-                url: '/admin/firstlevel/delete'
+                url: '/xddesign/admin/firstlevel/delete'
                 ,type: 'POST'
                 ,data: {"firstId":e.data.firstId}
                 ,dataType: 'json'
@@ -193,7 +240,7 @@
                         let field = data.field; //获取提交的字段
                         //提交 Ajax 成功后，静态更新表格中的数据
                         layui.$.ajax({
-                            url: '/admin/firstlevel/saveorupdate'
+                            url: '/xddesign/admin/firstlevel/saveorupdate'
                             ,type: 'POST'
                             ,data: field
                             ,dataType: 'json'
@@ -224,7 +271,7 @@
         }
     }), i.render({
         elem: "#LAY-secondlevel-manage",
-        url: "/admin/secondlevels",
+        url: "/xddesign/admin/secondlevels",
         cols: [[{type: "checkbox", fixed: "left"}, {field: "secondId", width: 80, title: "ID", sort: !0}, {
             field: "secondName",
             title: "分类名", templet: '<div><a href="property.html?secondId={{d.secondId}}">{{d.secondName}}</a></div>'
@@ -275,7 +322,7 @@
         e.data;
         if ("del" === e.event) layer.confirm("确定删除？", {icon:3, title: '提示'}, function (t) {
             layui.$.ajax({
-                url: '/admin/secondlevel/delete'
+                url: '/xddesign/admin/secondlevel/delete'
                 ,type: 'POST'
                 ,data: {"secondId":e.data.secondId}
                 ,dataType: 'json'
@@ -305,7 +352,7 @@
                         let field = data.field; //获取提交的字段
                         //提交 Ajax 成功后，静态更新表格中的数据
                         layui.$.ajax({
-                            url: '/admin/secondlevel/saveorupdate'
+                            url: '/xddesign/admin/secondlevel/saveorupdate'
                             ,type: 'POST'
                             ,data: field
                             ,dataType: 'json'
@@ -337,7 +384,7 @@
         }
     }), i.render({
         elem: "#LAY-property-manage",
-        url: "/admin/secondlevel/property",
+        url: "/xddesign/admin/secondlevel/property",
         cols: [[{type: "checkbox", fixed: "left"}, {field: "propertyId", width: 80, title: "ID", sort: !0}, {field: "propertyName", title: "属性名"}
         ,{field: "commonValue", title: "常用值"}, {field: "propertyDesc", title: "描述"},{field: "secondLevel", title: "二级分类", templet: '<div>{{d.secondLevel.secondName}}</div>'}
         ,{title: "操作", width: 150, align: "center", fixed: "right",toolbar: "#table-useradmin-admin"}]],
@@ -382,7 +429,7 @@
         e.data;
         if ("del" === e.event) layer.confirm("确定删除？", {icon:3, title: '提示'}, function (t) {
             layui.$.ajax({
-                url: '/admin/property/delete'
+                url: '/xddesign/admin/property/delete'
                 ,type: 'POST'
                 ,data: {"propertyId":e.data.propertyId}
                 ,dataType: 'json'
@@ -412,7 +459,7 @@
                         let field = data.field; //获取提交的字段
                         //提交 Ajax 成功后，静态更新表格中的数据
                         layui.$.ajax({
-                            url: '/admin/property/saveorupdate'
+                            url: '/xddesign/admin/property/saveorupdate'
                             ,type: 'POST'
                             ,data: field
                             ,dataType: 'json'
@@ -445,7 +492,7 @@
         }
     }), i.render({
         elem: "#LAY-productproperty-manage",
-        url: "/admin/product/property",
+        url: "/xddesign/admin/product/property",
         cols: [[{field: "valueId", width: 80, title: "ID", sort: !0}, {field: "productName", title: "产品名称"}
         , {field: "propertyName", title: "属性名"}, {field: "valueName", title: "属性值"}
         ,{title: "操作", width: 150, align: "center", fixed: "right",toolbar: "#table-useradmin-admin"}]],
@@ -492,7 +539,7 @@
         e.data;
         if ("del" === e.event) layer.confirm("确定删除？", {icon:3, title: '提示'}, function (t) {
             layui.$.ajax({
-                url: '/admin/product/property/delete'
+                url: '/xddesign/admin/product/property/delete'
                 ,type: 'POST'
                 ,data: {"valueId":e.data.valueId}
                 ,dataType: 'json'
@@ -522,7 +569,7 @@
                         let field = data.field; //获取提交的字段
                         //提交 Ajax 成功后，静态更新表格中的数据
                         layui.$.ajax({
-                            url: '/admin/product/property/update'
+                            url: '/xddesign/admin/product/property/update'
                             ,type: 'POST'
                             ,data: field
                             ,dataType: 'json'
@@ -549,6 +596,78 @@
                     $("input[name='propertyName']").val(e.data.propertyName);
                 }
             })
+        }
+    }), i.render({
+        elem: "#LAY-picture-manage",
+        url: "/xddesign/admin/product/picture",
+        cols: [[{field: "pictureId", width: 80, title: "ID", sort: !0}, {field: "pictureName", title: "图片名称", width: 300}
+            , {field: "pictureLink", title: "图片", templet: "#imgTpl", width: 330}, {field: "pictureAddTime", title: "图片上传时间", width: 200}
+            ,{field: "defaultPicture", title: "默认图片", width: 180, templet: "#switchTpl", unresize: true}
+            ,{title: "操作", width: 180, align: "center", fixed: "right",toolbar: "#table-useradmin-admin"}]],
+        request:{
+            pageName: 'current'
+            ,limitName: 'size'
+        },
+        page: !0,
+        limit: 10,
+        skin:'row',
+        even:true,
+        parseData: function(res) { //res 即为原始返回的数据
+            if(res.total == 0) {
+                return {
+                    'code': 201, //接口状态
+                    'msg': '无数据', //提示文本
+                    'count': 0, //数据长度
+                    'data': [] //数据列表，是直接填充进表格中的数组
+                }
+            }else if (res.records.length == 0) {
+                return {
+                    'code': 201, //接口状态
+                    'msg': '无数据', //提示文本
+                    'count': 0, //数据长度
+                    'data': [] //数据列表，是直接填充进表格中的数组
+                }
+            }else {
+                return {
+                    "code": 0,
+                    "count": res.total, //解析数据长度
+                    "data": res.records //解析数据列表
+                }
+            }
+        },
+        text: "对不起，加载出现异常！"
+    }), i.on("tool(LAY-picture-manage)", function (e) {
+        if ("del" === e.event) layer.confirm("确定删除？", {icon:3, title: '提示'}, function (t) {
+            layui.$.ajax({
+                url: '/xddesign/admin/product/picture/delete'
+                ,type: 'POST'
+                ,data: {"id":e.data.pictureId}
+                ,dataType: 'json'
+                ,success: function (res) {
+                    if (res.status == 0) {
+                        layer.msg(res.msg, {icon:5});
+                        return false;
+                    }
+                    e.del();
+                }
+            });
+            layer.close(t);
+        }); else if ("edit" === e.event) {
+            layer.photos({
+                photos: {
+                    "title": "产品图片", //相册标题
+                    "id": 1, //相册id
+                    "start": 0, //初始显示的图片序号，默认0
+                    "data": [   //相册包含的图片，数组格式
+                        {
+                            "alt": e.data.pictureName,
+                            "pid": e.data.pictureId, //图片id
+                            "src": e.data.pictureLink, //原图地址
+                            "thumb": "" //缩略图地址
+                        }
+                    ]
+                }
+            });
         }
     }), e("productadmin", {})
 });

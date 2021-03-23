@@ -12,7 +12,7 @@ $(function(){
     function querySoluImg(){
         $.ajax({
             //---------------------------------------------------------------url查询设计图
-            url:"/public/customer/renderings",
+            url:"/xddesign/public/customer/renderings",
             data: {"soluId" : soluId},
             dataType:"json",
             type:"GET",

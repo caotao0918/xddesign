@@ -199,15 +199,15 @@ $(function() {
         return rst;
     }
 
-    $('#div_addhouse img:first-of-type').attr('src','/img/addhouseplus_.svg');
-    $('#div_addhouse img:last-of-type').attr('src','/img/addhouseplus1.svg');
+    $('#div_addhouse img:first-of-type').attr('src','../../img/addhouseplus_.svg');
+    $('#div_addhouse img:last-of-type').attr('src','../../img/addhouseplus1.svg');
     $('#div_addhouse').mouseenter(function () {
-        $('#div_addhouse img:first-of-type').attr('src','/img/addhouseplus_hover.svg');
-        $('#div_addhouse img:last-of-type').attr('src','/img/addhouseplus1hover.svg');
+        $('#div_addhouse img:first-of-type').attr('src','../../img/addhouseplus_hover.svg');
+        $('#div_addhouse img:last-of-type').attr('src','../../img/addhouseplus1hover.svg');
     })
     $('#div_addhouse').mouseleave(function () {
-        $('#div_addhouse img:first-of-type').attr('src','/img/addhouseplus_.svg');
-        $('#div_addhouse img:last-of-type').attr('src','/img/addhouseplus1.svg');
+        $('#div_addhouse img:first-of-type').attr('src','../../img/addhouseplus_.svg');
+        $('#div_addhouse img:last-of-type').attr('src','../../img/addhouseplus1.svg');
     })
 
     $('#div_addhouse').click(function() {
@@ -286,7 +286,7 @@ $(function() {
                             aaa.children(".span_lightbox").click(function(){
                                 window.localStorage.setItem('houseId',houseId);
                                 window.localStorage.setItem('houseType',houseType);
-                                    location.href = "----------------------------------------------方案列表页面";
+                                    location.href = "listhousesolu.html?houseId="+houseId;
                                 });
                             aaa.addClass("div_house_hover");
                                 t= window.setTimeout( function(){
@@ -457,7 +457,7 @@ $(function() {
             $("#div_houselist input").attr("disabled" , "disabled");
         }else{
             //location.href = "---------------------------------------跳转到客户列表页";
-            location.href = "/dsg/listmycus.html";
+            location.href = "listmycus.html";
         }
     })
 })

@@ -13,7 +13,7 @@ var myHouseList;
 $(function() {
     $.ajax({
         //"-----------------------------------------------------------查询客户住宅列表"
-        url: "/public/customer",
+        url: "/xddesign/public/customer",
         //      data:data,
         dataType:"json",
         type:"GET",

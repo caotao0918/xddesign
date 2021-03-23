@@ -323,7 +323,7 @@
                         let field = data.field; //获取提交的字段
                         //提交 Ajax 成功后，静态更新表格中的数据
                         layui.$.ajax({
-                            url: '/admin/customer/solutions/update'
+                            url: '/xddesign/admin/customer/solutions/update'
                             ,type: 'POST'
                             ,data: field
                             ,dataType: 'json'
@@ -352,7 +352,7 @@
         }
     }), i.render({
             elem: "#LAY-room-manage",
-            url: "/admin/customer/room",
+            url: "/xddesign/admin/customer/room",
             cols: [[{type: "checkbox", fixed: "left"}
             ,{field: "roomId", width: 80, title: "ID", sort: !0}
             ,{field: "roomName", title: "房间名称", templet: '<div><a href="productnum.html?roomId={{d.roomId}}">{{d.roomName}}</a></div>'}
@@ -398,7 +398,7 @@
         e.data;
         if ("del" === e.event) layer.confirm("确定删除此房间？", {icon:3, title: '提示'}, function (t) {
             layui.$.ajax({
-                url: '/admin/customer/room/delete'
+                url: '/xddesign/admin/customer/room/delete'
                 ,type: 'POST'
                 ,data: {
                     "soluId":e.data.soluId,
@@ -435,7 +435,7 @@
                         let field = data.field; //获取提交的字段
                         //提交 Ajax 成功后，静态更新表格中的数据
                         layui.$.ajax({
-                            url: '/admin/customer/room/update'
+                            url: '/xddesign/admin/customer/room/update'
                             ,type: 'POST'
                             ,data: field
                             ,dataType: 'json'
@@ -464,7 +464,7 @@
         }
     }) , i.render({
         elem: "#LAY-pn-manage",
-        url: "/admin/customer/pn",
+        url: "/xddesign/admin/customer/pn",
         cols: [[{type: "checkbox", fixed: "left"}
             ,{field: "pnId", width: 80, title: "ID", sort: !0}
             ,{field: "product", title: "产品名称", templet: '<div>{{d.product.productName}}</div>'}
@@ -510,7 +510,7 @@
         e.data;
         if ("del" === e.event) layer.confirm("确定删除此行？", {icon:3, title: '提示'}, function (t) {
             layui.$.ajax({
-                url: '/admin/customer/pn/delete'
+                url: '/xddesign/admin/customer/pn/delete'
                 ,type: 'POST'
                 ,data: {
                     "pnId": e.data.pnId
@@ -543,7 +543,7 @@
                         let field = data.field; //获取提交的字段
                         //提交 Ajax 成功后，静态更新表格中的数据
                         layui.$.ajax({
-                            url: '/admin/customer/pn/update'
+                            url: '/xddesign/admin/customer/pn/update'
                             ,type: 'POST'
                             ,data: field
                             ,dataType: 'json'

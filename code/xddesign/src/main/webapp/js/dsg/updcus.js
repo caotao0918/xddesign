@@ -248,15 +248,15 @@ $(function() {
         return rst;
     }
 
-    $('#div_addhouse img:first-of-type').attr('src','/img/addhouseplus_.svg');
-    $('#div_addhouse img:last-of-type').attr('src','/img/addhouseplus1.svg');
+    $('#div_addhouse img:first-of-type').attr('src','../../img/addhouseplus_.svg');
+    $('#div_addhouse img:last-of-type').attr('src','../../img/addhouseplus1.svg');
     $('#div_addhouse').mouseenter(function () {
-        $('#div_addhouse img:first-of-type').attr('src','/img/addhouseplus_hover.svg');
-        $('#div_addhouse img:last-of-type').attr('src','/img/addhouseplus1hover.svg');
+        $('#div_addhouse img:first-of-type').attr('src','../../img/addhouseplus_hover.svg');
+        $('#div_addhouse img:last-of-type').attr('src','../../img/addhouseplus1hover.svg');
     })
     $('#div_addhouse').mouseleave(function () {
-        $('#div_addhouse img:first-of-type').attr('src','/img/addhouseplus_.svg');
-        $('#div_addhouse img:last-of-type').attr('src','/img/addhouseplus1.svg');
+        $('#div_addhouse img:first-of-type').attr('src','../../img/addhouseplus_.svg');
+        $('#div_addhouse img:last-of-type').attr('src','../../img/addhouseplus1.svg');
     })
 
     $('#div_addhouse').click(function() {
@@ -373,7 +373,7 @@ $(function() {
                 window.localStorage.setItem('houseId',houseId);
                 window.localStorage.setItem('houseType',houseType);
                 //location.href = "----------------------------------------------方案列表页面";
-                location.href = "/dsg/listhousesolu.html";
+                location.href = "listhousesolu.html";
 
 
             });

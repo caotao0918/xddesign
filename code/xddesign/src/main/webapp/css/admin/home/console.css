@@ -1,0 +1,21 @@
+.layui-col-md5 {
+    margin: 30px 30px 30px 100px;
+    background: #e5e9ef;
+    height: 180px;
+    width: 660px;
+    border:1px solid #a1a1a1;
+    border-radius:20px;
+}
+.layui-col-md5>div{
+    margin: 18px 30px 30px 18px;
+}
+.layui-col-md5>div>a{
+    float: left;
+    margin-left: 40px;
+    margin-bottom: 20px;
+    font-size: 17px;
+    width: 102px;
+}
+.layui-col-md5>div>i{
+    font-size: 19px;
+}

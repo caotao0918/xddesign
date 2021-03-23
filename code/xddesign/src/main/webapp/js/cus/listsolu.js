@@ -25,7 +25,7 @@ $(function(){
 
         $.ajax({
             //----------------------------------------------------------url查询每个house对应的soulu列表
-            url:"/public/customer/house/solutions",
+            url:"/xddesign/public/customer/house/solutions",
             data:{'houseId':houseId,'pageNum':pageNum,'pageSize':pageSize},
             dataType:"json",
             type:"GET",
@@ -82,15 +82,15 @@ $(function(){
             var td_showRnd = $(this).children().eq(-2);
             var td_showQuote = $(this).children().eq(-1);
             td_showSolu.click(function(){
-                window.location.href = "/customer/showcussolu.html?soluId=" +soluId ;
+                window.location.href = "showcussolu.html?soluId=" +soluId ;
                 //----------------------------------------------------------------查看方案
             })
             td_showRnd.click(function(){
-                window.location.href = "/customer/showrnd.html?soluId=" +soluId ;
+                window.location.href = "showrnd.html?soluId=" +soluId ;
                 //--------------------------------------------------------------查看效果图
             })
             td_showQuote.click(function(){
-                window.location.href = "/customer/showquote.html?soluId=" +soluId ;
+                window.location.href = "showquote.html?soluId=" +soluId ;
                 //----------------------------------------------------------------查看报表
             })
         })

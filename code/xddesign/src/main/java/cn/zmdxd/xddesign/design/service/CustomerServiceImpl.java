@@ -31,8 +31,6 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerDao, Customer> impl
         ReturnResult result = new ReturnResult();
 
         String desc = EnumUtil.getMsgByCode(CustomerEnum.class, customer.getCode());
-        System.out.println(customer.getCode());
-        System.out.println(desc);
         customer.setDesc(desc);
 
         if (!PhoneUtil.isMobile(customer.getMobile()) && !PhoneUtil.isPhone(customer.getMobile())) {

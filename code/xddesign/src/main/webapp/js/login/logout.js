@@ -1,6 +1,6 @@
 function userlogout() {
     $.ajax({
-        url: '/user/logout',
+        url: '/xddesign/user/logout',
         dataType:"json",
         type:"post",
         success:function(res) {
@@ -16,7 +16,7 @@ function userlogout() {
 
 function cuslogout() {
     $.ajax({
-        url: '/customer/logout',
+        url: '/xddesign/customer/logout',
         dataType:"json",
         type:"POST",
         success:function(res) {

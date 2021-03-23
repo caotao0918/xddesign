@@ -12,6 +12,7 @@
         <result column="picture_add_time" property="pictureAddTime" />
         <result column="picture_reserve" property="pictureReserve" />
         <result column="default_picture" property="defaultPicture" />
+        <result column="product_id" property="productId" />
     </resultMap>
 
     <insert id="insertPicture">
@@ -22,6 +23,28 @@
     <select id="getPictureById" resultMap="PictureMap">
         select picture_id, picture_name, picture_link, picture_add_time, picture_desc, picture_reserve,default_picture
         from t_picture where t_picture.picture_id=#{id}
+    </select>
+
+    <select id="selectPicture" resultMap="PictureMap">
+        select picture.picture_name, picture.picture_link, picture.picture_id, picture.picture_add_time, picture.default_picture
+        from t_picture picture
+        left join t_product product on picture.product_id = product.product_id
+        left join t_secondlevel sec on product.second_id = sec.second_id
+        left join t_firstlevel fir on sec.first_id = fir.first_id
+        <where>
+            <if test="productVo.productName != null and productVo.productName != ''">
+                product.product_name like '%${productVo.productName}%'
+            </if>
+            <if test="productVo.firstId != null and productVo.firstId != 0">
+                and fir.first_id = #{productVo.firstId}
+            </if>
+            <if test="productVo.secondId != null and productVo.secondId != 0">
+                and sec.second_id = #{productVo.secondId}
+            </if>
+            <if test="productVo.productId != null and productVo.productId != 0">
+                and product.product_id = #{productVo.productId}
+            </if>
+        </where>
     </select>
 
 </mapper>

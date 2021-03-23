@@ -14,7 +14,7 @@ var saveSolu_text = "保存";
 //----------------------------------------------------------------------------产品详情
 var url_prodProp = "../customer/showprod.html";
 //----------------------------------------------------------------------------方案列表
-var url_listHouseSolu = "/dsg/listhousesolu.html";
+var url_listHouseSolu = "listhousesolu.html";
 var url_addSolu = "/xddesign/design/customer/solutions/saveorupdate";
 
 var addRoomProdListNode = "";
@@ -89,7 +89,7 @@ $(function(){
         for (var i = 0; i < roomList.length; i++) {
             add += "<div>" + roomList[i].roomName + "</div>";
         }
-        add += '<div id = "div_plus" class = "div_plus"><img src = "/img/plus_.svg"/><img src = "/img/plus1.svg"/>';
+        add += '<div id = "div_plus" class = "div_plus"><img src = "../../img/plus_.svg"/><img src = "../../img/plus1.svg"/>';
         $('#div_roomlist').html('');
         $('#div_roomlist').append(add);
         $('#div_roomlist').children().addClass("div_room");
@@ -152,7 +152,7 @@ $(function(){
     //初始化方案
     if (soluId != null) {
         $.ajax({
-            url:"/public/customer/solution",
+            url:"/xddesign/public/customer/solution",
             data:{'soluId':soluId},
             dataType:"json",
             type:"GET",
@@ -309,15 +309,15 @@ $(function(){
     }
 
     function addProdDivCss(){
-        $('.div_addprod img:first-of-type').attr('src','/img/addhouseplus_.svg');
-        $('.div_addprod img:last-of-type').attr('src','/img/addhouseplus1.svg');
+        $('.div_addprod img:first-of-type').attr('src','../../img/addhouseplus_.svg');
+        $('.div_addprod img:last-of-type').attr('src','../../img/addhouseplus1.svg');
         $('.div_addprod').mouseenter(function () {
-            $('.div_addprod img:first-of-type').attr('src','/img/addhouseplus_hover.svg');
-            $('.div_addprod img:last-of-type').attr('src','/img/addhouseplus1hover.svg');
+            $('.div_addprod img:first-of-type').attr('src','../../img/addhouseplus_hover.svg');
+            $('.div_addprod img:last-of-type').attr('src','../../img/addhouseplus1hover.svg');
         })
         $('.div_addprod').mouseleave(function () {
-            $('.div_addprod img:first-of-type').attr('src','/img/addhouseplus_.svg');
-            $('.div_addprod img:last-of-type').attr('src','/img/addhouseplus1.svg');
+            $('.div_addprod img:first-of-type').attr('src','../../img/addhouseplus_.svg');
+            $('.div_addprod img:last-of-type').attr('src','../../img/addhouseplus1.svg');
         })
     }
 
@@ -526,7 +526,7 @@ $(function(){
                         "<span>" + prodList[i].productName + "</span>" +
                         "<span style = 'display: none;'>" + prodList[i].productId + "</span>" +
                         "<span style = 'display: none;'>" + prodList[i].price + "</span>" +
-                        "<img src = '/img/prodchk.png' />" +
+                        "<img src = '../../img/prodchk.png' />" +
                         "</div>";
 
                 }
@@ -704,12 +704,12 @@ $(function(){
     function getCountNode(){
         var node = '<div id = "" class = "div_count">' +
             '<div class="div_plus__2">' +
-            '<img src = "/img/plus_.svg"/>' +
+            '<img src = "../../img/plus_.svg"/>' +
             '</div>' +
             '<input value = "1" oninput="value=value.replace(/[^\\d]/g,\'\')" maxlength="3"/>' +
             '<div class = "div_plus_2">' +
-            '<img src = "/img/plus_.svg"/>' +
-            '<img src = "/img/plus1.svg"/>' +
+            '<img src = "../../img/plus_.svg"/>' +
+            '<img src = "../../img/plus1.svg"/>' +
             '</div>' +
             '</div>';
         return node;

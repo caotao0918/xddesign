@@ -12,6 +12,7 @@ var leftNavList;
 //左侧和上部按钮联动
 var fstLevNameChk = "";
 var scdLevNameChk = "";
+var productId = 0;
 
 var srhRegArr_qst = [];
 srhRegArr_qst.push(new RegExp("为什么"));
@@ -32,15 +33,15 @@ $(function() {
     $('#div_opt>div div:nth-child(2)').html(gui_text);
     $('#div_opt>div div:last-child').html(video_text);
 
-    $('#div_aftersalecntbgi img:first-of-type').attr("src" , "/img/schccl.svg");
-    $('#div_aftersalecntbgi img:last-of-type').attr("src" , "/img/schline.svg");
+    $('#div_aftersalecntbgi img:first-of-type').attr("src" , "../../img/schccl.svg");
+    $('#div_aftersalecntbgi img:last-of-type').attr("src" , "../../img/schline.svg");
     $('#div_aftersalecntbgi img').mouseleave(function(){
-        $('#div_aftersalecntbgi img:first-of-type').attr("src" , "/img/schccl.svg");
-        $('#div_aftersalecntbgi img:last-of-type').attr("src" , "/img/schline.svg");
+        $('#div_aftersalecntbgi img:first-of-type').attr("src" , "../../img/schccl.svg");
+        $('#div_aftersalecntbgi img:last-of-type').attr("src" , "../../img/schline.svg");
     })
     $('#div_aftersalecntbgi img').mouseover(function(){
-        $('#div_aftersalecntbgi img:first-of-type').attr("src" , "/img/schcclhover.svg");
-        $('#div_aftersalecntbgi img:last-of-type').attr("src" , "/img/schlinehover.svg");
+        $('#div_aftersalecntbgi img:first-of-type').attr("src" , "../../img/schcclhover.svg");
+        $('#div_aftersalecntbgi img:last-of-type').attr("src" , "../../img/schlinehover.svg");
     })
 
     $('#div_opt>div div').click(function(){
@@ -55,7 +56,7 @@ $(function() {
     function getLeftNav(){
         $.ajax({
             //----------------------------------------------------------url查询产品分类例如WIFI、照明
-            url:"/public/secondlevels/products",
+            url:"/xddesign/public/secondlevels/products",
             dataType:"json",
             type:"GET",
             async:false,
@@ -81,12 +82,12 @@ $(function() {
         // }
 
         for (var prop in leftNavList) {
-            var name_1 = prop;
-            add += '<li class="layui-nav-item "> <a href="javascript:;">' +name_1 +'</a>'+
+            add += '<li class="layui-nav-item "> <a href="javascript:;">' +prop +'</a>'+
                 '<dl class="layui-nav-child">';
-            for (var j = 0; j < leftNavList[prop].length; j++) {
+            for (let j = 0; j < leftNavList[prop].length; j++) {
                 var name_2 = leftNavList[prop][j].productName;
-                add += '<dd><a href="javascript:;">'+name_2+'</a></dd>';
+                let productId = leftNavList[prop][j].productId;
+                add += '<dd><a href="javascript:;" id="'+productId+'">'+name_2+'</a></dd>';
             }
             add += "</dl> </li>";
         }
@@ -103,24 +104,24 @@ $(function() {
                 if(navTier == 0) {
                     var topOptChk_Text = $('#div_opt>div div.div_optchk').html();
                     var scdLevName = elem.text();
+                    productId = elem.attr("id");
                     //查询问题
                     if (qst_text == topOptChk_Text) {
-                        var list = queryQst(fstLevName,scdLevName);
+                        var list = queryQst(productId);
                         clearForQst();
                         bindQst(list);
                         //查询产品手册
                     }else if(gui_text == topOptChk_Text){
-                        var list = queryGui(fstLevName,scdLevName);
+                        var list = queryGui(productId);
                         clearForGui();
                         bindGui(list);
                         //查询视频
                     }else if(video_text == topOptChk_Text){
-                        var list = queryVideo(fstLevName,scdLevName);
-                        console.log(666);
+                        var list = queryVideo(productId);
                         clearForVideo();
                         bindVideo(list);
                     }
-                    scdLevNameChk = scdLevName;
+                    // scdLevNameChk = scdLevName;
                 }
                 fstLevNameChk = fstLevName;
             });
@@ -134,7 +135,7 @@ $(function() {
             var topOptChk_Text = $(this).html();
             //查询问题
             if (qst_text == topOptChk_Text) {
-                var list = queryQst(fstLevNameChk, scdLevNameChk);
+                var list = queryQst(productId);
                 clearForQst();
                 bindQst(list);
                 //查询产品手册
@@ -146,10 +147,8 @@ $(function() {
                 bindGui(list);
                 //查询视频
             } else if (video_text == topOptChk_Text) {
-                // var list = queryVideo(fstLevNameChk, scdLevNameChk);
                 //这里我改成了查询全部的产品视频
                 var list = queryVideo();
-                console.log(222);
                 clearForVideo();
                 bindVideo(list);
             }
@@ -160,14 +159,31 @@ $(function() {
         $('#div_leftnav ~ div').remove();
         $("body>div").append('<div id = "div_aftersalecnttab_qst" class = "div_aftersalecnttab_qst"></div>');
     }
-    function queryQst(fstLevName,scdLevName){
+    // function queryQst(fstLevName,scdLevName){
+    //     var qstList;
+    //     $.ajax({
+    //         //----------------------------------------------------------url根据分类查询问题
+    //         url:"/xddesign/public/questions",
+    //         data:{
+    //             productName : scdLevName
+    //         },
+    //         dataType:"json",
+    //         type:"get",
+    //         async:false,
+    //         success:function(json) {
+    //             qstList =  json;
+    //         }
+    //     })
+    //     return qstList;
+    // }
+    function queryQst(productId){
         var qstList;
         $.ajax({
             //----------------------------------------------------------url根据分类查询问题
-            url:"/public/questions",
+            url:"/xddesign/public/questions",
             data:{
-                // fstLevName:fstLevName,
-                productName : scdLevName},
+                "productId": productId
+            },
             dataType:"json",
             type:"get",
             async:false,
@@ -210,23 +226,40 @@ $(function() {
         $('#div_leftnav ~ div').remove();
         $("body>div").append('<div id = "div_aftersalecnttab_gui" class = "div_aftersalecnttab_gui div_prodlist">');
     }
-     function queryGui(fstLevName,scdLevName){
-         var guiList;
-         $.ajax({
-             //----------------------------------------------------------url根据分类查询手册
-             url:"/public/guide",
-             data:{
-                 // fstLevName:fstLevName,
-                 productName : scdLevName},
-             dataType:"json",
-             type:"get",
-             async:false,
-             success:function(json) {
-                 guiList =  json;
-             }
-         })
-         return guiList;
-     }
+     // function queryGui(fstLevName,scdLevName){
+     //     var guiList;
+     //     $.ajax({
+     //         //----------------------------------------------------------url根据分类查询手册
+     //         url:"/xddesign/public/guide",
+     //         data:{
+     //             // fstLevName:fstLevName,
+     //             productName : scdLevName},
+     //         dataType:"json",
+     //         type:"get",
+     //         async:false,
+     //         success:function(json) {
+     //             guiList =  json;
+     //         }
+     //     })
+     //     return guiList;
+     // }
+    function queryGui(productId){
+        var guiList;
+        $.ajax({
+            //----------------------------------------------------------url根据分类查询手册
+            url:"/xddesign/public/guide",
+            data:{
+                "productId": productId
+            },
+            dataType:"json",
+            type:"get",
+            async:false,
+            success:function(json) {
+                guiList =  json;
+            }
+        })
+        return guiList;
+    }
 
     function bindGui(guiList){
         var add = '';
@@ -253,14 +286,14 @@ $(function() {
         $('#div_leftnav ~ div').remove();
         $("body>div").append('<div id = "div_aftersalecnttab_video" class = "div_aftersalecnttab_video">');
     }
-    function queryVideo(fstLevName,scdLevName){
+    function queryVideo(productId){
         var videoList;
         $.ajax({
             //----------------------------------------------------------url根据分类查询视频
-            url:"/public/video",
+            url:"/xddesign/public/video",
             data:{
-                // fstLevName:fstLevName,
-                productName : scdLevName},
+                "productId": productId
+            },
             dataType:"json",
             type:"get",
             async:false,

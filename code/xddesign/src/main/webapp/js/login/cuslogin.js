@@ -69,7 +69,7 @@ $(function(){
             }
             $.ajax({
                 type: "POST",
-                url: "/customer/login",
+                url: "/xddesign/customer/login",
                 data:{'mobile': $('#div_cuslogin>div input:first-of-type').val(),
                     'pwd': $('#div_cuslogin>div input:password').val()},
                 dataType: "json",
@@ -83,7 +83,7 @@ $(function(){
                     }else {
                         window.localStorage.setItem("cusName",data.data.username);
                         window.localStorage.setItem("cusId",data.data.id);
-                        window.location.href = "/customer/main.html";
+                        window.location.href = "../customer/myhouselist.html";
                     }
                 }
             });

@@ -1,7 +1,11 @@
 package cn.zmdxd.xddesign.admin.service;
 
 import cn.zmdxd.xddesign.entity.Picture;
+import cn.zmdxd.xddesign.entity.ProductVo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * @author 曹涛
@@ -18,4 +22,6 @@ public interface PictureService extends IService<Picture> {
      * @return Picture
      */
     Picture getPictureById(Integer id);
+
+    IPage<Picture> findPicture(Page<Picture> page, ProductVo productVo);
 }

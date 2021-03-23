@@ -10,13 +10,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <link rel="stylesheet" href="../admin/layuiadmin/layui/css/layui.css" media="all">
   <link rel="stylesheet" href="../admin/layuiadmin/style/admin.css" media="all">
-  <script src="/cmn/jquery/jquery-1.8.3.js"></script>
-  <script src="/js/login/logout.js"></script>
+  <script src="../../cmn/jquery/jquery-1.8.3.js"></script>
+  <script src="../../js/login/logout.js"></script>
 </head>
 <body>
 <ul class="layui-nav" style="z-index: 1998">
+  <li class="layui-nav-item"><img alt="logo" src="../../img/logo.png" height="40px" width="50px" /></li>
   <li class="layui-nav-item"><a href="main.html" style="font-size: 17px">迅达智能家居设计系统-设计人员</a></li>
-  <li class="layui-nav-item layui-col-md-offset3"><a href="listmycus.html">客户管理</a></li>
+  <li class="layui-nav-item layui-col-md-offset2 layui-this"><a href="listmycus.html">客户管理</a></li>
   <li class="layui-nav-item">
     <a href="javascript:">方案管理</a>
     <dl class="layui-nav-child"> <!-- 二级菜单 -->
@@ -28,8 +29,9 @@
   </li>
   <li class="layui-nav-item"><a href="../customer/goodslist.html">产品中心</a></li>
   <li class="layui-nav-item"><a href="../customer/aftersalecnt.html">售后支持</a></li>
-  <li class="layui-nav-item layui-col-md-offset4">
-    <a href="javascript:">我</a>
+  <li class="layui-nav-item layui-col-md-offset3">欢迎设计员：</li>
+  <li class="layui-nav-item">
+    <a id="me" href="javascript:">我</a>
     <dl class="layui-nav-child"> <!-- 二级菜单 -->
       <dd><a href="info.html">个人详情</a></dd>
       <dd><a href="password.html">修改密码</a></dd>
@@ -91,6 +93,14 @@
                 </div>
               </div>
               <div class="layui-form-item">
+                <label class="layui-form-label">上次登陆时间</label>
+                <div class="layui-input-inline">
+                  <label>
+                    <input type="text" name="lastTime" lay-verify="required" readonly autocomplete="off" class="layui-input">
+                  </label>
+                </div>
+              </div>
+              <div class="layui-form-item">
                 <div class="layui-input-block">
                   <button class="layui-btn" lay-submit lay-filter="setmyinfo">确认修改</button>
 <!--                  <button type="reset" class="layui-btn layui-btn-primary">重新填写</button>-->
@@ -115,20 +125,25 @@
     const form = layui.form;
     const layer = layui.layer;
 
+    $(".layui-form-label").width("90px");
+    $("#me").html(window.localStorage.getItem("username") + "<span class='layui-nav-more'></span>");
+
     $(function () {
       let rolename = window.localStorage.getItem("rolename");
       let username = window.localStorage.getItem("username");
       let mobile = window.localStorage.getItem("mobile");
+      let lastTime = window.localStorage.getItem("lastTime");
       $("input[name='role.name']").val(rolename);
       $("input[name='username']").val(username);
       $("input[name='mobile']").val(mobile);
+      $("input[name='lastTime']").val(lastTime);
       $("input[name='id']").val(window.localStorage.getItem("userId"));
       $("input[name='role.id']").val(window.localStorage.getItem("roleId"));
     });
     form.on('submit(setmyinfo)', function (data) {
 
       $.ajax({
-        url:"/admin/user/saveorupdate",
+        url:"/xddesign/admin/user/saveorupdate",
         data: data.field,
         dataType:"text",
         type:"POST",
