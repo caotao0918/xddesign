@@ -25,6 +25,8 @@ public class Guide {
     private String pictureLink;   //产品手册封面图片链接
     private String guideReserve;  //保留字段
 
+    private Integer productId;    //产品id
+
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     public Timestamp getGuideAddTime() {
         return guideAddTime;

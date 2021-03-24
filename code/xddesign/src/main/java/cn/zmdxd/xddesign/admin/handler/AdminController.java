@@ -570,28 +570,6 @@ public class AdminController {
         return ReturnResult.returnResult(removeByIds);
     }
 
-    /**
-     * @description: 添加或修改产品手册信息
-     * @param picture:手册封面图片
-     * @param guide:产品手册
-     * @param file:上传的文件
-     */
-    @RequestMapping(value = "guide/saveorupdate", method = RequestMethod.POST)
-    public ReturnResult saveOrUpdateGuide(Guide guide,@RequestParam(value = "picture", required = false) MultipartFile picture, @RequestParam(value = "file", required = false) MultipartFile file) {
-        if (file.getSize() != 0) {
-            String saveFileName = FileUtil.saveFile(file, uploadPath + uploadPath2 + "/guide/" + guide.getGuideName(), uploadPath);//上传路径名
-            String guideLink = fileHost + saveFileName;//保存到数据库中的链接
-            guide.setGuideLink(guideLink);
-        }
-        if (picture.getSize() != 0) {
-            String savePictureName = FileUtil.saveFile(picture, uploadPath + uploadPath2 + "/guide/"+guide.getGuideName(), uploadPath);
-            String pictureLink = fileHost + savePictureName;
-            guide.setPictureLink(pictureLink);
-        }
-        boolean saveOrUpdate = guideService.saveOrUpdate(guide);
-        return ReturnResult.returnResult(saveOrUpdate);
-    }
-
     // 上传产品手册和产品手册封面
     @RequestMapping(value = "guide/upload", method = RequestMethod.POST)
     public JSONObject uploadGuide(@RequestParam(value = "file") MultipartFile file) {
@@ -612,19 +590,36 @@ public class AdminController {
         return res;
     }
 
+    /**
+     * @description: 添加或修改产品手册信息
+     * @param guide:产品手册
+     */
+    @RequestMapping(value = "guide/saveorupdate", method = RequestMethod.POST)
+    public ReturnResult saveOrUpdateGuide(Guide guide) {
+        if (guide.getGuideId() == null && guide.getProductId() == null) {
+            return ReturnResult.returnResult(false, "请先选择一个产品");
+        }
+        if (guide.getGuideId() == null) {
+            guide.setGuideName(guide.getGuideName() + "产品手册");
+            guide.setGuideDesc("这是" + guide.getGuideName() + "的产品手册");
+        }else {
+            List<Guide> guides = guideService.list(new QueryWrapper<Guide>().eq("guide_id", guide.getGuideId()));
+            String guideName = guides.get(0).getGuideName();
+            guide.setGuideName(guideName);
+            guide.setGuideDesc("这是" + guideName);
+        }
+        boolean saveOrUpdate = guideService.saveOrUpdate(guide);
+        return ReturnResult.returnResult(saveOrUpdate);
+    }
+
     // 批量删除产品手册信息
-    @RequestMapping(value = "guide/delete", method = RequestMethod.POST)
+    @RequestMapping(value = "guide/batchdelete", method = RequestMethod.POST)
     public ReturnResult deleteGuide(@RequestBody ArrayList<Integer> ids) {
-        ReturnResult result = new ReturnResult();
         Guide guide;
         for (Integer id:ids) {
             guide = guideService.getById(id);
-            boolean deleteFile = FileUtil.deleteFile(uploadPath + guide.getGuideLink().substring(fileHost.length()));
-            if (!deleteFile) {
-                result.setStatus(0);
-                result.setMsg("删除失败，请稍后重试");
-                return result;
-            }
+            FileUtil.deleteFile(uploadPath + guide.getGuideLink().substring(fileHost.length()));
+            FileUtil.deleteFile(uploadPath + guide.getPictureLink().substring(fileHost.length()));
         }
 
         boolean removeByIds = guideService.removeByIds(ids);
@@ -664,9 +659,9 @@ public class AdminController {
 
     // 查询产品视频列表
     @RequestMapping(value = "videos")
-    public IPage<Video> findVideos(@RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "100") Integer size) {
+    public IPage<Video> findVideos(ProductVo productVo, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
         Page<Video> page = new Page<>(current,size);
-        return videoService.page(page);
+        return videoService.findVideos(page, productVo);
     }
 
     // 查询产品手册列表

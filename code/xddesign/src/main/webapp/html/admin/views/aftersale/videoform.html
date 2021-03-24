@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
   <meta charset="utf-8">
-  <title>添加或修改产品手册</title>
+  <title>添加或修改产品视频</title>
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
@@ -17,12 +17,12 @@
 </head>
 <body>
 
-  <div class="layui-form" lay-filter="layuiadmin-guide-manage" id="layuiadmin-guide-manage" style="padding: 20px 30px 0 0;">
+  <div class="layui-form" lay-filter="layuiadmin-video-manage" id="layuiadmin-video-manage" style="padding: 20px 30px 0 0;">
     <div class="layui-form-item">
       <div class="layui-form-item" hidden>
         <label class="layui-form-label">ID</label>
         <div class="layui-input-block">
-          <input type="text" name="guideId" autocomplete="off" class="layui-input">
+          <input type="text" name="videoId" autocomplete="off" class="layui-input">
         </div>
       </div>
       <div class="layui-form-item" id="level">
@@ -44,19 +44,13 @@
       </div>
       <div class="layui-form-item">
         <div class="btnAndInp">
-          <button type="button" class="layui-btn" id="insertGuide" style="width: 110px;position: relative;z-index: 10;"><i class="layui-icon layui-icon-upload"></i>上传手册</button>
-          <input type="text" name="guideLink" lay-verify="required|url" autocomplete="off" placeholder="请上传文件或输入文件链接" class="layui-input">
-        </div>
-      </div>
-      <div class="layui-form-item">
-        <div class="btnAndInp">
-          <button type="button" class="layui-btn" id="insertPicture" style="width: 110px;position: relative;z-index: 10;"><i class="layui-icon layui-icon-upload"></i>上传封面</button>
-          <input type="text" name="pictureLink" lay-verify="required|url" autocomplete="off" placeholder="请上传图片或输入图片链接" class="layui-input">
+          <button type="button" class="layui-btn" id="insertvideo" style="width: 110px;position: relative;z-index: 10;"><i class="layui-icon layui-icon-upload"></i>上传视频</button>
+          <input type="text" name="videoLink" lay-verify="required|url" autocomplete="off" placeholder="请上传视频或输入视频链接" class="layui-input">
         </div>
       </div>
     </div>
     <div class="layui-form-item layui-hide">
-      <button class="layui-btn" lay-submit lay-filter="LAY-guide-front-submit" id="LAY-guide-front-submit">提交</button>
+      <button class="layui-btn" lay-submit lay-filter="LAY-video-front-submit" id="LAY-video-front-submit">提交</button>
     </div>
   </div>
   <script src="../../../admin/layuiadmin/layui/layui.js"></script>
@@ -137,12 +131,12 @@
     var loadindex;
     // 上传产品手册
     upload.render({
-      elem: '#insertGuide'
-      ,url: '/xddesign/admin/guide/upload'
+      elem: '#insertvideo'
+      ,url: '/xddesign/admin/video/upload'
       ,accept: "file"
-      ,exts: 'pdf'
+      ,exts: 'mp4'
       ,multiple: false
-      ,size: 20*1024
+      ,size: 50*1024
       ,before: function(obj){
         loadindex = layer.load();//上传loading
       }
@@ -155,31 +149,7 @@
         if (res.status === 0) {
           return layer.msg(res.msg, {icon:5});
         }
-        $('input[name="guideLink"]').val(res.data.src);
-      }
-    });
-
-    var loadindex2;
-    // 上传产品手册封面
-    upload.render({
-      elem: '#insertPicture'
-      ,url: '/xddesign/admin/guide/upload'
-      ,accept: "images"
-      ,multiple: false
-      ,size: 5*1024
-      ,before: function(obj){
-        loadindex2 = layer.load();//上传loading
-      }
-      ,error: function(index, upload){
-        return layer.msg("服务器出现错误，请重试", {icon:5});
-      }
-      ,done: function (res, index, upload) {
-        layer.close(loadindex2);
-        //上传失败
-        if (res.status === 0) {
-          return layer.msg(res.msg, {icon:5});
-        }
-        $('input[name="pictureLink"]').val(res.data.src);
+        $('input[name="videoLink"]').val(res.data.src);
       }
     });
 

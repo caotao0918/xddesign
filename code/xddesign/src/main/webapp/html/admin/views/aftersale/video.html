@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
   <meta charset="utf-8">
-  <title>产品手册管理</title>
+  <title>产品视频管理</title>
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
@@ -43,7 +43,7 @@
             </div>
           </div>
           <div class="layui-inline">
-            <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-guide-front-search">
+            <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-video-front-search">
               <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
             </button>
           </div>
@@ -51,13 +51,12 @@
       </div>
       <div class="layui-card-body">
         <div style="padding-bottom: 10px;">
-          <button class="layui-btn layuiadmin-btn-guide" data-type="batchdel">删除</button>
-          <button class="layui-btn layuiadmin-btn-guide" data-type="add">添加</button>
+          <button class="layui-btn layuiadmin-btn-video" data-type="batchdel">删除</button>
+          <button class="layui-btn layuiadmin-btn-video" data-type="add">添加</button>
         </div>
       
-        <table id="LAY-guide-manage" lay-filter="LAY-guide-manage"></table>
+        <table id="LAY-video-manage" lay-filter="LAY-video-manage"></table>
         <script type="text/html" id="table-useradmin-admin">
-          <a class="layui-btn layui-btn-radius layui-btn-xs" lay-event="pic"><i class="layui-icon layui-icon-picture"></i>查看封面图片</a>
           <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
           <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
         </script>
@@ -76,9 +75,9 @@
     ,form = layui.form
     ,table = layui.table;
 
-    form.on('submit(LAY-guide-front-search)', function(data){
+    form.on('submit(LAY-video-front-search)', function(data){
       //执行重载
-      table.reload('LAY-guide-manage', {
+      table.reload('LAY-video-manage', {
         where: data.field
       });
     });
@@ -149,7 +148,7 @@
     //事件
     var active = {
       batchdel: function(){
-        var checkStatus = table.checkStatus('LAY-guide-manage')
+        var checkStatus = table.checkStatus('LAY-video-manage')
         ,checkData = checkStatus.data; //得到选中的数据
 
         if(checkData.length === 0){
@@ -157,14 +156,14 @@
         }
         let ids = [];
         for (let i = 0; i < checkData.length; i++) {
-          ids.push(checkData[i].guideId);
+          ids.push(checkData[i].videoId);
         }
 
         layer.confirm('确定删除吗？', function(index) {
 
           //执行 Ajax 后重载
           $.ajax({
-            url: '/xddesign/admin/guide/batchdelete'
+            url: '/xddesign/admin/video/batchdelete'
             ,type: 'POST'
             ,data: JSON.stringify(ids)
             ,dataType: 'json'
@@ -174,7 +173,7 @@
                 layer.msg(res.msg,{icon:5});
                 return false;
               }
-              table.reload('LAY-guide-manage');
+              table.reload('LAY-video-manage');
               layer.msg('已删除');
             }
           });
@@ -184,30 +183,30 @@
         layer.open({
           type: 2
           ,title: '添加产品手册'
-          ,content: 'guideform.html'
+          ,content: 'videoform.html'
           ,area: ['1000px', '500px']
           ,btn: ['确定', '取消']
           ,yes: function(index, layero){
             var iframeWindow = window['layui-layer-iframe'+ index]
-            ,submit = layero.find('iframe').contents().find("#LAY-guide-front-submit");
+            ,submit = layero.find('iframe').contents().find("#LAY-video-front-submit");
 
             //监听提交
-            iframeWindow.layui.form.on('submit(LAY-guide-front-submit)', function(data){
+            iframeWindow.layui.form.on('submit(LAY-video-front-submit)', function(data){
 
               let iframe = window['layui-layer-iframe' + index];
               let  $$ = iframe.layui.$;
               let productSelect = $$('select[name="productId"]');
-              let guideLink = $$('input[name="guideLink"]').val();
+              let videoLink = $$('input[name="videoLink"]').val();
               let pictureLink = $$('input[name="pictureLink"]').val();
 
               //提交 Ajax 成功后，静态更新表格中的数据
               $.ajax({
-                url: '/xddesign/admin/guide/saveorupdate'
+                url: '/xddesign/admin/video/saveorupdate'
                 ,type: 'POST'
                 ,data: {
-                  "guideName": productSelect.find("option:selected").text()
+                  "videoName": productSelect.find("option:selected").text()
                   ,"productId": productSelect.val()
-                  ,"guideLink": guideLink
+                  ,"videoLink": videoLink
                   ,"pictureLink": pictureLink
                 }
                 ,dataType: 'json'
@@ -216,7 +215,7 @@
                     layer.msg(res.msg,{icon:5});
                     return false;
                   }
-                  table.reload('LAY-guide-manage');
+                  table.reload('LAY-video-manage');
                   layer.close(index); //关闭弹层
                 }
                 ,error: function () {
@@ -229,7 +228,7 @@
         }); 
       }
     }
-    $('.layui-btn.layuiadmin-btn-guide').on('click', function(){
+    $('.layui-btn.layuiadmin-btn-video').on('click', function(){
       var type = $(this).data('type');
       active[type] ? active[type].call(this) : '';
     });

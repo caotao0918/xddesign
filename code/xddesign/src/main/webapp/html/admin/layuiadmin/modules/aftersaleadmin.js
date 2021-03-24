@@ -155,11 +155,14 @@
         text: "对不起，加载出现异常！"
     }), i.on("tool(LAY-guide-manage)", function (e) {
         if ("del" === e.event) layer.confirm("确定删除？", {icon:3, title: '提示'}, function (t) {
+            let ids = [];
+            ids.push(e.data.guideId);
             layui.$.ajax({
-                url: '/xddesign/admin/firstlevel/delete'
+                url: '/xddesign/admin/guide/batchdelete'
                 ,type: 'POST'
-                ,data: {"firstId":e.data.firstId}
+                ,data: JSON.stringify(ids)
                 ,dataType: 'json'
+                ,contentType: 'application/json;charset=utf-8'
                 ,success: function (res) {
                     if (res.status == 0) {
                         layer.msg(res.msg, {icon:5});
@@ -173,22 +176,31 @@
             t(e.tr);
             layer.open({
                 type: 2,
-                title: "编辑角色",
-                content: "firstlevelform.html",
-                area: ["550px", "480px"],
+                title: "编辑产品手册",
+                content: "guideform.html",
+                area: ["700px", "500px"],
                 btn: ["确定", "取消"]
                 ,yes: function(index, layero){
                     let iframeWindow = window['layui-layer-iframe'+ index]
-                        ,submitID = 'LAY-firstlevel-front-submit'
+                        ,submitID = 'LAY-guide-front-submit'
                         ,submit = layero.find('iframe').contents().find('#'+ submitID);
                     //监听提交
+
+                    let  $$ = iframeWindow.layui.$;
+                    let guideId = $$('input[name="guideId"]').val();
+                    let guideLink = $$('input[name="guideLink"]').val();
+                    let pictureLink = $$('input[name="pictureLink"]').val();
+
                     iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
-                        let field = data.field; //获取提交的字段
                         //提交 Ajax 成功后，静态更新表格中的数据
                         layui.$.ajax({
-                            url: '/xddesign/admin/firstlevel/saveorupdate'
+                            url: '/xddesign/admin/guide/saveorupdate'
                             ,type: 'POST'
-                            ,data: field
+                            ,data: {
+                                "guideId": guideId
+                                ,"guideLink": guideLink
+                                ,"pictureLink": pictureLink
+                            }
                             ,dataType: 'json'
                             ,success: function (res) {
                                 if (res.status == 0) {
@@ -199,8 +211,6 @@
                                 layer.close(index); //关闭弹层
                             }
                         });
-                        // layui.table.reload('LAY-secondlevel-manage'); //数据刷新
-                        // layer.close(index); //关闭弹层
                     });
 
                     submit.trigger('click');
@@ -209,9 +219,10 @@
                     // 获取子页面的iframe
                     let iframe = window['layui-layer-iframe' + index];
                     let $ = iframe.layui.$;
-                    $("input[name='firstId']").val(e.data.firstId);
-                    $("input[name='firstName']").val(e.data.firstName);
-                    $("textarea[name='firstDesc']").val(e.data.firstDesc);
+                    $('#level').attr("hidden", true);
+                    $("input[name='guideId']").val(e.data.guideId);
+                    $("input[name='guideLink']").val(e.data.guideLink);
+                    $("input[name='pictureLink']").val(e.data.pictureLink);
                 }
             })
         } else if ("pic" === e.event) {
@@ -232,12 +243,12 @@
             });
         }
     }), i.render({
-        elem: "#LAY-secondlevel-manage",
-        url: "/xddesign/admin/secondlevels",
-        cols: [[{type: "checkbox", fixed: "left"}, {field: "secondId", width: 80, title: "ID", sort: !0}, {
-            field: "secondName",
-            title: "分类名", templet: '<div><a href="property.html?secondId={{d.secondId}}">{{d.secondName}}</a></div>'
-        }, {field: "secondDesc", title: "描述"},{field: "firstLevel", title: "一级分类", templet: '<div>{{d.firstLevel.firstName}}</div>'}, {
+        elem: "#LAY-video-manage",
+        url: "/xddesign/admin/videos",
+        cols: [[{type: "checkbox", fixed: "left"}, {field: "videoId", width: 80, title: "ID", sort: !0}, {
+            field: "videoName",
+            title: "视频名称", templet: '<div><a href="{{d.videoLink}}" target="_blank">{{d.videoName}}</a></div>'
+        }, {field: "videoAddTime", title: "上传时间"},{field: "videoDesc", title: "描述"}, {
             title: "操作",
             width: 150,
             align: "center",
@@ -252,9 +263,6 @@
         limit: 10,
         skin:'row',
         even:true,
-        where: {
-            "firstLevel.firstId":document.getElementsByName("firstlevel").value
-        },
         parseData: function(res) { //res 即为原始返回的数据
             if(res.total == 0) {
                 return {
@@ -280,16 +288,16 @@
         },
         height: "full-220",
         text: "对不起，加载出现异常！"
-    }), i.on("tool(LAY-secondlevel-manage)", function (e) {
+    }), i.on("tool(LAY-video-manage)", function (e) {
         e.data;
         if ("del" === e.event) layer.confirm("确定删除？", {icon:3, title: '提示'}, function (t) {
             layui.$.ajax({
-                url: '/xddesign/admin/secondlevel/delete'
+                url: '/xddesign/admin/video/batchdelete'
                 ,type: 'POST'
                 ,data: {"secondId":e.data.secondId}
                 ,dataType: 'json'
                 ,success: function (res) {
-                    if (res.status == 0) {
+                    if (res.status === 0) {
                         layer.msg(res.msg, {icon:5});
                         return false;
                     }
@@ -301,20 +309,20 @@
             t(e.tr);
             layer.open({
                 type: 2,
-                title: "编辑产品二级分类",
-                content: "secondlevelform.html?firstId="+e.data.firstLevel.firstId,
+                title: "编辑产品视频",
+                content: "videoform.html",
                 area: ["500px", "630px"],
                 btn: ["确定", "取消"]
                 ,yes: function(index, layero){
                     let iframeWindow = window['layui-layer-iframe'+ index]
-                        ,submitID = 'LAY-secondlevel-front-submit'
+                        ,submitID = 'LAY-video-front-submit'
                         ,submit = layero.find('iframe').contents().find('#'+ submitID);
                     //监听提交
                     iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
                         let field = data.field; //获取提交的字段
                         //提交 Ajax 成功后，静态更新表格中的数据
                         layui.$.ajax({
-                            url: '/xddesign/admin/secondlevel/saveorupdate'
+                            url: '/xddesign/admin/video/saveorupdate'
                             ,type: 'POST'
                             ,data: field
                             ,dataType: 'json'
@@ -323,11 +331,11 @@
                                     layer.msg(res.msg,{icon:5});
                                     return false;
                                 }
-                                layui.table.reload('LAY-secondlevel-manage'); //数据刷新
+                                layui.table.reload('LAY-video-manage'); //数据刷新
                                 layer.close(index); //关闭弹层
                             }
                         });
-                        // layui.table.reload('LAY-secondlevel-manage'); //数据刷新
+                        // layui.table.reload('LAY-video-manage'); //数据刷新
                         // layer.close(index); //关闭弹层
                     });
 
