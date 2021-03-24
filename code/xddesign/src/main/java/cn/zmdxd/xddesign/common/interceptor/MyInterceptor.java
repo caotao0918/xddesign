@@ -17,6 +17,7 @@ public class MyInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        String contextPath = "/xddesign";
         String path = request.getServletPath();
         String userId = CookieUtil.getCookieValue(request, "userId");
         String cusId = CookieUtil.getCookieValue(request, "customerId");

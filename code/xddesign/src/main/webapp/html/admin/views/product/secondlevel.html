@@ -70,7 +70,7 @@
     $(function () {
 
       $.ajax({
-        url:"/admin/firstlevel/nopage"
+        url:"/xddesign/admin/firstlevel/nopage"
         ,type:"GET"
         ,dataType:"json"
         ,async: false
@@ -103,7 +103,7 @@
             
           //执行 Ajax 后重载
           $.ajax({
-            url: '/admin/secondlevel/batchdelete'
+            url: '/xddesign/admin/secondlevel/batchdelete'
             ,type: 'POST'
             ,data: JSON.stringify(checkData)
             ,dataType: 'json'
@@ -138,7 +138,7 @@
               console.log(field);
               //提交 Ajax 成功后，静态更新表格中的数据
               $.ajax({
-                url: '/admin/secondlevel/saveorupdate'
+                url: '/xddesign/admin/secondlevel/saveorupdate'
                 ,type: 'POST'
                 ,data: field
                 ,dataType: 'json'

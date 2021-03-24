@@ -182,9 +182,9 @@
       add: function(){
         layer.open({
           type: 2
-          ,title: '添加产品手册'
+          ,title: '添加产品视频'
           ,content: 'videoform.html'
-          ,area: ['1000px', '500px']
+          ,area: ['1000px', '450px']
           ,btn: ['确定', '取消']
           ,yes: function(index, layero){
             var iframeWindow = window['layui-layer-iframe'+ index]
@@ -197,7 +197,6 @@
               let  $$ = iframe.layui.$;
               let productSelect = $$('select[name="productId"]');
               let videoLink = $$('input[name="videoLink"]').val();
-              let pictureLink = $$('input[name="pictureLink"]').val();
 
               //提交 Ajax 成功后，静态更新表格中的数据
               $.ajax({
@@ -207,7 +206,6 @@
                   "videoName": productSelect.find("option:selected").text()
                   ,"productId": productSelect.val()
                   ,"videoLink": videoLink
-                  ,"pictureLink": pictureLink
                 }
                 ,dataType: 'json'
                 ,success: function (res) {

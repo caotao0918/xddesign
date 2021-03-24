@@ -15,7 +15,7 @@
       <div class="layui-form-item" hidden>
         <label class="layui-form-label">ID</label>
         <div class="layui-input-block">
-          <input type="text" name="productId" lay-verify="required" autocomplete="off" class="layui-input">
+          <input type="text" name="productId" autocomplete="off" class="layui-input">
         </div>
       </div>
       <div class="layui-form-item">
@@ -56,7 +56,7 @@
           </select>
         </div>
       </div>
-      <div id="productproperty" class="layui-form-item" id="product_property">
+      <div id="productproperty" class="layui-form-item">
       </div>
       <div class="layui-form-item">
         <input type="file" name="file" value="上传产品图片" multiple="multiple">
@@ -141,7 +141,7 @@
         ,dataType:"json"
         ,async: false
         ,success:function(res) {
-          let propertyhtml = $("#product_property");
+          let propertyhtml = $("#productproperty");
           propertyhtml.empty();
           let con = "";
           for (let i = 0; i < res.length; i++) {

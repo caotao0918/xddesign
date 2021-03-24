@@ -480,14 +480,14 @@ public class AdminController {
     }
 
 
-    //修改产品某个属性信息
+    // 修改产品某个属性信息
     @RequestMapping(value = "product/property/update", method = RequestMethod.POST)
     public ReturnResult updateProductProperty(PropertyValue propertyValue) {
         boolean state = valueService.update(new UpdateWrapper<PropertyValue>().eq("value_id",propertyValue.getValueId()).set("value_name",propertyValue.getValueName()));
         return ReturnResult.returnResult(state);
     }
 
-    //删除产品某个属性
+    // 删除产品某个属性
     @RequestMapping(value = "/product/property/delete", method = RequestMethod.POST)
     public ReturnResult deleteProductProperty(Integer valueId) {
         ReturnResult result = new ReturnResult();
@@ -503,68 +503,50 @@ public class AdminController {
         return result;
     }
 
+    // 产品视频上传
+    @RequestMapping(value = "video/upload", method = RequestMethod.POST)
+    public JSONObject uploadProductVideo(@RequestParam(value = "file", required = false) MultipartFile file) {
+        JSONObject res = new JSONObject();
+        JSONObject data = new JSONObject();
+        if (file.getSize() != 0) {
+            String date = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+            String saveFileName = FileUtil.saveFile(file, uploadPath + uploadPath2 + "/video/" + date, uploadPath);
+            String link = fileHost + saveFileName;
+            res.put("status", 1);
+            res.put("msg", "上传成功");
+            data.put("src", link);
+            res.put("data", data);
+        }else {
+            res.put("status", 0);
+            res.put("msg", "上传失败");
+        }
+        return res;
+    }
+
     /**
      * @description: 添加或修改产品视频信息
      * @param video:视频信息（视频名称、视频描述、视频链接）
-     * @param file:上传的视频
      */
     @RequestMapping(value = "video/saveorupdate", method = RequestMethod.POST)
-    public ReturnResult saveOrUpdateVideo(Video video, @RequestParam(value = "file", required = false) MultipartFile file) {
-        ReturnResult result = new ReturnResult();
-        int status;
-        String msg;
-        if (video.getVideoId() == null) {
-            if (file.getSize() != 0) {
-                //添加视频信息、上传视频
-                String saveFileName = FileUtil.saveFile(file, uploadPath + uploadPath2 + "/video/" + video.getVideoName(), uploadPath);//上传路径+文件名
-                String videoLink = fileHost + saveFileName;//保存到数据库中的文件链接
-                video.setVideoLink(videoLink);
-                boolean saveOrUpdate = videoService.saveOrUpdate(video);
-                if (!saveOrUpdate) {
-                    status = 0;
-                    msg = "添加失败，请稍后重试";
-                }else {
-                    status = 1;
-                    msg = "添加成功";
-                }
-            }else {
-                status = 0;
-                msg = "请上传文件";
-            }
-        }else {
-            //修改视频信息
-            if (file.getSize() != 0) {
-                String saveFileName = FileUtil.saveFile(file, uploadPath + uploadPath2 + "/video/" + video.getVideoName(), uploadPath);
-                String videoLink = fileHost + saveFileName;
-                video.setVideoLink(videoLink);
-            }
-            boolean update = videoService.update(new UpdateWrapper<Video>().eq("video_id", video.getVideoId()).set("video_name", video.getVideoName()).set("video_link", video.getVideoLink()).set("video_desc", video.getVideoDesc()).set("video_reserve", video.getVideoReserve()));
-            if (!update) {
-                status = 0;
-                msg = "修改失败，请稍后重试";
-            }else {
-                status = 1;
-                msg = "修改成功";
-            }
+    public ReturnResult saveOrUpdateVideo(Video video) {
+        if (video.getVideoId() == null && video.getProductId() == null) {
+            return ReturnResult.returnResult(false, "请先选择一个产品");
         }
-        result.setMsg(msg);
-        result.setStatus(status);
-        return result;
+        if (video.getVideoId() == null) {
+            video.setVideoName(video.getVideoName() + "安装使用视频");
+            video.setVideoDesc("这是" + video.getVideoName());
+        }
+        boolean saveOrUpdate = videoService.saveOrUpdate(video);
+        return ReturnResult.returnResult(saveOrUpdate);
     }
 
-    //产品视频信息的删除
-    @RequestMapping(value = "video/delete",method = RequestMethod.POST)
+    // 产品视频信息的删除
+    @RequestMapping(value = "video/batchdelete",method = RequestMethod.POST)
     public ReturnResult deleteVideo(@RequestBody ArrayList<Integer> ids) {
-        ReturnResult result = new ReturnResult();
         Video video;
         for (Integer id:ids){
             video = videoService.getById(id);
-            boolean deleteFile = FileUtil.deleteFile(uploadPath + video.getVideoLink().substring(fileHost.length()));//删除视频文件
-            if (!deleteFile) {
-                result.setStatus(0);
-                result.setMsg("删除失败，请稍后重试");
-                return result;
-            }
+            FileUtil.deleteFile(uploadPath + video.getVideoLink().substring(fileHost.length()));//删除视频文件
         }
         boolean removeByIds = videoService.removeByIds(ids);//删除数据库中的视频信息
         return ReturnResult.returnResult(removeByIds);
@@ -601,7 +583,7 @@ public class AdminController {
         }
         if (guide.getGuideId() == null) {
             guide.setGuideName(guide.getGuideName() + "产品手册");
-            guide.setGuideDesc("这是" + guide.getGuideName() + "的产品手册");
+            guide.setGuideDesc("这是" + guide.getGuideName());
         }else {
             List<Guide> guides = guideService.list(new QueryWrapper<Guide>().eq("guide_id", guide.getGuideId()));
             String guideName = guides.get(0).getGuideName();

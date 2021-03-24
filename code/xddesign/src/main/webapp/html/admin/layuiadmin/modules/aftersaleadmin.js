@@ -289,13 +289,16 @@
         height: "full-220",
         text: "对不起，加载出现异常！"
     }), i.on("tool(LAY-video-manage)", function (e) {
-        e.data;
         if ("del" === e.event) layer.confirm("确定删除？", {icon:3, title: '提示'}, function (t) {
+            let ids = [];
+            ids.push(e.data.videoId);
+
             layui.$.ajax({
                 url: '/xddesign/admin/video/batchdelete'
                 ,type: 'POST'
-                ,data: {"secondId":e.data.secondId}
+                ,data: JSON.stringify(ids)
                 ,dataType: 'json'
+                ,contentType: 'application/json;charset=utf-8'
                 ,success: function (res) {
                     if (res.status === 0) {
                         layer.msg(res.msg, {icon:5});
@@ -311,12 +314,17 @@
                 type: 2,
                 title: "编辑产品视频",
                 content: "videoform.html",
-                area: ["500px", "630px"],
+                area: ["700px", "400px"],
                 btn: ["确定", "取消"]
                 ,yes: function(index, layero){
                     let iframeWindow = window['layui-layer-iframe'+ index]
                         ,submitID = 'LAY-video-front-submit'
                         ,submit = layero.find('iframe').contents().find('#'+ submitID);
+
+                    let $$ = iframeWindow.layui.$;
+                    let videoId = $$('input[name="videoId"]').val();
+                    let videoLink = $$('input[name="videoLink"]').val();
+
                     //监听提交
                     iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
                         let field = data.field; //获取提交的字段
@@ -324,7 +332,10 @@
                         layui.$.ajax({
                             url: '/xddesign/admin/video/saveorupdate'
                             ,type: 'POST'
-                            ,data: field
+                            ,data: {
+                                "videoId": videoId
+                                ,"videoLink": videoLink
+                            }
                             ,dataType: 'json'
                             ,success: function (res) {
                                 if (res.status == 0) {
@@ -335,8 +346,6 @@
                                 layer.close(index); //关闭弹层
                             }
                         });
-                        // layui.table.reload('LAY-video-manage'); //数据刷新
-                        // layer.close(index); //关闭弹层
                     });
 
                     submit.trigger('click');
@@ -345,10 +354,9 @@
                     // 获取子页面的iframe
                     let iframe = window['layui-layer-iframe' + index];
                     let $ = iframe.layui.$;
-                    $("input[name='secondId']").val(e.data.secondId);
-                    $("input[name='secondName']").val(e.data.secondName);
-                    $("textarea[name='secondDesc']").val(e.data.secondDesc);
-                    $("select[name='firstLevel.firstId']").val(e.data.firstLevel.firstId);
+                    $("#level").attr("hidden", true);
+                    $("input[name='videoId']").val(e.data.videoId);
+                    $("input[name='videoLink']").val(e.data.videoLink);
                 }
             })
         }

@@ -24,6 +24,8 @@ public class Video {
     private String videoDesc;          //视频描述
     private String videoReserve;       //保留字段
 
+    private Integer productId;         //产品id
+
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     public Timestamp getVideoAddTime() {
         return videoAddTime;
