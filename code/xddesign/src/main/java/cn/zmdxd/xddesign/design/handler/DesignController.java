@@ -407,7 +407,7 @@ public class DesignController {
         return solutionsService.saveOrUpdateSolution(solutions, request);
     }
 
-    //查询添加方案时对应的左侧分类栏
+    // 添加方案时对应的左侧分类栏
     @RequestMapping(value = "customer/solutions/levels")
     public List<List<SecondLevel>> findFirstLevelAndSecondLevel() {
         List<FirstLevel> firstLevelList = firstLevelService.list(new QueryWrapper<FirstLevel>().select("first_id", "first_name"));
@@ -428,7 +428,7 @@ public class DesignController {
         return productService.findProductsBySecond(secondId);
     }
 
-    //查询全部二级分类下的全部产品
+    // 查询全部二级分类下的全部产品
     @RequestMapping(value = "customer/solutions/level/products")
     public List<Map<SecondLevel, List<Product>>> findAllProducts() {
         List<List<SecondLevel>> listLeftNav = findFirstLevelAndSecondLevel();
@@ -524,11 +524,18 @@ public class DesignController {
         return ReturnResult.returnResult(update);
     }
 
-    //根据id删除方案内的单条报价数据
+    // 根据id删除方案内的单条报价数据
     @RequestMapping(value = "customer/quote/delete", method = RequestMethod.POST)
     public ReturnResult deleteQuote(Integer quoteId) {
         boolean removeById = quoteService.removeById(quoteId);
         return ReturnResult.returnResult(removeById);
+    }
+
+    // 批量删除报价单
+    @RequestMapping(value = "customer/quote/batchdelete")
+    public ReturnResult batchdeleteQuote(@RequestBody ArrayList<Integer> ids) {
+        boolean removeByIds = quoteService.removeByIds(ids);
+        return ReturnResult.returnResult(removeByIds);
     }
 
     /**
@@ -540,6 +547,9 @@ public class DesignController {
      */
     @RequestMapping(value = "customer/renderings/save", method = RequestMethod.POST)
     public ReturnResult saveRenderings(Integer soluId, String soluName, @RequestParam(value = "file",required = false) MultipartFile file) {
+        if (soluId == null) {
+            return ReturnResult.returnResult(false, "需要选择一个方案");
+        }
         String saveFileName,rendPath,rendDesc,rendName;
         boolean save;
         Renderings renderings = new Renderings();
@@ -548,7 +558,7 @@ public class DesignController {
         }
         saveFileName = FileUtil.saveFile(file,uploadPath + uploadPath2 +"/renderings/"+soluName, uploadPath);
         rendPath = fileHost + saveFileName;
-        rendDesc = "这是"+soluName+"的效果图";
+        rendDesc = "这是" +soluName+"的效果图";
         rendName = Objects.requireNonNull(file.getOriginalFilename()).substring(0, file.getOriginalFilename().lastIndexOf("."));
         renderings.setRendName(rendName);
         renderings.setRendDesc(rendDesc);
@@ -575,10 +585,6 @@ public class DesignController {
         path = uploadPath + renderings.getRendPath().substring(fileHost.length());
         //删除本地的图片
         deleteFile = FileUtil.deleteFile(path);
-        if (!deleteFile) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
-            return ReturnResult.returnResult(false, "删除失败，请稍后重试");
-        }
         //删除数据库中的信息
         boolean removeById = renderingsService.removeById(rendId);
         return ReturnResult.returnResult(removeById);

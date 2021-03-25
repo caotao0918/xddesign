@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zmdxd.xddesign.design.dao.RenderingsDao">
+
+    <select id="selectRenderings" resultType="Renderings">
+        select renderings.rend_id, renderings.rend_name, renderings.rend_path, renderings.rend_desc, renderings.solu_id
+        from t_renderings renderings
+        left join t_solutions solutions on renderings.solu_id = solutions.solu_id
+        left join t_house house on solutions.house_id = house.house_id
+        left join t_customer cus on house.customer_id = cus.id
+        <where>
+            <if test="room.customerId != null and room.customerId != 0 ">
+                cus.id = #{room.customerId}
+            </if>
+            <if test="room.houseId != null and room.houseId != 0 ">
+                and house.house_id = #{room.houseId}
+            </if>
+            <if test="room.soluId != null and room.soluId != 0 ">
+                and renderings.solu_id = #{room.soluId}
+            </if>
+        </where>
+    </select>
+
+</mapper>

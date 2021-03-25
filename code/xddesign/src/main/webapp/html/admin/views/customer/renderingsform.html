@@ -1,0 +1,177 @@
+
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <title>上传方案设计效果图</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="../../layuiadmin/layui/css/layui.css" media="all">
+</head>
+<body>
+<div class="layui-form" lay-filter="layuiadmin-rendering-manage" id="layuiadmin-rendering-manage" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <div class="layui-form-item">
+            <label class="layui-form-label">客户</label>
+            <div class="layui-input-inline">
+                <select name="customerId" lay-search lay-filter="inithouse">
+                </select>
+            </div>
+            <label class="layui-form-label">房子</label>
+            <div class="layui-input-inline">
+                <select name="houseId" lay-search lay-filter="initsolutions">
+                </select>
+            </div>
+            <label class="layui-form-label">方案</label>
+            <div class="layui-input-inline">
+                <select name="soluId" lay-search>
+                </select>
+            </div>
+        </div>
+        <div class="layui-upload">
+            <button type="button" class="layui-btn" id="selectpic">选择图片(可多选)</button>
+            <button type="button" class="layui-btn" id="uploadpic">上传图片</button>
+            <div class="layui-progress layui-progress-big" lay-filter="progress" lay-showPercent="true">
+              <div class="layui-progress-bar" lay-percent="0%"></div>
+            </div>
+            <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+              预览图：
+              <div class="layui-upload-list" id="showpic"></div>
+            </blockquote>
+        </div>
+    </div>
+</div>
+
+      <script src="../../layuiadmin/layui/layui.js"></script>
+      <script>
+          layui.config({
+              base: '../../layuiadmin/' //静态资源所在路径
+          }).extend({
+              index: 'lib/index' //主入口模块
+          }).use(['index', 'upload', 'element', 'form'], function(){
+              var $ = layui.$
+                  ,upload = layui.upload
+                  ,element = layui.element
+                  ,form = layui.form;
+
+
+              $(function(){
+                  $.ajax({
+                      url:"/xddesign/design/customers/nopage"
+                      ,type:"GET"
+                      ,dataType:"json"
+                      ,async: false
+                      ,success:function(res) {
+                          let select = $("select[name='customerId']");
+                          select.empty();
+                          let con = '<option value="0">--请选择--</option>';
+                          for (let i = 0; i < res.length; i++) {
+                              con += '<option value='+'"'+res[i].id+'"'+'>'+res[i].username+'</option>';
+                          }
+                          select.html(con);
+                          //这一步必不可少
+                          form.render("select");
+                      }
+                  });
+
+
+
+              });
+              form.on('select(inithouse)', function (data) {
+                  $.ajax({
+                      url:"/xddesign/design/customer/house/nopage"
+                      ,type:"GET"
+                      ,data:{"customerId":data.value}
+                      ,dataType:"json"
+                      ,async: false
+                      ,success:function(res) {
+                          let select = $("select[name='houseId']");
+                          select.empty();
+                          let con = '<option value="0">--请选择--</option>';
+                          for (let i = 0; i < res.length; i++) {
+                              con += '<option value='+'"'+res[i].houseId+'"'+'>'+res[i].houseName+'</option>';
+                          }
+                          select.html(con);
+                          //这一步必不可少
+                          form.render("select");
+                      }
+                  });
+              });
+              form.on('select(initsolutions)', function (data) {
+                  $.ajax({
+                      url:"/xddesign/design/customer/solutions/nopage"
+                      ,type:"GET"
+                      ,data:{"houseId":data.value}
+                      ,dataType:"json"
+                      ,async: false
+                      ,success:function(res) {
+                          let select = $("select[name='soluId']");
+                          select.empty();
+                          let con = '';
+                          for (let i = 0; i < res.length; i++) {
+                              con += '<option value='+'"'+res[i].soluId+'"'+'>'+res[i].soluName+'</option>';
+                          }
+                          select.html(con);
+                          //这一步必不可少
+                          form.render("select");
+                      }
+                  });
+              });
+
+              var loadindex;
+              //多图片上传
+              upload.render({
+                  elem: '#selectpic'
+                  ,url: '/xddesign/design/customer/renderings/save'
+                  ,auto: false
+                  ,data: {
+                      soluId: function(){
+                          return $("select[name='soluId']").val();
+                      },
+                      soluName: function () {
+                          return $("select[name='soluId'] option:selected").text();
+                      }
+                  }
+                  ,accept: "images"
+                  ,multiple: true
+                  ,size: 10*1024
+                  ,bindAction: '#uploadpic'
+                  ,choose: function (obj) {
+                      //将每次选择的文件追加到文件队列
+                      var files = obj.pushFile();
+                      obj.preview(function(index, file, result){
+                          $('#showpic').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img" width="200px" height="200px">')
+                      });
+                  }
+                  ,before: function(obj){
+                      loadindex = layer.load();//上传loading
+                  }
+                  ,progress: function(n, elem){
+                      var percent = n + '%' //获取进度百分比
+                      element.progress('progress', percent); //配合 layui 进度条元素使用
+                  }
+                  ,error: function(index, upload){
+                      return layer.msg("服务器出现错误，请重试", {icon:5});
+                  }
+                  ,done: function (res, index, upload) {
+                      //上传失败
+                      if (res.status === 0) {
+                          return layer.msg(res.msg, {icon:5});
+                      }
+                  }
+                  ,allDone: function(obj){ //当文件全部被提交后，才触发
+                      setTimeout(function () {
+                          let index = parent.layer.getFrameIndex(window.name);
+                          layer.close(loadindex);
+                          parent.layer.close(index);//关闭当前页
+                          window.parent.location.reload();
+                      }, 2000);
+                      // window.parent.layer.msg("上传了"+obj.total+"张图片 成功"+obj.successful+"张 失败"+obj.aborted+"张");
+                  }
+              });
+          })
+      </script>
+</body>
+</html>

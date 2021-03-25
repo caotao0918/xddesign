@@ -9,7 +9,7 @@
             {field: "productName", title: "产品名", minWidth: 100}, {field: "productModels", title: "产品型号"}
             , {field: "productLink", title: "产品官网链接",templet:'<div><a href="{{d.productLink}}">{{d.productLink}}</a></div>'},
             {field: "price", title: "产品价格", sort: !0}, {field: "productDesc", title: "产品描述"},
-            {title: "操作", width: 280, align: "center", fixed: "right", toolbar: "#table-useradmin-admin"}]],
+            {title: "操作", width: 350, align: "center", fixed: "right", toolbar: "#table-useradmin-admin"}]],
         request:{
           pageName: 'current'
             ,limitName: 'size'
@@ -159,6 +159,41 @@
                     $("#layeditDemo").val(e.data.productDetail);
                 }
             })
+        }else if ("pic" === e.event) {
+            let picList = [];
+            layui.$.ajax({
+                url: '/xddesign/public/product'
+                ,type: 'GET'
+                ,data: {
+                    "productId": e.data.productId
+                }
+                ,dataType: 'json'
+                ,async: false
+                ,success: function (res) {
+                    picList = res.pictureList;
+                }
+            });
+
+            let data = [];
+            if (picList !== '' && picList != null) {
+                for (let i = 0; i < picList.length; i++) {
+                    let picmap = {};
+                    picmap.alt = picList[i].pictureName;
+                    picmap.pid = picList[i].pictureId;
+                    picmap.src = picList[i].pictureLink;
+                    picmap.thumb = '';
+                    data.push(picmap);
+                }
+            }
+
+            layer.photos({
+                photos: {
+                    "title": "产品图片", //相册标题
+                    "id": e.data.productId, //相册id
+                    "start": 0, //初始显示的图片序号，默认0
+                    "data": data
+                }
+            });
         }
     }), i.render({
         elem: "#LAY-firstlevel-manage",

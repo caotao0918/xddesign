@@ -7,6 +7,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+
 public class FileUtil {
 
     private FileUtil() {
@@ -24,12 +26,10 @@ public class FileUtil {
     }
 
     /**
-     * 文件保存方法
-     *
+     * @description: 文件保存方法
      * @param file:上传的文件
      * @param destination:文件保存路径
      * @throws IllegalStateException
-     * @throws IOException
      */
     public static String saveFile(MultipartFile file, String destination, String uploadPath) throws IllegalStateException {
         // 获取上传的文件名称，并结合存放路径，构建新的文件名称
@@ -49,6 +49,28 @@ public class FileUtil {
             throw new RuntimeException("上传文件异常，请稍后重试");
         }
         return destination.substring(uploadPath.length()) + File.separator + substring + filename;
+    }
+
+    // 获取文件头信息
+    public static FileType getFileType(InputStream is) throws IOException {
+        byte[] src = new byte[28];
+        is.read(src, 0, 28);
+        StringBuilder stringBuilder = new StringBuilder("");
+        for (byte b : src) {
+            int v = b & 0xFF;
+            String hv = Integer.toHexString(v).toUpperCase();
+            if (hv.length() < 2) {
+                stringBuilder.append(0);
+            }
+            stringBuilder.append(hv);
+        }
+        FileType[] fileTypes = FileType.values();
+        for (FileType fileType : fileTypes) {
+            if (stringBuilder.toString().startsWith(fileType.getValue())) {
+                return fileType;
+            }
+        }
+        return null;
     }
 
 }

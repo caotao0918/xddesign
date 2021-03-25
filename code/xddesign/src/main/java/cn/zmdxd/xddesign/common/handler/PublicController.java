@@ -130,6 +130,29 @@ public class PublicController {
         out.close();
     }
 
+    /**
+     * @description: 查询所有产品
+     * @param current:当前页
+     * @param size:每页条数
+     */
+    @RequestMapping(value = "products", method = RequestMethod.GET)
+    public Object findProducts(ProductVo productVo, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+        Page<Product> page = new Page<>(current, size);
+        String productName = productVo.getProductName();
+        if (productName != null) {
+            // 搜索时，去除输入的产品名称左右两边的空格
+            productVo.setProductName(productName.trim());
+        }
+        return productService.findProducts(page, productVo);
+    }
+
+    // 根据产品id查询产品详情
+    @RequestMapping(value = "product")
+    public Product findProduct(Integer productId) {
+        return productService.findProduct(productId);
+    }
+
+
     // 客户-查询自己的信息
     @RequestMapping("customer")
     public Customer findCustomer(HttpServletRequest request) {
@@ -148,6 +171,16 @@ public class PublicController {
     @RequestMapping(value = "customer/solution")
     public Solutions findSolution(Integer soluId) {
         return solutionsService.findSolutions(soluId);
+    }
+
+    /**
+     * @description: 查看效果图
+     * @param soluId:方案id
+     * @return List
+     */
+    @RequestMapping(value = "customer/renderings")
+    public List<Renderings> findRenderingsList(Integer soluId) {
+        return renderingsService.list(new QueryWrapper<Renderings>().eq("solu_id",soluId));
     }
 
     // 根据方案id查看方案报价单
@@ -251,36 +284,5 @@ public class PublicController {
 
     }
 
-    /**
-     * @description: 查看效果图
-     * @param soluId:方案id
-     * @return List
-     */
-    @RequestMapping(value = "customer/renderings")
-    public List<Renderings> findRenderingsList(Integer soluId) {
-        return renderingsService.list(new QueryWrapper<Renderings>().eq("solu_id",soluId));
-    }
-
-    /**
-     * @description: 查看产品
-     * @param current:当前页
-     * @param size:每页条数
-     */
-    @RequestMapping(value = "products", method = RequestMethod.GET)
-    public Object findProducts(ProductVo productVo, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
-        Page<Product> page = new Page<>(current, size);
-        String productName = productVo.getProductName();
-        if (productName != null) {
-            // 搜索时，去除输入的产品名称左右两边的空格
-            productVo.setProductName(productName.trim());
-        }
-        return productService.findProducts(page, productVo);
-    }
-
-    // 根据产品id查询产品详情
-    @RequestMapping(value = "product")
-    public Product findProduct(Integer productId) {
-        return productService.findProduct(productId);
-    }
 
 }

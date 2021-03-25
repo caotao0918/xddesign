@@ -3,6 +3,7 @@ package cn.zmdxd.xddesign.admin.handler;
 import cn.zmdxd.xddesign.admin.service.*;
 import cn.zmdxd.xddesign.design.service.*;
 import cn.zmdxd.xddesign.entity.*;
+import cn.zmdxd.xddesign.util.FileType;
 import cn.zmdxd.xddesign.util.FileUtil;
 import cn.zmdxd.xddesign.util.ReturnResult;
 import com.alibaba.fastjson.JSONObject;
@@ -10,6 +11,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -18,8 +20,9 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -69,6 +72,8 @@ public class AdminController {
     private ProductNumService productNumService;//产品数量接口
     @Autowired
     private QuoteService quoteService;//产品报价单接口
+    @Autowired
+    private RenderingsService renderingsService;//方案效果图接口
 
     @Value("${upload_path}")
     private String uploadPath;
@@ -77,7 +82,7 @@ public class AdminController {
     @Value("${upload_path_2}")
     private String uploadPath2;
 
-    //角色添加和修改
+    // 角色添加和修改
     @RequestMapping(value = "role/saveorupdate", method = RequestMethod.POST)
     public ReturnResult saveOrUpdateRole(Role role) {
         //id存在，则为修改，否则新增
@@ -91,7 +96,7 @@ public class AdminController {
         return ReturnResult.returnResult(saveOrUpdate);
     }
 
-    //查看角色列表
+    // 查看角色列表
     @RequestMapping(value = "roles")
     public IPage<Role> findRoles(@RequestParam(defaultValue = "0")Integer id, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
         Page<Role> page = new Page<>(current,size);
@@ -99,19 +104,19 @@ public class AdminController {
         return roleService.page(page,new QueryWrapper<Role>().eq("id", id));
     }
 
-    //查询角色列表(不分页)
+    // 查询角色列表(不分页)
     @RequestMapping(value = "roles/nopage")
     public List<Role> findRoles() {
         return roleService.list(new QueryWrapper<Role>().select("id", "name"));
     }
 
-    //根据id查询要修改的角色
+    // 根据id查询要修改的角色
     @RequestMapping(value = "role")
     public Role findRole(Integer id) {
         return roleService.getById(id);
     }
 
-    //删除角色
+    // 删除角色
     @RequestMapping(value = "role/del", method = RequestMethod.POST)
     public ReturnResult delRole(Integer id) {
         boolean removeById;
@@ -123,7 +128,7 @@ public class AdminController {
             return ReturnResult.returnResult(false, "此角色不能删除");
         }
     }
-    //批量删除角色
+    // 批量删除角色
     @RequestMapping(value = "role/batchdel",method = RequestMethod.POST)
     public ReturnResult delRole(@RequestBody List<Role> roleList) {
         ReturnResult result;
@@ -137,7 +142,7 @@ public class AdminController {
         return ReturnResult.returnResult(true);
     }
 
-    //添加系统用户和修改系统用户信息
+    // 添加系统用户和修改系统用户信息
     @RequestMapping(value = "user/saveorupdate", method = RequestMethod.POST)
     public String addUser(User user) {
         return userService.saveOrUpdateUser(user);
@@ -155,13 +160,13 @@ public class AdminController {
         return userService.findUser(user, current, size);
     }
 
-    //查询系统用户中的设计人员列表
+    // 查询系统用户中的设计人员列表
     @RequestMapping(value = "design")
     public List<User> findDesignList() {
         return userService.findDesignList();
     }
 
-    //批量删除用户(假删除，把del_sign置为true)
+    // 批量删除用户(假删除，把del_sign置为true)
     @RequestMapping(value = "user/batchdel", method = RequestMethod.POST)
     public ReturnResult delUser(@RequestBody List<User> userList) {
         List<Customer> customerList;
@@ -176,7 +181,7 @@ public class AdminController {
         }
         return ReturnResult.returnResult(true);
     }
-    //删除用户
+    // 删除用户
     @RequestMapping(value = "user/del", method = RequestMethod.POST)
     public ReturnResult delUser(@RequestBody User user) {
         List<Customer> customerList = customerService.list(new QueryWrapper<Customer>().eq("design_id", user.getId()));
@@ -185,21 +190,35 @@ public class AdminController {
         return ReturnResult.returnResult(update);
     }
 
-    //修改客户方案信息
+    // 管理员修改客户方案信息
     @RequestMapping(value = "customer/solutions/update", method = RequestMethod.POST)
     public ReturnResult updateSolutions(Solutions solutions) {
         boolean updateById = solutionsService.updateById(solutions);
         return ReturnResult.returnResult(updateById);
     }
 
-    //查询客户房间信息
+    // 管理员查询客户方案效果图
+    @RequestMapping(value = "solutions/renderings")
+    public IPage<Renderings> findRenderings(Room room, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+        Page<Renderings> page = new Page<>(current, size);
+        return renderingsService.findRenderings(page, room);
+    }
+
+    // 管理员查询客户方案报价表
+    @RequestMapping(value = "solutions/quotes")
+    public IPage<Quote> findQuotes(Room room, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+        Page<Quote> page = new Page<>(current, size);
+        return quoteService.findQuotes(page ,room);
+    }
+
+    // 查询客户房间信息
     @RequestMapping(value = "customer/room")
     public IPage<Room> findRoom(Room room, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
         Page<Room> page = new Page<>(current, size);
         return roomService.findRoom(page, room);
     }
 
-    //删除客户房间
+    // 删除客户房间
     @RequestMapping(value = "customer/room/delete", method = RequestMethod.POST)
     public ReturnResult deleteRoom(Room room) {
         if (templateService.findTemplateBySoluId(room.getSoluId()) != null) {
@@ -659,7 +678,7 @@ public class AdminController {
      * @param files:产品图片列表
      */
     @RequestMapping(value = "product/save", method = RequestMethod.POST)
-    public ReturnResult saveProduct(ProductVo productVo, @RequestParam(value = "files", required = false) MultipartFile[] files) {
+    public ReturnResult saveProduct(ProductVo productVo, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
         if (files.length == 0) {
             return ReturnResult.returnResult(false, "必须上传至少一张图片");
         }
@@ -701,7 +720,24 @@ public class AdminController {
             Picture picture = new Picture();
             Picture picture1 = pictureService.getOne(new QueryWrapper<Picture>().eq("product_id", productVo.getProductId()).eq("default_picture", true), true);//查看该产品图片是否已经有默认图片
             int i = 0;
+
+            CommonsMultipartFile commonsMultipartFile;
+            DiskFileItem fileItem;
+            InputStream ips;
+            FileType fileType;
+
             for (MultipartFile file:files) {
+
+                // 判断上传的文件是否为图片
+                commonsMultipartFile = (CommonsMultipartFile) file;
+                fileItem = (DiskFileItem) commonsMultipartFile.getFileItem();
+                ips = fileItem.getInputStream();
+                fileType = FileUtil.getFileType(ips);
+                if (fileType == null) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                    return ReturnResult.returnResult(false, "图片格式错误");
+                }
+
                 String saveFileName = FileUtil.saveFile(file, uploadPath + uploadPath2 + "/picture/" + productVo.getProductName(), uploadPath);//上传图片到nginx服务器
                 String pictureLink = fileHost + saveFileName;
                 String pictureDesc = "这是一张"+productVo.getProductName()+"图片";
@@ -912,12 +948,24 @@ public class AdminController {
     }
 
     /**
-     *
+     * @description: 添加或修改产品详情
      */
     @RequestMapping(value = "product/detail/saveorupdate", method = RequestMethod.POST)
     public ReturnResult saveproductdetail(Product product) {
         boolean update = productService.update(new UpdateWrapper<Product>().eq("product_id", product.getProductId()).set("product_detail", product.getProductDetail()));
         return ReturnResult.returnResult(update);
+    }
+
+    @RequestMapping(value = "test", method = RequestMethod.POST)
+    public void test(@RequestParam(value = "file") MultipartFile file) throws IOException {
+        InputStream ips = null;
+        File file1 = File.createTempFile("temp", null);
+        file.transferTo(file1);
+        ips = new FileInputStream(file1);
+        FileType fileType = FileUtil.getFileType(ips);
+        System.out.println("++++++++++++++");
+        System.out.println(fileType);
+        System.out.println("++++++++++++++");
     }
 
 }

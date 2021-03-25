@@ -2,7 +2,11 @@ package cn.zmdxd.xddesign.design.service;
 
 import cn.zmdxd.xddesign.design.dao.RenderingsDao;
 import cn.zmdxd.xddesign.entity.Renderings;
+import cn.zmdxd.xddesign.entity.Room;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,4 +16,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class RenderingsServiceImpl extends ServiceImpl<RenderingsDao, Renderings> implements RenderingsService {
+
+    @Autowired
+    private RenderingsDao renderingsDao;
+
+    @Override
+    public IPage<Renderings> findRenderings(Page<Renderings> page, Room room) {
+        return renderingsDao.selectRenderings(page, room);
+    }
 }

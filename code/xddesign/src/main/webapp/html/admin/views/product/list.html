@@ -51,6 +51,7 @@
         <table id="LAY-product-manage" lay-filter="LAY-product-manage"></table>
         <script type="text/html" id="table-useradmin-admin">
           <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>基本信息</a>
+          <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="pic"><i class="layui-icon layui-icon-picture"></i>产品图片</a>
           <a class="layui-btn layui-btn-radius layui-btn-xs" lay-event="detail"><i class="layui-icon layui-icon-note"></i>产品详情</a>
           <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
         </script>
@@ -182,6 +183,11 @@
                 formData.append("propertyValueList["+i+"]['propertyId']", propertyList[i].get('propertyId'));
               }
               for (let j = 0; j < pictureList.length; j++) {
+                let filetype = pictureList[j].type;
+                let str = filetype.substring(0, 5);
+                if (str !== 'image') {
+                  return layer.msg('图片格式不正确', {icon:5});
+                }
                 formData.append("files", pictureList[j]);
               }
 
@@ -195,7 +201,7 @@
                 ,dataType: 'json'
                 ,cache: false
                 ,success: function (res) {
-                  if (res.status == 0) {
+                  if (res.status === 0) {
                     layer.msg(res.msg,{icon:5});
                     return false;
                   }

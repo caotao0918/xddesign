@@ -570,5 +570,186 @@
                 }
             })
         }
+    }) , i.render({
+        elem: "#LAY-renderings-manage",
+        url: "/xddesign/admin/solutions/renderings",
+        cols: [[{field: "rendId", width: 50, title: "ID", sort: !0}, {field: "rendName", title: "名称"}, {field: "rendPath", title: "图片", templet: "#imgTpl"}
+        , {field: "rendDesc", title: "描述"}, {title: "操作", width: 150, align: "center", fixed: "right", toolbar: "#table-renderings-admin"}]],
+        request:{
+            pageName: 'current'
+            ,limitName: 'size'
+        },
+        page: !0,
+        limit: 10,
+        skin:'row',
+        even:true,
+        parseData: function(res){ //res 即为原始返回的数据
+            if(res.total === 0) {
+                return {
+                    'code': 201, //接口状态
+                    'msg': '无数据', //提示文本
+                    'count': 0, //数据长度
+                    'data': [] //数据列表，是直接填充进表格中的数组
+                }
+            }else if (res.records.length === 0) {
+                return {
+                    'code': 201, //接口状态
+                    'msg': '无数据', //提示文本
+                    'count': 0, //数据长度
+                    'data': [] //数据列表，是直接填充进表格中的数组
+                }
+            }else {
+                return {
+                    "code": 0,
+                    "count": res.total, //解析数据长度
+                    "data": res.records //解析数据列表
+                }
+            }
+        },
+        height: "full-220",
+        text: "对不起，加载出现异常！"
+    }), i.on("tool(LAY-renderings-manage)", function (e) {
+        e.data;
+        if ("del" === e.event) layer.confirm("确定删除此房间？", {icon:3, title: '提示'}, function (t) {
+            layui.$.ajax({
+                url: '/xddesign/design/customer/renderings/delete'
+                ,type: 'POST'
+                ,data: {
+                    "rendId": e.data.rendId
+                }
+                ,dataType: 'json'
+                ,success: function (res) {
+                    if (res.status == 0) {
+                        layer.msg(res.msg, {icon:5});
+                        return false;
+                    }
+                    e.del();
+                    layui.table.reload('LAY-renderings-manage');
+                }
+                ,error: function () {
+                    layer.msg("服务器错误，请重试", {icon:5});
+                }
+            });
+            layer.close(t);
+        }); else if ("edit" === e.event) {
+            layer.photos({
+                photos: {
+                    "title": "方案效果图", //相册标题
+                    "id": 1, //相册id
+                    "start": 0, //初始显示的图片序号，默认0
+                    "data": [   //相册包含的图片，数组格式
+                        {
+                            "alt": e.data.rendName,
+                            "pid": e.data.rendId, //图片id
+                            "src": e.data.rendPath, //原图地址
+                            "thumb": "" //缩略图地址
+                        }
+                    ]
+                }
+            });
+        }
+    }) ,i.render({
+        elem: "#LAY-quote-manage",
+        url: "/xddesign/admin/solutions/quotes",
+        cols: [[{type: "checkbox", fixed: "left"}, {field: "quoteId", width: 80, title: "ID", sort: !0}, {field: "roomName", title: "房间名"}
+        , {field: "productName", title: "产品名称"}, {field: "productNum", title: "产品数量"},{field: "price", title: "产品单价/元"}
+        , {title: "操作", width: 180, align: "center", fixed: "right", toolbar: "#table-quote-admin"}]],
+        request:{
+            pageName: 'current'
+            ,limitName: 'size'
+        },
+        page: !0,
+        limit: 10,
+        skin:'row',
+        even:true,
+        parseData: function(res){ //res 即为原始返回的数据
+            if(res.total === 0) {
+                return {
+                    'code': 201, //接口状态
+                    'msg': '无数据', //提示文本
+                    'count': 0, //数据长度
+                    'data': [] //数据列表，是直接填充进表格中的数组
+                }
+            }else if (res.records.length === 0) {
+                return {
+                    'code': 201, //接口状态
+                    'msg': '无数据', //提示文本
+                    'count': 0, //数据长度
+                    'data': [] //数据列表，是直接填充进表格中的数组
+                }
+            }else {
+                return {
+                    "code": 0,
+                    "count": res.total, //解析数据长度
+                    "data": res.records //解析数据列表
+                }
+            }
+        },
+        height: "full-220",
+        text: "对不起，加载出现异常！"
+    }), i.on("tool(LAY-quote-manage)", function (e) {
+        e.data;
+        if ("del" === e.event) layer.confirm("确定删除此条报价？", {icon:3, title: '提示'}, function (t) {
+            layui.$.ajax({
+                url: '/xddesign/design/customer/quote/delete'
+                ,type: 'POST'
+                ,data: {
+                    "quoteId": e.data.quoteId
+                }
+                ,dataType: 'json'
+                ,success: function (res) {
+                    if (res.status === 0) {
+                        layer.msg(res.msg, {icon:5});
+                        return false;
+                    }
+                    e.del();
+                    layui.table.reload('LAY-quote-manage');
+                }
+                ,error: function () {
+                    layer.msg("服务器错误，请重试", {icon:5});
+                }
+            });
+            layer.close(t);
+        }); else if ("edit" === e.event) {
+            layer.open({
+                type: 2,
+                title: "编辑价格",
+                content: "quoteform.html",
+                area: ["450px", "450px"],
+                btn: ["确定", "取消"]
+                ,yes: function(index, layero){
+                    let iframeWindow = window['layui-layer-iframe'+ index]
+                        ,submitID = 'LAY-quote-submit'
+                        ,submit = layero.find('iframe').contents().find('#'+ submitID);
+                    //监听提交
+                    iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
+                        let field = data.field; //获取提交的字段
+                        //提交 Ajax 成功后，静态更新表格中的数据
+                        layui.$.ajax({
+                            url: '/xddesign/design/customer/quote/update'
+                            ,type: 'POST'
+                            ,data: field
+                            ,dataType: 'json'
+                            ,success: function (res) {
+                                if (res.status === 0) {
+                                    layer.msg(res.msg,{icon:5});
+                                    return false;
+                                }
+                                layui.table.reload('LAY-quote-manage'); //数据刷新
+                                layer.close(index); //关闭弹层
+                            }
+                        });
+                    });
+                    submit.trigger('click');
+                }
+                , success: function (layero,index) {
+                    // 获取子页面的iframe
+                    let iframe = window['layui-layer-iframe' + index];
+                    let $ = iframe.layui.$;
+                    $("input[name='quoteId']").val(e.data.quoteId);
+                    $("input[name='price']").val(e.data.price);
+                }
+            })
+        }
     }) , e("customeradmin", {})
 });
