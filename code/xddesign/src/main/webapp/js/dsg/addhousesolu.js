@@ -22,7 +22,13 @@ var soluNameNull_text = "方案名称不能为空或空格！";
 var noProd_text = "请新建房间并配置至少一个产品！";
 var soluId = UrlParam.param("soluId");
 
+
 $(function(){
+
+    if (UrlParam.hasParam("houseId")) {
+        houseId = UrlParam.param("houseId");
+    }
+
     $('#div_1').show();
     $('#div_2').hide();
 
@@ -366,7 +372,8 @@ $(function(){
             async:false,
             success:function(json) {
                 if(1 == json.status){
-                    location.href = url_listHouseSolu;
+                    // window.history.back();
+                    self.location=document.referrer;
                 }else {
                     lightbox_tip(json.msg);
                     return false;
@@ -402,7 +409,8 @@ $(function(){
 
 
     $('.img_back_1').click(function(){
-        location.href = url_listHouseSolu;
+        // window.history.back();
+        self.location=document.referrer;
     })
 })
 /**

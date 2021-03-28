@@ -13,4 +13,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface RenderingsService extends IService<Renderings> {
     IPage<Renderings> findRenderings(Page<Renderings> page, Room room);
+
+    void copyRenderings(Integer soluId, Integer soluId1, String cusName);
 }

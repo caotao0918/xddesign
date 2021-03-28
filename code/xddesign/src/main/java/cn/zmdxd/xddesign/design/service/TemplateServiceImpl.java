@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,5 +56,10 @@ public class TemplateServiceImpl extends ServiceImpl<TemplateDao, Template> impl
     @Override
     public Template findTemplateByHouseId(Integer houseId) {
         return templateDao.selectTemplateByHouseId(houseId);
+    }
+
+    @Override
+    public List<Template> findTemplateByTypeId(Integer typeId) {
+        return templateDao.selectTemplateByTypeId(typeId);
     }
 }

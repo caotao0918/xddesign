@@ -14,4 +14,6 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface RenderingsDao extends BaseMapper<Renderings> {
     IPage<Renderings> selectRenderings(Page<Renderings> page, @Param("room") Room room);
+
+    void copyRenderings(@Param("oldSoluId") Integer oldSoluId, @Param("soluId") Integer soluId, @Param("desc") String desc);
 }

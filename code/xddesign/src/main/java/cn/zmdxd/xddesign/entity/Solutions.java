@@ -40,6 +40,9 @@ public class Solutions {
     @TableField(exist = false)
     private Integer customerId; //客户id
 
+    @TableField(exist = false)
+    private String customerName;// 客户姓名
+
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Timestamp getAddTime() {
         return addTime;

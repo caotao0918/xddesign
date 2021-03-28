@@ -280,10 +280,10 @@ public class DesignController {
         return ReturnResult.returnResult(removeById);
     }
 
-    //根据户型查询模板方案
+    // 根据户型查询模板方案
     @RequestMapping(value = "customer/houseType/templates")
     public List<Template> findTemplateList(Integer typeId) {
-        return templateService.list(new QueryWrapper<Template>().select("temp_id","temp_name","solu_id").eq("type_id",typeId));
+        return templateService.findTemplateByTypeId(typeId);
     }
 
     /**
@@ -306,7 +306,15 @@ public class DesignController {
 
     //根据id删除模板方案
     @RequestMapping(value = "customer/template/delete", method = RequestMethod.POST)
-    public ReturnResult deleteTemplate(Integer tempId, HttpServletRequest request) {
+    public ReturnResult deleteTemplate(Integer tempId, Integer userId, HttpServletRequest request) {
+
+        if (CookieUtil.getCookieValue(request, "userId") == null) {
+            return ReturnResult.returnResult(false, "服务器出错啦");
+        }else {
+            if (!Integer.valueOf(CookieUtil.getCookieValue(request, "userId")).equals(userId)) {
+                return ReturnResult.returnResult(false, "不是你的模板，不能删除");
+            }
+        }
 
         //修改方案状态为未共享
         Template template = templateService.findTemplateById(tempId);
@@ -331,6 +339,10 @@ public class DesignController {
     //我的方案转模板方案
     @RequestMapping(value = "customer/template/save", method = RequestMethod.POST)
     public ReturnResult solutionsToTemplate(Template template,HttpServletRequest request) {
+        Solutions solutions = solutionsService.getById(template.getSolutions().getSoluId());
+        if (solutions.getShareSign()) {
+            return ReturnResult.returnResult(false, "已经是模板方案啦");
+        }
         Integer typeId = templateService.findTypeIdBySoluId(template.getSolutions().getSoluId());//得到户型id
         Integer designId = Integer.valueOf(CookieUtil.getCookieValue(request, "userId"));//得到设计人员或管理员id
         boolean saveTemplate = templateService.saveTemplate(template, typeId, designId);
@@ -354,13 +366,21 @@ public class DesignController {
      * @param templateVo:模板方案Vo类 (客户名称、客户电话、客户联系地址、客户户型id、根据户型匹配的方案id)
      * @return ReturnResult
      */
-    @RequestMapping(value = "customer/solutions/quicksave")
+    @RequestMapping(value = "customer/solutions/quicksave", method = RequestMethod.POST)
     public ReturnResult quickSaveSolutions(TemplateVo templateVo, HttpServletRequest request) {
-        Customer customer = customerService.getOne(new QueryWrapper<Customer>().select("id").eq("mobile", templateVo.getMobile()), true);//根据手机号查询客户存在与否
+        if (templateVo.getTypeId() == 0) {
+            return ReturnResult.returnResult(false, "选择一个户型以匹配模板方案");
+        }
+        if (templateVo.getSoluId() == null) {
+            return ReturnResult.returnResult(false, "该户型没有匹配的方案");
+        }
+        Customer customer = customerService.getOne(new QueryWrapper<Customer>().select("id", "username").eq("mobile", templateVo.getMobile()), true);//根据手机号查询客户存在与否
+        String cusName;
         if (customer == null) {
             customer = new Customer();
             User design = new User();
             customer.setUsername(templateVo.getUsername());
+            cusName = templateVo.getUsername();
             customer.setMobile(templateVo.getMobile());
             customer.setAddress(templateVo.getAddress());
             Integer designId = Integer.valueOf(CookieUtil.getCookieValue(request, "userId"));
@@ -371,13 +391,15 @@ public class DesignController {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
                 return result;
             }
+        }else {
+            cusName = customer.getUsername();// 还用原来的名称
         }
         Integer customerId = customer.getId();//得到客户id
         House house = new House();
         house.setCustomerId(customerId);
         HouseType houseType = new HouseType();
         houseType.setTypeId(templateVo.getTypeId());
-        house.setHouseName("客户"+templateVo.getUsername()+"的家");
+        house.setHouseName("客户" + cusName + "的" + templateVo.getTypeName() + "的家");
         house.setHouseAddress(templateVo.getAddress());
         house.setHouseType(houseType);
         ReturnResult result = houseService.saveHouse(house);//添加客户房子
@@ -391,8 +413,10 @@ public class DesignController {
         Solutions solutions = solutionsService.findSolutions(templateVo.getSoluId());
         solutions.setHouseId(houseId);
         solutions.setSoluId(null);
-        solutions.setSoluName("客户"+templateVo.getUsername()+"的快速方案");
-        solutions.setSoluDesc("客户"+templateVo.getUsername()+"的快速方案描述");
+//        solutions.setSoluName("客户"+templateVo.getUsername()+"的快速方案");
+//        solutions.setSoluDesc("客户"+templateVo.getUsername()+"的快速方案描述");
+        solutions.setSoluName("客户"+cusName+"的快速方案");
+        solutions.setSoluDesc("客户"+cusName+"的快速方案描述");
         solutions.setState(SolutionsStateEnum.DESIGNING.getMsg());
         List<Room> roomList = solutions.getRoomList();
         List<ProductNum> productNumList;
@@ -404,7 +428,15 @@ public class DesignController {
             }
         }
         //快速建方案
-        return solutionsService.saveOrUpdateSolution(solutions, request);
+        ReturnResult saveOrUpdateSolution = solutionsService.saveOrUpdateSolution(solutions, request);
+        if (saveOrUpdateSolution.getStatus() == 0) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+            return ReturnResult.returnResult(false);
+        }else {
+            // 复制效果图
+            renderingsService.copyRenderings(templateVo.getSoluId(), solutions.getSoluId(), cusName);
+            return ReturnResult.returnResult(true);
+        }
     }
 
     // 添加方案时对应的左侧分类栏
@@ -423,7 +455,7 @@ public class DesignController {
         return levelList;
     }
 
-    //根据二级分类查询对应产品列表
+    // 根据二级分类查询对应产品列表
     public List<Product> findProductBySecondId(Integer secondId) {
         return productService.findProductsBySecond(secondId);
     }
@@ -455,7 +487,7 @@ public class DesignController {
         return solutionsService.saveOrUpdateSolution(solutions,request);
     }
 
-    //方案状态列表
+    // 方案状态列表
     @RequestMapping(value = "solutions/state")
     public List<Map<String, Object>> getSolutionsState() {
         return EnumUtil.enumToListMap(SolutionsStateEnum.class);
@@ -473,7 +505,7 @@ public class DesignController {
         return ReturnResult.returnResult(update);
     }
 
-    //删除客户方案信息（连同这个方案的房间、产品信息一并删除）
+    // 删除客户方案信息（连同这个方案的房间、产品信息一并删除）
     @RequestMapping(value = "customer/solutions/delete",method = RequestMethod.POST)
     public ReturnResult deleteSolutions(Integer soluId) {
         if (templateService.findTemplateBySoluId(soluId) != null) {

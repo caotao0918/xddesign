@@ -23,4 +23,10 @@
         </where>
     </select>
 
+    <insert id="copyRenderings">
+        INSERT INTO t_renderings(rend_name, rend_path, rend_desc, solu_id)
+        select rend_name, rend_path, #{desc} as rend_desc, #{soluId} as solu_id from t_renderings
+        where t_renderings.solu_id = #{oldSoluId}
+    </insert>
+
 </mapper>

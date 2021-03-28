@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>模板方案详情</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <!-- we code these -->
+  <link rel="stylesheet" type="text/css" href="../../css/cus/showcussolu.css" />
+  <link rel="stylesheet" href="../../cmn/layui/css/layui.css"  media="all">
+  <script charset="utf-8" src="../../cmn/layui/layui.js" ></script>
+  <script type="text/javascript" src="../../cmn/jquery/jquery-1.8.3.js"></script>
+  <script type="text/javascript" src="../../js/utils/getUrlParam.js"></script>
+  <script type="text/javascript" src="../../js/cus/showcussolu.js"></script>
+  <script src="../../js/login/logout.js"></script>
+</head>
+<body>
+<ul class="layui-nav" style="z-index: 1998">
+  <li class="layui-nav-item"><img alt="logo" src="../../img/logo.png" height="40px" width="50px" /></li>
+  <li class="layui-nav-item"><a href="main.html" style="font-size: 17px">迅达智能家居设计系统-设计人员</a></li>
+  <li class="layui-nav-item layui-col-md-offset2"><a href="listmycus.html">客户管理</a></li>
+  <li class="layui-nav-item">
+    <a href="javascript:">方案管理</a>
+    <dl class="layui-nav-child"> <!-- 二级菜单 -->
+      <dd><a href="listcussolu.html">客户方案</a></dd>
+      <dd><a href="listalltemplate.html">方案模板</a></dd>
+      <dd><a href="quicksolu.html">快速方案</a></dd>
+    </dl>
+  </li>
+  <li class="layui-nav-item"><a href="../customer/goodslist.html">产品中心</a></li>
+  <li class="layui-nav-item"><a href="../customer/aftersalecnt.html">售后支持</a></li>
+  <li class="layui-nav-item"><a href="https://www.kujiale.com/" target="_blank">酷家乐</a></li>
+  <li class="layui-nav-item layui-col-md-offset2">欢迎设计员：</li>
+  <li class="layui-nav-item">
+    <a id="me" href="javascript:">我</a>
+    <dl class="layui-nav-child"> <!-- 二级菜单 -->
+      <dd><a href="info.html">个人详情</a></dd>
+      <dd><a href="password.html">修改密码</a></dd>
+      <dd><a href="javascript:" onclick="userlogout()">退出</a></dd>
+    </dl>
+  </li>
+</ul>
+<script>
+  layui.use('element', function () {
+    const element = layui.element;
+    const $ = layui.$;
+    $("#me").html(window.localStorage.getItem("username") + "<span class='layui-nav-more'></span>");
+  });
+</script>
+<div>
+  <div>
+    <img id = "img_back" class = "img_back" src="../../img/back.svg"/>
+  </div>
+  <div id = "div_tempname" class = "div_tempname">
+    <span></span>
+  </div>
+  <div id = "div_roomlist" class = "div_roomlist">
+  </div>
+  <div id = "div_tab" class = "div_tab">
+  </div>
+
+</div>
+</body>
+<script type="text/javascript">
+
+  // $('#div_soluname span').html(soluName);
+  function bindRoom() {
+    var add = "<div>" + allProd_text + "</div>";
+    for (var i = 0; i < roomList.length; i++) {
+      add += "<div>" + roomList[i].roomName + "</div>";
+    }
+    $('#div_roomlist').append(add);
+    $('#div_roomlist').children().addClass("div_room");
+  }
+
+  function bindProdList(){
+    var add = "";
+    for (var j = 0; j < roomList.length; j++) {
+      productNumList = roomList[j].productNumList;
+      add += "<div>";
+      for (var l = 0; l < productNumList.length; l++) {
+        productNum = productNumList[l];
+        for (var num = 0; num < productNum.pnNum; num++) {
+          add += "<div>" +
+                  "<img src =" +productNum.product.pictureList[0].pictureLink + "\>" +
+                  "<span>" + productNum.product.productName + "</span>" +
+                  "<span style = 'display: none;'>" + productNum.product.productId + "</span>" +
+                  "</div>";
+        }
+      }
+      add += "</div>";
+    }
+
+    $('#div_tab').append(add);
+    var addFirst = "<div>";
+    $('#div_tab>div').each(function(){
+      addFirst += $(this).html();
+    })
+    addFirst += "</div>";
+    $('#div_tab').prepend(addFirst);
+
+    $('#div_tab>div').addClass("div_prodlist");
+    $('#div_tab>div div').addClass("div_prod");
+  }
+
+
+</script>
+</html>

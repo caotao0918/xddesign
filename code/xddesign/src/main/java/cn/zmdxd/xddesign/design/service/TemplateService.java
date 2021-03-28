@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * @author 曹涛
  * @date 2021/2/7 11:39
@@ -22,4 +24,6 @@ public interface TemplateService extends IService<Template> {
     Template findTemplateBySoluId(Integer soluId);
 
     Template findTemplateByHouseId(Integer houseId);
+
+    List<Template> findTemplateByTypeId(Integer typeId);
 }

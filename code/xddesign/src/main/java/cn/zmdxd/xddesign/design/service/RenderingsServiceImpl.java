@@ -24,4 +24,11 @@ public class RenderingsServiceImpl extends ServiceImpl<RenderingsDao, Renderings
     public IPage<Renderings> findRenderings(Page<Renderings> page, Room room) {
         return renderingsDao.selectRenderings(page, room);
     }
+
+    @Override
+    public void copyRenderings(Integer soluId, Integer soluId1, String cusName) {
+        String desc = "客户" + cusName + "的快速方案的效果图";
+        renderingsDao.copyRenderings(soluId, soluId1, desc);
+    }
+
 }

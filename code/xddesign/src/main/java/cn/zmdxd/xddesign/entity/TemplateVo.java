@@ -15,6 +15,7 @@ public class TemplateVo {
     private String address;//客户联系地址
     private Integer typeId;//户型id
     private Integer soluId;//方案id
+    private String typeName;// 户型名称
 
 
 }

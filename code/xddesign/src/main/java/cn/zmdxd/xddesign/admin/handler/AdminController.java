@@ -777,12 +777,13 @@ public class AdminController {
     @RequestMapping(value = "product/del", method = RequestMethod.POST)
     public ReturnResult deleteProduct(Integer productId) {
         List<ProductNum> productNumList = productNumService.list(new QueryWrapper<ProductNum>().eq("product_id", productId).select("pn_id"));
-        if (productNumList != null) {
+        System.out.println(productNumList);
+        if (!productNumList.isEmpty()) {
             return ReturnResult.returnResult(false, "客户方案用到了该产品，不能删除");
         }
 
         List<ProductProperty> productPropertyList = productService.findProductPropertyByProductId(productId);//查看t_product_property表中有无要删除的信息
-        if (productPropertyList != null) {
+        if (!productPropertyList.isEmpty()) {
             boolean removeProductPropertyByProductId = productService.removeProductPropertyByProductId(productId);// 删除t_product_property表的信息
             if (!removeProductPropertyByProductId) {
                 return ReturnResult.returnResult(false);

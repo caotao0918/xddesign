@@ -23,10 +23,12 @@
     </resultMap>
 
     <select id="selectTemplatesPage" resultMap="TemplateResultMap">
-        select template.temp_id,template.temp_name,template.temp_desc,template.temp_reserve1,template.temp_reserve2,template.temp_reserve3,
-        design.username,type.type_name
-        from t_template template,t_user design,t_house_type type
-        where template.type_id=type.type_id and design.id=template.designer_id
+        select template.temp_id, template.temp_name, template.temp_desc, template.temp_reserve1, template.temp_reserve2, template.temp_reserve3
+        , design.id , design.username, type.type_name, solutions.solu_id
+        from t_template template
+        left join t_solutions solutions on template.solu_id = solutions.solu_id
+        left join t_house_type type on type.type_id=template.type_id
+        left join t_user design on solutions.designer_id = design.id
     </select>
 
     <select id="selectTemplate" resultMap="TemplateResultMap">
@@ -68,6 +70,12 @@
         select template.temp_id,template.temp_name from t_template template, t_house house, t_solutions solutions
         where template.solu_id=solutions.solu_id and house.house_id=solutions.house_id
         and house.house_id=#{houseId}
+    </select>
+
+    <select id="selectTemplateByTypeId" resultMap="TemplateResultMap">
+        select template.solu_id, template.temp_name
+        from t_template template
+        where template.type_id = #{typeId}
     </select>
 
 </mapper>
