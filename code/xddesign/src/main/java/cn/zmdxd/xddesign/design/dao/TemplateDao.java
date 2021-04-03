@@ -4,6 +4,7 @@ import cn.zmdxd.xddesign.entity.Template;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,7 @@ import java.util.Map;
  */
 public interface TemplateDao extends BaseMapper<Template> {
 
-    IPage<Template> selectTemplatesPage(Page<Template> page);
+    IPage<Template> selectTemplatesPage(Page<Template> page, @Param("template") Template template);
 
     Template selectTemplate(Integer tempId);
 

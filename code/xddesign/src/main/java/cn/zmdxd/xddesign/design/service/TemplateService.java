@@ -13,7 +13,7 @@ import java.util.List;
  * @description:
  */
 public interface TemplateService extends IService<Template> {
-    IPage<Template> findTemplateList(Page<Template> page);
+    IPage<Template> findTemplateList(Page<Template> page, Template template);
 
     Template findTemplateById(Integer tempId);
 

@@ -29,6 +29,18 @@
         left join t_solutions solutions on template.solu_id = solutions.solu_id
         left join t_house_type type on type.type_id=template.type_id
         left join t_user design on solutions.designer_id = design.id
+        <where>
+            <if test="template.design != null">
+                <if test="template.design.id != 0">
+                    template.designer_id = #{template.design.id}
+                </if>
+            </if>
+            <if test="template.houseType != null">
+                <if test="template.houseType.typeId != 0">
+                    and template.type_id = #{template.houseType.typeId}
+                </if>
+            </if>
+        </where>
     </select>
 
     <select id="selectTemplate" resultMap="TemplateResultMap">

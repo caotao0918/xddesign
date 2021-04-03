@@ -51,7 +51,8 @@
         <table id="LAY-product-manage" lay-filter="LAY-product-manage"></table>
         <script type="text/html" id="table-useradmin-admin">
           <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>基本信息</a>
-          <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="pic"><i class="layui-icon layui-icon-picture"></i>产品图片</a>
+          <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="pic"><i class="layui-icon layui-icon-picture"></i>图片管理</a>
+          <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="prop"><i class="layui-icon layui-icon-note"></i>属性管理</a>
           <a class="layui-btn layui-btn-radius layui-btn-xs" lay-event="detail"><i class="layui-icon layui-icon-note"></i>产品详情</a>
           <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
         </script>
@@ -64,6 +65,7 @@
 
     var propertyList;
     var pictureList;
+    var productId = null;
     function getProductInfo(list, picturelist) {
       propertyList = list;
       pictureList = picturelist;

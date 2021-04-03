@@ -9,7 +9,7 @@
             {field: "productName", title: "产品名", minWidth: 100}, {field: "productModels", title: "产品型号"}
             , {field: "productLink", title: "产品官网链接",templet:'<div><a href="{{d.productLink}}">{{d.productLink}}</a></div>'},
             {field: "price", title: "产品价格", sort: !0}, {field: "productDesc", title: "产品描述"},
-            {title: "操作", width: 350, align: "center", fixed: "right", toolbar: "#table-useradmin-admin"}]],
+            {title: "操作", width: 440, align: "center", fixed: "right", toolbar: "#table-useradmin-admin"}]],
         request:{
           pageName: 'current'
             ,limitName: 'size'
@@ -19,14 +19,14 @@
         skin:'row',
         even:true,
         parseData: function(res){ //res 即为原始返回的数据
-            if(res.total == 0) {
+            if(res.total === 0) {
                 return {
                     'code': 201, //接口状态
                     'msg': '无数据', //提示文本
                     'count': 0, //数据长度
                     'data': [] //数据列表，是直接填充进表格中的数组
                 }
-            }else if (res.records.length == 0) {
+            }else if (res.records.length === 0) {
                 return {
                     'code': 201, //接口状态
                     'msg': '无数据', //提示文本
@@ -103,7 +103,7 @@
                     let iframe = window['layui-layer-iframe' + index];
                     let $ = iframe.layui.$;
                     $("#productproperty").prop("hidden", true);
-                    $("input[name='file']").prop("hidden", true);
+                    $("#addpic").attr("hidden", true);
                     $("input[name='productId']").val(e.data.productId);
                     $("input[name='productName']").val(e.data.productName);
                     $("input[name='productModels']").val(e.data.productModels);
@@ -113,7 +113,7 @@
                 }
             })
         } else if ("detail" === e.event) {
-            layer.open({
+            let index = layer.open({
                 type: 2,
                 title: "编辑产品详情",
                 content: "productdetail.html",
@@ -158,42 +158,39 @@
                     $("#productId").val(e.data.productId);
                     $("#layeditDemo").val(e.data.productDetail);
                 }
-            })
+            });
+            layer.full(index);
         }else if ("pic" === e.event) {
-            let picList = [];
-            layui.$.ajax({
-                url: '/xddesign/public/product'
-                ,type: 'GET'
-                ,data: {
-                    "productId": e.data.productId
-                }
-                ,dataType: 'json'
-                ,async: false
-                ,success: function (res) {
-                    picList = res.pictureList;
-                }
-            });
-
-            let data = [];
-            if (picList !== '' && picList != null) {
-                for (let i = 0; i < picList.length; i++) {
-                    let picmap = {};
-                    picmap.alt = picList[i].pictureName;
-                    picmap.pid = picList[i].pictureId;
-                    picmap.src = picList[i].pictureLink;
-                    picmap.thumb = '';
-                    data.push(picmap);
-                }
-            }
-
-            layer.photos({
-                photos: {
-                    "title": "产品图片", //相册标题
-                    "id": e.data.productId, //相册id
-                    "start": 0, //初始显示的图片序号，默认0
-                    "data": data
+            let index = layer.open({
+                type: 2,
+                title: "产品图片管理",
+                content: "picture.html?productId=" + e.data.productId + '&productName=' + e.data.productName,
+                maxmin: !0,
+                area: ["1000px", "800px"]
+                // , btn: ["确定", "取消"]
+                , success: function (layero,index) {
+                    // 获取子页面的iframe
+                    let iframe = window['layui-layer-iframe' + index];
+                    let $ = iframe.layui.$;
+                    $("#searchpic").attr("hidden", true);
                 }
             });
+            layer.full(index);
+        }else if ("prop" === e.event) {
+            let index = layer.open({
+                type: 2,
+                title: "产品属性管理",
+                content: "productproperty.html?productId=" + e.data.productId + '&secondId=' + e.data.secondLevel.secondId,
+                maxmin: !0
+                // area: ["1000px", "800px"]
+                , success: function (layero,index) {
+                    // 获取子页面的iframe
+                    let iframe = window['layui-layer-iframe' + index];
+                    let $ = iframe.layui.$;
+                    $("#searchprop").attr("hidden", true);
+                }
+            });
+            layer.full(index);
         }
     }), i.render({
         elem: "#LAY-firstlevel-manage",
@@ -540,11 +537,9 @@
         skin:'row',
         even:true,
         where: {
-
+            "productId": productId
         },
         parseData: function(res) { //res 即为原始返回的数据
-            console.log(res.records)
-            console.log(res.records.length)
             if(res.total == 0) {
                 return {
                     'code': 201, //接口状态
@@ -643,6 +638,7 @@
             pageName: 'current'
             ,limitName: 'size'
         },
+        where: {"productId": productId},
         page: !0,
         limit: 10,
         skin:'row',

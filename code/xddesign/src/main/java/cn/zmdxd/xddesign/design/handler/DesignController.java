@@ -287,15 +287,15 @@ public class DesignController {
     }
 
     /**
-     * @description: 分页查询公共模板方案
+     * @description: 分页查询模板方案
      * @param current:当前页
      * @param size:每页条数
      * @return IPage
      */
     @RequestMapping(value = "customer/templates")
-    public IPage<Template> findTemplateList(@RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+    public IPage<Template> findTemplateList(Template template, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
         Page<Template> page = new Page<>(current,size);
-        return templateService.findTemplateList(page);
+        return templateService.findTemplateList(page, template);
     }
 
     //根据id查询模板方案详情
@@ -307,12 +307,15 @@ public class DesignController {
     //根据id删除模板方案
     @RequestMapping(value = "customer/template/delete", method = RequestMethod.POST)
     public ReturnResult deleteTemplate(Integer tempId, Integer userId, HttpServletRequest request) {
-
+        Integer designId = null;
         if (CookieUtil.getCookieValue(request, "userId") == null) {
             return ReturnResult.returnResult(false, "服务器出错啦");
         }else {
-            if (!Integer.valueOf(CookieUtil.getCookieValue(request, "userId")).equals(userId)) {
-                return ReturnResult.returnResult(false, "不是你的模板，不能删除");
+            if ("设计人员".equals(CookieUtil.getCookieValue(request,"roleName"))) {
+                designId = Integer.valueOf(CookieUtil.getCookieValue(request,"userId"));
+                if (!Integer.valueOf(CookieUtil.getCookieValue(request, "userId")).equals(userId)) {
+                    return ReturnResult.returnResult(false, "不是你的模板，不能删除");
+                }
             }
         }
 
@@ -320,11 +323,6 @@ public class DesignController {
         Template template = templateService.findTemplateById(tempId);
         Integer soluId = template.getSolutions().getSoluId();
         solutionsService.update(new UpdateWrapper<Solutions>().eq("solu_id",soluId).set("share_sign",false));
-
-        Integer designId = null;
-        if ("设计人员".equals(CookieUtil.getCookieValue(request,"roleName"))) {
-            designId = Integer.valueOf(CookieUtil.getCookieValue(request,"userId"));
-        }
         boolean remove;
         if (designId != null) {
             //设计人员删除
@@ -334,6 +332,23 @@ public class DesignController {
             remove = templateService.remove(new QueryWrapper<Template>().eq("temp_id", tempId));
         }
         return ReturnResult.returnResult(remove);
+    }
+
+    @RequestMapping(value = "customer/template/batchdelete", method = RequestMethod.POST)
+    public ReturnResult deleteTemplate(@RequestBody ArrayList<Integer> ids) {
+        Template template;
+        Integer soluId;
+        boolean remove;
+        for (Integer id:ids) {
+            template = templateService.findTemplateById(id);
+            soluId = template.getSolutions().getSoluId();
+            solutionsService.update(new UpdateWrapper<Solutions>().eq("solu_id",soluId).set("share_sign",false));
+            remove = templateService.remove(new QueryWrapper<Template>().eq("temp_id", id));
+            if (!remove) {
+                return ReturnResult.returnResult(false);
+            }
+        }
+        return ReturnResult.returnResult(true);
     }
 
     //我的方案转模板方案

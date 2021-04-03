@@ -24,8 +24,8 @@ public class TemplateServiceImpl extends ServiceImpl<TemplateDao, Template> impl
     private TemplateDao templateDao;
 
     @Override
-    public IPage<Template> findTemplateList(Page<Template> page) {
-        return templateDao.selectTemplatesPage(page);
+    public IPage<Template> findTemplateList(Page<Template> page, Template template) {
+        return templateDao.selectTemplatesPage(page, template);
     }
 
     @Override

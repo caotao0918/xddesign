@@ -8,6 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <link rel="stylesheet" href="../../../admin/layuiadmin/layui/css/layui.css" media="all">
   <link rel="stylesheet" href="../../../admin/layuiadmin/style/admin.css" media="all">
+  <script src="../../../../js/utils/getUrlParam.js"></script>
   <style type="text/css">
     .layui-table-cell {
       height: auto;
@@ -23,7 +24,7 @@
 <div class="layui-fluid">
   <div class="layui-card">
     <div class="layui-form layui-card-header layuiadmin-card-header-auto">
-      <div class="layui-form-item">
+      <div class="layui-form-item" id="searchpic">
         <div class="layui-inline">
           <label class="layui-form-label">产品名称</label>
           <div class="layui-input-block">
@@ -88,6 +89,12 @@
 
 <script src="../../layuiadmin/layui/layui.js"></script>
 <script>
+  var productId = null;
+  var productName = null;
+  if (UrlParam.hasParam("productId")) {
+    productId = UrlParam.param("productId");
+    productName = UrlParam.param("productName");
+  }
   layui.config({
     base: '../../../admin/layuiadmin/' //静态资源所在路径
   }).extend({
@@ -106,23 +113,27 @@
 
     $(function () {
 
-      $.ajax({
-        url:"/xddesign/admin/firstlevel/nopage"
-        ,type:"GET"
-        ,dataType:"json"
-        ,async: false
-        ,success:function(res) {
-          let select = $("select[name='firstId']");
-          select.empty();
-          let con = '<option value="0">全部</option>';
-          for (let i = 0; i < res.length; i++) {
-            con += '<option value='+'"'+res[i].firstId+'"'+'>'+res[i].firstName+'</option>';
+      if (UrlParam.hasParam("productId")) {
+        productId = UrlParam.param("productId");
+      }else{
+        $.ajax({
+          url:"/xddesign/admin/firstlevel/nopage"
+          ,type:"GET"
+          ,dataType:"json"
+          ,async: false
+          ,success:function(res) {
+            let select = $("select[name='firstId']");
+            select.empty();
+            let con = '<option value="0">全部</option>';
+            for (let i = 0; i < res.length; i++) {
+              con += '<option value='+'"'+res[i].firstId+'"'+'>'+res[i].firstName+'</option>';
+            }
+            select.html(con);
+            //这一步必不可少
+            form.render("select");
           }
-          select.html(con);
-          //这一步必不可少
-          form.render("select");
-        }
-      });
+        });
+      }
 
     });
     form.on('select(initsecondlevel)', function(data){
@@ -195,9 +206,17 @@
         layer.open({
           type: 2
           ,title: '添加产品图片'
-          ,content: 'addpicture.html'
+          ,content: 'addpicture.html?productId=' + productId + '&productName=' + productName
           ,maxmin: true
           ,area: ['960px', '800px']
+          , success: function (layero,index) {
+            // 获取子页面的iframe
+            let iframe = window['layui-layer-iframe' + index];
+            let $ = iframe.layui.$;
+            if (productId != null) {
+              $("#level").attr("hidden", true);
+            }
+          }
         });
       }
     };
