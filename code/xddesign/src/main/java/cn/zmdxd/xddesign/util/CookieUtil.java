@@ -249,6 +249,7 @@ public final class CookieUtil {
                     cookie.setValue(null);
                     cookie.setMaxAge(0);
                     cookie.setPath("/");
+                    cookie.setDomain(getDomainName(request));
                     response.addCookie(cookie);
                     return true;
                 }
