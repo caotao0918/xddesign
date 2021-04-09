@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>方案列表</title>
+    <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
+    <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
+
+    <script>
+        $(function () {
+            $("#menu").load("menu.html");
+            var cusName = window.localStorage.getItem("cusName");
+            var cusId = window.localStorage.getItem("cusId");
+            var houseId = window.location.search.split("=")[1];
+            $.get("/xddesign/public/customer/house/solutions", {
+                'houseId': houseId
+            }, function (data) {
+                var total = data.total;
+                var list = data.records;
+                for (var i = 0; i < total; i++) {
+                    var listtbody = $("<tr>");
+                    listtbody.append("<td>" + (i + 1) + "</td>");
+                    listtbody.append("<td>" + cusName + "</td>");
+                    listtbody.append("<td>" + list[i].soluName + "</td>");
+                    listtbody.append("<td>" + list[i].state + "</td>");
+                    listtbody.append("<td>" + list[i].addTime + "</td>");
+                    listtbody.append("<td><button type='button' class='btn btn-default btn-xs'onclick='showdesign(\"" + list[i].soluId + "\");'>方案</button><br><button type='button' class='btn btn-default btn-xs' onclick='showquote(\"" + list[i].soluId + "\");'>报表</button><br><button type='button' onclick='showrendering("+list[i].soluId+")' class='btn btn-default btn-xs'>效果图</button></td></tr>");
+                    $("tbody").append(listtbody);
+                }
+            }, "json");
+        });
+
+        function showrendering(soluId){
+            window.location.href = "showrendering.html?soluId=" + soluId;
+        }
+
+        function showquote(soluId) {
+            window.location.href = "showreport.html?soluId=" + soluId;
+        }
+
+        function showdesign(soluId) {
+            window.location.href = "showdesign.html?soluId=" + soluId;
+        }
+
+        function backpage() {
+            history.go(-1);
+        }
+    </script>
+
+    <style>
+        .back {
+            margin: 0 5px 5px 0;
+        }
+    </style>
+</head>
+<body>
+<div id="menu"></div>
+<span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
+                                                                         onclick="backpage()">返回</button>
+    <span>方案列表</span>
+</span>
+<table class="table table-bordered table-hover table-striped">
+    <thead>
+    <tr style="font-weight: bold">
+        <td></td>
+        <td>客户</td>
+        <td>地址</td>
+        <td>状态</td>
+        <td>时间</td>
+        <td>查看</td>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+</body>
+</html>

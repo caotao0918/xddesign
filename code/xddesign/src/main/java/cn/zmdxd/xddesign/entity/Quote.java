@@ -7,10 +7,9 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
-import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.*;
+
+
 
 /**
  * @author 曹涛
@@ -20,10 +19,10 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 @Data
 @ContentRowHeight(28)//内容行高
 @HeadRowHeight(28)//头行高
-@ContentFontStyle(fontHeightInPoints = 14, bold = true)//内容字体大小
-@HeadFontStyle(fontHeightInPoints = 18,bold = true)//头字体大小
-@HeadStyle(wrapped = false)
-@ContentStyle(horizontalAlignment = HorizontalAlignment.CENTER, verticalAlignment = VerticalAlignment.CENTER, borderTop = BorderStyle.MEDIUM,borderBottom = BorderStyle.MEDIUM,borderLeft = BorderStyle.MEDIUM,borderRight = BorderStyle.MEDIUM)
+//@HeadStyle(wrapped = false, fillPatternType = FillPatternType.SOLID_FOREGROUND, fillForegroundColor = 18, borderTop = BorderStyle.MEDIUM,borderBottom = BorderStyle.MEDIUM,borderLeft = BorderStyle.MEDIUM,borderRight = BorderStyle.MEDIUM)
+//@HeadFontStyle(fontHeightInPoints = 20, color = 9)//头字体大小
+//@ContentStyle(horizontalAlignment = HorizontalAlignment.CENTER, verticalAlignment = VerticalAlignment.CENTER, borderTop = BorderStyle.MEDIUM,borderBottom = BorderStyle.MEDIUM,borderLeft = BorderStyle.MEDIUM,borderRight = BorderStyle.MEDIUM)
+//@ContentFontStyle(fontHeightInPoints = 14, bold = true)//内容字体大小
 public class Quote {
 
     @TableId(value = "quote_id",type = IdType.AUTO)
@@ -34,28 +33,28 @@ public class Quote {
     private Integer soluId;//方案id
 
     @TableField(exist = false)
-    @ExcelProperty(value = {"智能家居方案报价表","序号"})
+//    @ExcelProperty(value = {"智能家居方案报价表","序号"})
     @ColumnWidth(10)
     private Integer id;//excel序号
 
-    @ExcelProperty(value = {"智能家居方案报价表","房间名称"})
+//    @ExcelProperty(value = {"智能家居方案报价表","房间名称"})
     @ColumnWidth(20)
     private String roomName;//房间名称
 
-    @ExcelProperty(value = {"智能家居方案报价表","产品名称"})
-    @ColumnWidth(32)
+//    @ExcelProperty(value = {"智能家居方案报价表","产品名称"})
+    @ColumnWidth(38)
     private String productName;//产品名称
 
-    @ExcelProperty(value = {"智能家居方案报价表","产品数量/个"})
+//    @ExcelProperty(value = {"智能家居方案报价表","产品数量/个"})
     @ColumnWidth(18)
     private Integer productNum;//产品数量
 
-    @ExcelProperty(value = {"智能家居方案报价表","产品单价/元"})
+//    @ExcelProperty(value = {"智能家居方案报价表","产品单价/元"})
     @ColumnWidth(18)
     private Double price;//产品价格
 
     @TableField(exist = false)
-    @ExcelProperty(value = {"智能家居方案报价表","合计/元"})
+//    @ExcelProperty(value = {"智能家居方案报价表","合计/元"})
     @ColumnWidth(18)
     private Double totalPrice;//单个产品合计价格
 

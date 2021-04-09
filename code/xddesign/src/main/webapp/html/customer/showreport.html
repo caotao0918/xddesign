@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>方案报价表</title>
+    <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
+    <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
+    <script>
+        soluId = window.location.search.split("=")[1];
+        $(function () {
+            $("#menu").load("menu.html");
+
+            $.get("/xddesign/public/customer/quotes", {"soluId": soluId}, function (data) {
+                var totalnum = 0;
+                var totalprice = 0
+                for (var i = 0; i < data.length; i++) {
+                    var content = $("<tr><td>" + (i + 1) + "</td>");
+                    content.append("<td>" + data[i].roomName + "</td>");
+                    content.append("<td>" + data[i].productName + "</td>");
+                    content.append("<td>" + data[i].productNum + "</td>");
+                    content.append("<td>" + data[i].price + "</td>");
+                    content.append("<td>" + data[i].totalPrice + "</td></tr>");
+                    totalnum += data[i].productNum;
+                    totalprice += data[i].totalPrice;
+                    $("tbody").append(content);
+                }
+                $("tbody").append("<tr style='font-weight: bold'><td>总计</td ><td colspan='2'></td><td>" + totalnum + "</td><td></td><td>" + totalprice + "</td></tr>");
+            }, "json");
+        });
+
+        function toexcel() {
+            window.location.href = "/xddesign/public/customer/quote/toexcel?soluId=" + soluId;
+        }
+
+        function backpage() {
+            history.go(-1);
+        }
+    </script>
+
+    <style>
+        .back {
+            margin: 0 5px 5px 0;
+        }
+    </style>
+</head>
+<body>
+<div id="menu"></div>
+<span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
+                                                                         onclick="backpage()">返回</button>
+<span>方案报价表</span>
+</span>
+<div style="width: 90%;margin: 0 auto;">
+    <table class="table table-bordered">
+        <thead>
+        <tr style="font-weight: bold">
+            <td>序号</td>
+            <td>房间名</td>
+            <td>产品</td>
+            <td>数量</td>
+            <td>单价</td>
+            <td>总价</td>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <button type="button" class="btn btn-default" style="float: right" onclick="toexcel()">下载报表</button>
+</div>
+
+</body>
+</html>

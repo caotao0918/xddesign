@@ -33,6 +33,7 @@
             <mvc:exclude-mapping path="/customer/login" />
             <mvc:exclude-mapping path="/user/login" />
             <mvc:exclude-mapping path="/html/customer/goodslist.html" />
+            <mvc:exclude-mapping path="/html/customer/productlist.html" />
             <mvc:exclude-mapping path="/public/products" />
             <mvc:exclude-mapping path="/html/customer/showprod.html" />
             <mvc:exclude-mapping path="/public/product" />

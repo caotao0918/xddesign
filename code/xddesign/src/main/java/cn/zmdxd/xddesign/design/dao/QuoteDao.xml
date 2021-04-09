@@ -23,4 +23,14 @@
         </where>
     </select>
 
+    <select id="selectQuoteInfo" resultType="QuoteVo">
+        select cus.username as cusName, cus.mobile as cusMobile, solu.quote_num, solu.add_time, solu.solu_desc as descr, design.mobile as designMobile, design.username as designName
+        from t_customer cus, t_solutions solu, t_user design, t_house house
+        where cus.design_id=design.id
+          and cus.id = house.customer_id
+          and house.house_id=solu.house_id
+          and design.id=solu.designer_id
+          and solu.solu_id=#{soluId}
+    </select>
+
 </mapper>

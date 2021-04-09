@@ -44,16 +44,21 @@ public class MyWriteHandler implements CellWriteHandler {
     @Override
     public void afterCellDispose(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, List<CellData> list, Cell cell, Head head, Integer integer, Boolean aBoolean) {
 
-        Workbook workbook = writeSheetHolder.getSheet().getWorkbook();
+        Sheet sheet = writeSheetHolder.getSheet();
+        Workbook workbook = sheet.getWorkbook();
 
         //内容策略
         WriteCellStyle contentWriteCellStyle = new WriteCellStyle();
         //设置内容字体
         WriteFont contentWriteFont = new WriteFont();
-        contentWriteFont.setBold(true);
-        contentWriteFont.setFontHeightInPoints((short)14);
-        if (cell.getColumnIndex() == 5)
-            contentWriteFont.setColor(IndexedColors.RED.getIndex());
+        contentWriteFont.setBold(true);// 设置内容字体加粗
+        contentWriteFont.setFontHeightInPoints((short)14);// 设置内容字体大小
+        if (cell.getRowIndex() == 13) {
+            contentWriteCellStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex()); //设置内容背景颜色
+            contentWriteCellStyle.setFillPatternType(FillPatternType.SOLID_FOREGROUND);
+            contentWriteFont.setColor(IndexedColors.WHITE.getIndex());// 设置内容字体颜色
+        }
+
         contentWriteCellStyle.setWriteFont(contentWriteFont);
         //设置 水平居中
         contentWriteCellStyle.setHorizontalAlignment(HorizontalAlignment.CENTER);
@@ -65,7 +70,6 @@ public class MyWriteHandler implements CellWriteHandler {
         contentWriteCellStyle.setBorderTop(MEDIUM);
 
         CellStyle cellStyle = StyleUtil.buildContentCellStyle(workbook, contentWriteCellStyle);
-
         cell.setCellStyle(cellStyle);
 
     }

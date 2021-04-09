@@ -27,7 +27,8 @@
     </resultMap>
 
     <insert id="insertSolutions" parameterType="Solutions" useGeneratedKeys="true" keyProperty="soluId" keyColumn="solu_id">
-        insert into t_solutions(solu_name, designer_id, state, solu_desc, house_id,solu_reserve1,solu_reserve2,solu_reserve3) VALUES (#{soluName},#{design.id},#{state},#{soluDesc},#{houseId},#{soluReserve1},#{soluReserve2},#{soluReserve3})
+        insert into t_solutions(solu_name, designer_id, state, solu_desc, house_id, quote_num, solu_reserve1,solu_reserve2,solu_reserve3)
+         VALUES (#{soluName},#{design.id},#{state},#{soluDesc},#{houseId},#{quoteNum},#{soluReserve1},#{soluReserve2},#{soluReserve3})
     </insert>
 
     <select id="selectSolutionsList" resultMap="SolutionsAndRoom">

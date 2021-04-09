@@ -72,7 +72,7 @@ $(function(){
     }
 
     $('#div_downquote').click(function() {
-        window.location.href = "/xddesign/public/customer/quote/toexcel?soluId=" + soluId;
+        window.location.href = "/xddesign/public/quote/test?soluId=" + soluId;
     })
     $('#img_back').click(function() {
         history.go(-1);

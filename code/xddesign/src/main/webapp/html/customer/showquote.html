@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>方案报价表</title>
+    <meta charset="UTF-8">
+    <title>方案报价表</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
-  <!-- we code these -->
-    <link rel="stylesheet" type="text/css" href="../../css/cus/showquote.css" />
-    <link rel="stylesheet" href="../../cmn/layui/css/layui.css"  media="all">
-    <script charset="utf-8" src="../../cmn/layui/layui.js" ></script>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <!-- we code these -->
+    <link rel="stylesheet" type="text/css" href="../../css/cus/showquote.css"/>
+    <link rel="stylesheet" href="../../cmn/layui/css/layui.css" media="all">
+    <script charset="utf-8" src="../../cmn/layui/layui.js"></script>
     <script type="text/javascript" src="../../cmn/jquery/jquery-1.8.3.js"></script>
     <script type="text/javascript" src="../../js/utils/getUrlParam.js"></script>
     <script type="text/javascript" src="../../js/cus/showquote.js"></script>
@@ -17,13 +18,17 @@
 </head>
 <body>
 <ul class="layui-nav" style="z-index: 1998">
-    <li class="layui-nav-item"><img alt="logo" src="../../img/logo.png" height="40px" width="50px" /></li>
-    <li class="layui-nav-item"><a href="main.html" style="font-size: 17px">迅达智能家居设计系统-客户</a></li>
-    <li class="layui-nav-item layui-col-md-offset2"><a href="myhouselist.html">我的家庭</a></li>
-    <li class="layui-nav-item"><a href="goodslist.html">产品中心</a></li>
-    <li class="layui-nav-item"><a href="aftersalecnt.html">售后支持</a></li>
-    <li class="layui-nav-item layui-col-md-offset2">欢迎尊贵的客户：</li>
-    <li class="layui-nav-item">
+    <li class="layui-nav-item layui-col-xs12 layui-col-sm6 layui-col-md4"><a href="main.html"
+                                                                             style="font-size: 17px"><img alt="logo"
+                                                                                                          src="../../img/logo.png"
+                                                                                                          height="40px"
+                                                                                                          width="50px"/>迅达智能家居设计系统-客户</a>
+    </li>
+    <li class="layui-nav-item  layui-col-xs12 layui-col-sm6 layui-col-md2"><a
+            href="myhouselist.html">我的家庭</a></li>
+    <li class="layui-nav-item layui-col-xs12 layui-col-sm6 layui-col-md2"><a href="goodslist.html">产品中心</a></li>
+    <li class="layui-nav-item layui-col-xs12 layui-col-sm6 layui-col-md2"><a href="aftersalecnt.html">售后支持</a></li>
+    <li class="layui-nav-item layui-col-md-offset1">
         <a id="me" href="javascript:">我</a>
         <dl class="layui-nav-child"> <!-- 二级菜单 -->
             <dd><a href="password.html">修改密码</a></dd>
@@ -38,20 +43,20 @@
         $("#me").html(window.localStorage.getItem("cusName") + "<span class='layui-nav-more'></span>");
     });
 </script>
-<div class = "div_quotepage">
+<div class="div_quotepage">
     <div>
-      <img id = "img_back" class = "img_back" src="../../img/back.svg"/>
+        <img id="img_back" class="img_back" src="../../img/back.svg"/>
     </div>
-    <div id = "div_quotetitle" class = "div_quotetitle"></div>
+    <div id="div_quotetitle" class="div_quotetitle"></div>
     <div>
-      <table id = "t_quote" class = "t_quote">
-        <thead></thead>
-        <tbody></tbody>
-        <tfoot></tfoot>
-      </table>
+        <table id="t_quote" class="t_quote">
+            <thead></thead>
+            <tbody></tbody>
+            <tfoot></tfoot>
+        </table>
     </div>
 
-    <div id = "div_downquote" class = "div_downquote">
+    <div id="div_downquote" class="div_downquote">
     </div>
 </div>
 </body>

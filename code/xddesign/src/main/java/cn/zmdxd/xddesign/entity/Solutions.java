@@ -43,6 +43,9 @@ public class Solutions {
     @TableField(exist = false)
     private String customerName;// 客户姓名
 
+    @TableField(exist = false)
+    private String quoteNum;// 报价单号
+
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Timestamp getAddTime() {
         return addTime;

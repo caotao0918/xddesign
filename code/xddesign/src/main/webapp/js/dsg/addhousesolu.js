@@ -81,7 +81,7 @@ $(function(){
                 dataType:"json",
                 type:"POST",
                 success:function(res) {
-                    lightbox_tip(res.msg);
+                    self.location=document.referrer;
                 },
                 error: function () {
                     lightbox_tip('出错啦');

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.thymeleaf.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
@@ -39,6 +40,8 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
     private TemplateDao templateDao;
     @Autowired
     private RenderingsDao renderingsDao;
+    @Autowired
+    private HouseDao houseDao;
 
     @Override
     public IPage<Solutions> findSolutionsList(Page<Solutions> page, Solutions solutions) {
@@ -103,6 +106,15 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
         solutions.setDesign(design);
         solutions.setState(SolutionsStateEnum.DESIGNING.getMsg());
         solutions.setAddTime(Timestamp.valueOf(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
+        Integer customerId = houseDao.selectById(solutions.getHouseId()).getCustomerId();
+
+        // 拼接报价单号
+        String num1 = String.format("%04d", designId);
+        String num2 = String.format("%04d", customerId);
+        String num3 = Timestamp.valueOf(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())).toString();
+        num3 = StringUtils.substringBefore(num3, ".").replaceAll("[[\\s-:punct:]]","");
+        solutions.setQuoteNum(num1 + num2 + num3);
+
         int saveSolutions =  solutionsDao.insertSolutions(solutions);//将方案基本信息插入t_solutions
 
         //将更新后的方案id同步更新到模板方案表里

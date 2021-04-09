@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>效果图</title>
+    <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
+    <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
+
+    <script>
+        $(function () {
+            $("#menu").load("menu.html");
+
+
+            var soluId = window.location.search.split("=")[1];
+            // alert(soluId);
+
+            $("#rid").html("soluId："+soluId);
+        });
+
+        function backpage() {
+            history.go(-1);
+        }
+    </script>
+
+    <style>
+        .back {
+            margin: 0 5px 5px 0;
+        }
+    </style>
+</head>
+<body>
+<div id="menu"></div>
+<span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
+                                                                         onclick="backpage()">返回</button>
+    <span>效果图</span>
+</span>
+<div>
+    <img src="/xddesign/img/cusloginlogo.png"></div><span style="font-size: 50px" id="rid"></span>
+</body>
+</html>

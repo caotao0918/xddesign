@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>我的住宅</title>
+    <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
+    <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
+
+    <script>
+        $(function () {
+            $("#menu").load("menu.html");
+            $.get("/xddesign/public/customer", function (data) {
+                myHouseList = data.houseList;
+                for (var i = 0; i < myHouseList.length; i++) {
+                    var house = $("<div class='alert alert-success' role='alert' style='height: 200px'>");
+                    // house.attr("id", myHouseList[i].houseId);
+                    house.append("<p class='pname'><b>住宅名称</b></p>");
+                    house.append("<p class='pval'>" + myHouseList[i].houseName + "</p>");
+                    house.append("<p class='pname'><b>户型</b></p>");
+                    house.append("<p class='pval'>" + myHouseList[i].houseType.typeName + "</p>");
+                    house.append("<p class='pname'><b>地址</b></p>");
+                    house.append("<p class='pval'>" + myHouseList[i].houseAddress + "</p>");//myHouseList[i].houseId
+                    house.append("<p class='pbtn'><button type='button' class='btn btn-success' onclick='housedesign(" + myHouseList[i].houseId + ");'>查看</button></p>");
+                    house.append("</div>");
+
+                    var houseblock = $("<div class='col-xs-12 col-sm-6 col-md-6 col-lg-3'></div>");
+                    houseblock.append(house);
+                    $("#houselist").append(houseblock);
+                }
+            });
+
+        });
+
+        function housedesign(id, name) {
+            window.location.href = "designlist.html?houseId=" + id;
+        }
+    </script>
+    <style>
+        .houseinfo {
+            height: 150px;
+            background-color: gray;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            height: 100%;
+        }
+
+        p {
+            padding-top: 10px;
+        }
+
+        .pname {
+            display: inline-block;
+            width: 30%;
+            font-size: 12px;
+        }
+
+        .pval {
+            display: inline-block;
+            width: 65%;
+            font-size: 15px;
+        }
+
+        .pbtn {
+            text-align: right;
+        }
+
+    </style>
+</head>
+<body>
+<div id="menu"></div>
+<span style="font-weight: bold;margin-left: 5%;font-size: 30px;">我的住宅</span>
+<div class="container-fluid">
+    <div class="row" id="houselist">
+    </div>
+</div>
+</body>
+</html>
