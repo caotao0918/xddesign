@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>产品中心</title>
+    <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/xddesign/css/xddesign.css" rel="stylesheet">
+    <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
+    <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
+    <script src="/xddesign/js/xddesign.js"></script>
+
+    <script>
+        var url = "/xddesign/public/products";
+        var pagesize = 6;
+        var kw = "";
+
+        $(function () {
+            loadmenu();
+
+            getpages(1, pagesize, kw);
+
+            $("#kw").bind("input propertychange", function () {
+                kw = $(this).val();
+            });
+
+            $("#pinfo").load("showproduct.html");
+
+
+        });
+
+        function getpages(current, size, kw) {
+            $(".pagination").empty();
+            $("#products").empty();
+
+            $.get(url, {current: current, size: size, productName: kw}, function (data) {
+                var list = data.records;
+                for (var i = 0; i < list.length; i++) {
+                    var pid = list[i].productId;
+                    $("#products").append("<div onclick='showproduct(" + pid + ")' class='col-xs-6 col-sm-4 col-md-4 col-lg-2 product'><img style='width: auto;height: 80%' src='" + list[i].pictureList[0].pictureLink + "' \><br><b>￥" + list[i].price + "</b><br>" + list[i].productName + "</div>");
+                }
+                pages = data.pages;
+
+                if (current != 1) {
+                    $(".pagination").append("<li><a href='javascript:void(0);' onclick='getpages(" + (current - 1) + ",pagesize,kw)' aria-label='Previous'><span aria-hidden='true'>&laquo;</span></a></li>");
+                }
+                for (var i = 1; i <= pages; i++) {
+                    if (i == current) {
+                        $(".pagination").append("<li class='active'><a href='javascript:void(0);' onclick='getpages(" + i + ",pagesize,kw)'>" + i + "</a></li>");
+                    } else {
+                        $(".pagination").append("<li><a href='javascript:void(0);' onclick='getpages(" + i + ",pagesize,kw)'>" + i + "</a></li>");
+                    }
+                }
+                if (current < pages) {
+                    $(".pagination").append("<li><a href='javascript:void(0);' onclick='getpages(" + (current + 1) + ",pagesize,kw)' aria-label='Previous'><span aria-hidden='true'>&raquo;</span></a></li>");
+                }
+            }, "json");
+        }
+
+    </script>
+
+    <style>
+
+    </style>
+
+</head>
+<body>
+
+<div id="menu"></div>
+
+<span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
+                                                                         onclick="backpage()">返回</button>
+    <span>产品中心</span>
+</span>
+
+<div style="text-align: center;margin-top: 30px">
+    <input type="text" class="form-control" style="display: inline;width: 70%;" placeholder="请输入产品名称" id="kw">
+    <button type="button" class="btn btn-default" style="margin-bottom: 3px" onclick="getpages(1,pagesize,kw)">搜索
+    </button>
+</div>
+
+<div class="container-fluid" id="products" style="padding-left: 5px;padding-right: 5px"></div>
+
+<div style="text-align: center;margin-top: 100px;clear: both;margin-top: 10px;">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+        </ul>
+    </nav>
+</div>
+
+<div id="pinfo">
+</div>
+
+</body>
+
+
+</html>

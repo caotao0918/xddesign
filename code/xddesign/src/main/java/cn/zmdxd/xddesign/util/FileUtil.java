@@ -1,14 +1,14 @@
 package cn.zmdxd.xddesign.util;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * @author 曹涛
+ */
 public class FileUtil {
 
     private FileUtil() {
@@ -48,10 +48,12 @@ public class FileUtil {
         } catch (IOException e) {
             throw new RuntimeException("上传文件异常，请稍后重试");
         }
-        return destination.substring(uploadPath.length()) + File.separator + substring + filename;
+        return destination.substring(uploadPath.length()) + "/" + substring + filename;
     }
 
-    // 获取文件头信息
+    /**
+     * @description: 获取文件头信息
+     */
     public static FileType getFileType(InputStream is) throws IOException {
         byte[] src = new byte[28];
         is.read(src, 0, 28);

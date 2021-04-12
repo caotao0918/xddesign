@@ -5,13 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>方案</title>
     <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/xddesign/css/xddesign.css" rel="stylesheet">
     <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
     <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
+    <script src="/xddesign/js/xddesign.js"></script>
 
     <script>
-        soluId = window.location.search.split("=")[1];
+        var soluId = window.location.search.split("=")[1];
         $(function () {
-            $("#menu").load("menu.html");
+            $("#pinfo").load("/xddesign/html/showproduct.html");
 
             $.get("/xddesign/public/customer/solution", {"soluId": soluId}, function (data) {
                 $("#dname").html(data.soluName);
@@ -21,6 +23,8 @@
                 }
                 showproducts();
             }, "json");
+
+            loadmenu();
         });
 
         function showproducts(obj, id) {
@@ -59,28 +63,12 @@
             }
         }
 
-        function backpage() {
-            history.go(-1);
-        }
 
-        function showproduct(id) {
-            location.href = "showproduct.html?pid=" + id;
-        }
     </script>
 
     <style>
-        .back {
-            margin: 0 5px 5px 0;
-        }
-
         .show {
             margin-top: 30px;
-        }
-
-        .product {
-            text-align: center;
-            height: 175px;
-            margin-top: 10px;
         }
     </style>
 </head>
@@ -98,5 +86,9 @@
 </div>
 <div class="container-fluid" id="products" style="height: 100px;">
 </div>
+
+<div id="pinfo">
+</div>
+
 </body>
 </html>

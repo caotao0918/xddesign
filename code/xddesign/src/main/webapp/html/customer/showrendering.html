@@ -5,30 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>效果图</title>
     <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/xddesign/css/xddesign.css" rel="stylesheet">
     <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
     <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
+    <script src="/xddesign/js/xddesign.js"></script>
 
     <script>
         $(function () {
-            $("#menu").load("menu.html");
-
-
+            loadmenu();
             var soluId = window.location.search.split("=")[1];
-            // alert(soluId);
 
-            $("#rid").html("soluId："+soluId);
+            $("#rid").html("soluId：" + soluId);
+
+            $.get("/xddesign/public/customer/renderings", {"soluId": soluId}, function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    var picpath = data[i].rendPath;
+                    // picpath = "/xddesign/img/cusloginlogo.png";
+                    $("#rndpics").append("<img src='" + picpath + "'>");
+                    $("#rndpics").append("名称：" + data[i].rendName + "<br>");
+                    $("#rndpics").append("描述：" + data[i].rendDesc);
+                }
+            }, "json");
         });
 
-        function backpage() {
-            history.go(-1);
-        }
     </script>
 
-    <style>
-        .back {
-            margin: 0 5px 5px 0;
-        }
-    </style>
 </head>
 <body>
 <div id="menu"></div>
@@ -36,7 +37,8 @@
                                                                          onclick="backpage()">返回</button>
     <span>效果图</span>
 </span>
-<div>
-    <img src="/xddesign/img/cusloginlogo.png"></div><span style="font-size: 50px" id="rid"></span>
+<br><span style="font-size: 40px" id="rid"></span>
+<div style="text-align: center" id="rndpics">
+</div>
 </body>
 </html>

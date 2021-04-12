@@ -88,9 +88,13 @@ public class AdminController {
         //id存在，则为修改，否则新增
         if (role.getId() == null) {
             Role one = roleService.getOne(new QueryWrapper<Role>().eq("name", role.getName()), true);
-            if (one != null) return ReturnResult.returnResult(false);
+            if (one != null) {
+                return ReturnResult.returnResult(false);
+            }
         }else {
-            if (!roleService.getById(role.getId()).getName().equals(role.getName())) return ReturnResult.returnResult(false);
+            if (!roleService.getById(role.getId()).getName().equals(role.getName())) {
+                return ReturnResult.returnResult(false);
+            }
         }
         boolean saveOrUpdate = roleService.saveOrUpdate(role);
         return ReturnResult.returnResult(saveOrUpdate);
@@ -100,7 +104,9 @@ public class AdminController {
     @RequestMapping(value = "roles")
     public IPage<Role> findRoles(@RequestParam(defaultValue = "0")Integer id, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
         Page<Role> page = new Page<>(current,size);
-        if (id == 0) return roleService.page(page);
+        if (id == 0) {
+            return roleService.page(page);
+        }
         return roleService.page(page,new QueryWrapper<Role>().eq("id", id));
     }
 
@@ -177,7 +183,9 @@ public class AdminController {
                 return ReturnResult.returnResult(false, "其中一些用户不能删除");
             }
             boolean update = userService.update(new UpdateWrapper<User>().eq("id", user.getId()).set("del_sign", true));
-            if (!update) return ReturnResult.returnResult(false);
+            if (!update) {
+                return ReturnResult.returnResult(false);
+            }
         }
         return ReturnResult.returnResult(true);
     }
@@ -185,7 +193,9 @@ public class AdminController {
     @RequestMapping(value = "user/del", method = RequestMethod.POST)
     public ReturnResult delUser(@RequestBody User user) {
         List<Customer> customerList = customerService.list(new QueryWrapper<Customer>().eq("design_id", user.getId()));
-        if (!customerList.isEmpty()) return ReturnResult.returnResult(false, "不能删除此设计人员");
+        if (!customerList.isEmpty()) {
+            return ReturnResult.returnResult(false, "不能删除此设计人员");
+        }
         boolean update = userService.update(new UpdateWrapper<User>().eq("id", user.getId()).set("del_sign", true));
         return ReturnResult.returnResult(update);
     }
@@ -744,8 +754,12 @@ public class AdminController {
                 picture.setPictureName(productVo.getProductName());
                 picture.setPictureLink(pictureLink);
                 picture.setPictureDesc(pictureDesc);
-                if (picture1 == null) picture.setDefaultPicture(i == 0);//默认将第一张图片设置为默认图片
-                else picture.setDefaultPicture(false);//已经有默认图片则不设置
+                if (picture1 == null) {
+                    // 默认将第一张图片设置为默认图片
+                    picture.setDefaultPicture(i == 0);
+                } else {
+                    picture.setDefaultPicture(false);//已经有默认图片则不设置
+                }
                 boolean state = pictureService.savePicture(picture, productVo.getProductId());//将图片信息保存到t_picture表中
                 if(!state) {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚

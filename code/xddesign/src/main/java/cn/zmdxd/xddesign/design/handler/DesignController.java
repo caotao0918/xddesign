@@ -231,8 +231,11 @@ public class DesignController {
         Page<House> page = new Page<>(current, size);
         Customer customer = house.getCustomer();
         if (customer != null) {
-            if (customer.getUsername().trim().equals("")) house.setCustomer(null);
-            else customer.setUsername(customer.getUsername().trim());
+            if (customer.getUsername().trim().equals("")) {
+                house.setCustomer(null);
+            } else {
+                customer.setUsername(customer.getUsername().trim());
+            }
         }
 //        if ("设计人员".equals(CookieUtil.getCookieValue(request, "roleName", "utf-8"))) {
 //

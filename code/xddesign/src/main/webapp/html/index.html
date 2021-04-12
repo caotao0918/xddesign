@@ -9,85 +9,39 @@
           content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <link rel="stylesheet" href="/xddesign/html/admin/layuiadmin/layui/css/layui.css" media="all">
     <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/xddesign/css/xddesign.css" rel="stylesheet">
     <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
     <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
+    <script src="/xddesign/js/xddesign.js"></script>
 
 </head>
 <body>
 
 <div>
-
-    <nav class="navbar navbar-inverse">
-
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="javascript:void(0);"><img alt="Brand" src="/xddesign/img/logo.png"
-                                                                        id="logo"
-                                                                        style="width: 40px;display: inline">迅达智能家居</a>
-            </div>
-
-
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
-                    <li><a href="http://zmdxd.cn/gwAction_toIntroduce1.action">公司简介</a></li>
-                    <li><a href="/xddesign/html/customer/productlist.html">产品中心</a></li>
-                    <li><a href="/xddesign/html/customer/aftersalecnt.html">售后支持</a></li>
-                    <li><a href="http://zmdxd.cn/gwAction_toIntroduce4.action">联系我们</a></li>
-                    <li><a href="http://zmdxd.cn">官网首页</a></li>
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    <form class="navbar-form navbar-left">
-                        <a href="/xddesign/html/login/cuslgi.html" class="btn btn-success btn-default">客户登录</a>
-                        <a href="/xddesign/html/login/userlogin.html" class="btn btn-success btn-default">设计人员登录</a>
-                    </form>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <!--<ul class="layui-nav" style="z-index: 1998">
-        <li class="layui-nav-item"><img alt="logo" src="/xddesign/img/logo.png" height="40px" width="50px"/></li>
-        <li class="layui-nav-item"><a href="/xddesign/html/index.html" style="font-size: 17px">迅达智能家居</a></li>
-        <li class="layui-nav-item layui-col-md-offset0"><a href="http://zmdxd.cn/gwAction_toIntroduce1.action">公司简介</a>
-        </li>
-        <li class="layui-nav-item"><a href="/xddesign/html/customer/productlist.html">产品中心</a></li>
-        <li class="layui-nav-item"><a href="/xddesign/html/customer/aftersalecnt.html">售后支持</a></li>
-        <li class="layui-nav-item"><a href="http://zmdxd.cn/gwAction_toIntroduce4.action">联系我们</a></li>
-        <li class="layui-nav-item"><a href="http://zmdxd.cn">官网首页</a></li>
-        <li class="layui-nav-item layui-col-md-offset3"><a href="/xddesign/html/login/cuslgi.html"
-                                                           style="background-color: orange; line-height: 30px; display: block;text-align: center;border-radius:10px">客户登录</a>
-        </li>
-        <li class="layui-nav-item"><a href="/xddesign/html/login/userlogin.html"
-                                      style="margin-left: 10px;background-color: orange; line-height: 30px; display: block;text-align: center;border-radius:10px">设计员登录</a>
-        </li>
-    </ul>-->
+    <div id="menu"></div>
 </div>
-<div class="layui-carousel" id="lunbo">
+<div class="layui-carousel" id="lunbo" style="height: 100%">
     <div carousel-item>
-        <div><img src="/xddesign/img/carousel/carousel01.png" width="100%" alt="轮播图"/></div>
-        <div><img src="/xddesign/img/carousel/carousel02.png" width="100%" alt="轮播图"/></div>
-        <div><img src="/xddesign/img/carousel/carousel03.png" width="100%" alt="轮播图"/></div>
-        <div><img src="/xddesign/img/carousel/carousel04.png" width="100%" alt="轮播图"/></div>
+        <div><img src="/xddesign/img/carousel/carousel01.png" alt="轮播图"/></div>
+        <div><img src="/xddesign/img/carousel/carousel02.png" alt="轮播图"/></div>
+        <div><img src="/xddesign/img/carousel/carousel03.png" alt="轮播图"/></div>
+        <div><img src="/xddesign/img/carousel/carousel04.png" alt="轮播图"/></div>
     </div>
 </div>
 <!-- 条目中可以是任意内容，如：<img src=""> -->
 
 <script src="/xddesign/html/admin/layuiadmin/layui/layui.js"></script>
 <script>
+    $(function () {
+        loadmenu();
+    });
     layui.use('carousel', function () {
         var carousel = layui.carousel;
         //建造实例
         carousel.render({
             elem: '#lunbo'
             , width: '100%' //设置容器宽度
-            , height: '800px'
+            , height: '600px'
             , arrow: 'always' //始终显示箭头
             //,anim: 'updown' //切换动画方式
         });

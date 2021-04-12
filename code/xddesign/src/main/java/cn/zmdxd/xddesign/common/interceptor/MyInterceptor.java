@@ -29,10 +29,10 @@ public class MyInterceptor implements HandlerInterceptor {
                     //告诉ajax我是重定向
                     response.setHeader("REDIRECT", "REDIRECT");
                     //告诉ajax我重定向的路径
-                    response.setHeader("CONTENTPATH", "/xddesign/html/login/cuslogin.html");
+                    response.setHeader("CONTENTPATH", "/xddesign/html/login/cuslgi.html");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 } else {
-                    response.sendRedirect("/xddesign/html/login/cuslogin.html");
+                    response.sendRedirect("/xddesign/html/login/cuslgi.html");
                 }
                 return false;
             }

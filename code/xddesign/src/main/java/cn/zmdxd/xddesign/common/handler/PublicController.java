@@ -84,12 +84,17 @@ public class PublicController {
     // 售后中心-常见问题
     @RequestMapping(value = "questions")
     public List<Question> findQuestionList(Integer productId) {
+        if (productId == null) {
+            return questionService.list();
+        }
         return questionService.list(new QueryWrapper<Question>().eq("product_id", productId));
     }
     // 售后中心-安装视频
     @RequestMapping(value = "video")
     public List<Video> findVideo(Integer productId) {
-        if (productId != null) return videoService.list(new QueryWrapper<Video>().eq("product_id", productId));
+        if (productId != null) {
+            return videoService.list(new QueryWrapper<Video>().eq("product_id", productId));
+        }
         return videoService.list();
     }
     //售后中心-产品手册
@@ -131,8 +136,9 @@ public class PublicController {
 //            response.addHeader("Content-Disposition","attachment;filename=" + new String(filename.getBytes("utf-8"),"ISO8859-1")); //文件名解决中文乱码
         }
         OutputStream out = response.getOutputStream();
-        while ((len = br.read(buf)) > 0)
+        while ((len = br.read(buf)) > 0) {
             out.write(buf, 0, len);
+        }
         br.close();
         out.close();
     }

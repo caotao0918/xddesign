@@ -3,24 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!--    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">-->
-
     <title>客户登录</title>
-
     <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
     <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
     <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
+    <script src="/xddesign/js/xddesign.js"></script>
+    <script>
+        $(function () {
 
+            valnone();
 
+            $("#uname,#pwd").bind("input propertychange", function () {
+                valnone();
+            });
+
+            $("#btn").click(function () {
+                if (!isphone($("#uname").val())) {
+                    setinfo("手机号格式不正确");
+                    return false;
+                }
+
+                var issuccess = false;
+                $.ajax({
+                    type: "POST",
+                    url: "/xddesign/customer/login",
+                    data: {
+                        'mobile': $('#uname').val(),
+                        'pwd': $('#pwd').val()
+                    },
+                    // 同步
+                    async: false,
+                    dataType: "json",
+                    beforeSend: function () {
+                    },
+                    complete: function () {
+                    },
+                    success: function (data) {
+                        if (data.status == 0) {
+                            setinfo(data.msg);
+                        } else {
+                            window.localStorage.setItem("cusName", data.data.username);
+                            window.localStorage.setItem("cusId", data.data.id);
+                            window.location.href = "../customer/houselist.html";
+                        }
+                    }
+                });
+                return issuccess;
+            });
+        });
+
+        function valnone() {
+            if ($("#uname").val() == "" || $("#pwd").val() == "") {
+                $("#btn").attr("disabled", true);
+            } else {
+                $("#btn").attr("disabled", false);
+            }
+        }
+
+        function setinfo(msg) {
+            if ($("#info").hide()) {
+                $("#info").show();
+            }
+            $("#info").html(msg);
+        }
+
+        function toxddesign() {
+            location.href = "../index.html";
+        }
+    </script>
 </head>
 <body>
+<div style="width: 350px;margin: 0 auto;">
+    <img src="/xddesign/img/cusloginlogo.png" style="width: 100%">
+</div>
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="text-align: center">
-            <img src="/xddesign/img/cusloginlogo.png" style="width: 50%">
-        </div>
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+
+        <div class="col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4 col-lg-4 col-lg-offset-4" >
             <form>
                 <div class="form-group">
                     <br>
@@ -34,77 +94,12 @@
                     <div class="alert alert-danger" role="alert" id="info" style="display: none"></div>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block" id="btn" disabled>登录</button>
+                <br><br>
+                <button type="button" onclick="toxddesign()" class="btn btn-default" style="width: 100%">迅达智能家居</button>
             </form>
         </div>
     </div>
 
 </div>
 </body>
-<script>
-    $(function () {
-
-        valnone();
-
-        $("#uname").bind("input propertychange", function () {
-            valnone();
-        });
-        $("#pwd").bind("input propertychange", function () {
-            valnone();
-        });
-
-        $("#btn").click(function () {
-            if (!isphone($("#uname").val())) {
-                setinfo("手机号格式不正确");
-                return false;
-            }
-
-            var issuccess = false;
-            $.ajax({
-                type: "POST",
-                url: "/xddesign/customer/login",
-                data: {
-                    'mobile': $('#uname').val(),
-                    'pwd': $('#pwd').val()
-                },
-                // 同步
-                async: false,
-                dataType: "json",
-                beforeSend: function () {
-                },
-                complete: function () {
-                },
-                success: function (data) {
-                    if (data.status == 0) {
-                        setinfo(data.msg);
-                    } else {
-                        window.localStorage.setItem("cusName", data.data.username);
-                        window.localStorage.setItem("cusId", data.data.id);
-                        window.location.href = "../customer/houselist.html";
-                    }
-                }
-            });
-            return issuccess;
-        });
-    });
-
-    function valnone() {
-        if ($("#uname").val() == "" || $("#pwd").val() == "") {
-            $("#btn").attr("disabled", true);
-        } else {
-            $("#btn").attr("disabled", false);
-        }
-    }
-
-    function setinfo(msg) {
-        if ($("#info").hide()) {
-            $("#info").show();
-        }
-        $("#info").html(msg);
-    }
-
-    function isphone(phone) {
-        var pattern = /^1[34578]\d{9}$/;
-        return pattern.test(phone);
-    }
-</script>
 </html>

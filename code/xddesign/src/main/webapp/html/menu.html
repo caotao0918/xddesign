@@ -1,0 +1,73 @@
+<script>
+    var cusname = null;
+    $(function () {
+        cusname = window.localStorage.getItem("cusName")
+        var content = "";
+        if (cusname != null) {
+            content += "<li><a href='/xddesign/html/customer/houselist.html'>我的住宅</a></li>";
+            $("#cusname").html(cusname);
+            $("#login").hide();
+        } else {
+            content += "<li><a href='http://zmdxd.cn'>官网首页</a></li>";
+            content += "<li><a href='http://zmdxd.cn/gwAction_toIntroduce1.action'>公司简介</a></li>";
+            content += "<li><a href='http://zmdxd.cn/gwAction_toIntroduce4.action'>联系我们</a></li>";
+            $("#uinfo").hide();
+        }
+        content += "<li><a href='/xddesign/html/productlist.html'>产品中心</a></li>";
+        content += "<li><a href='/xddesign/html/aftersale.html'>售后支持</a></li>";
+        $("#menuitem").append(content);
+    })
+
+    function cuslogout() {
+        $.ajax({
+            url: '/xddesign/customer/logout',
+            dataType: "json",
+            type: "POST",
+            success: function (res) {
+                if (1 == res.status) {
+                    window.localStorage.clear();
+                    location.href = '/xddesign/html/login/cuslgi.html';
+                } else {
+                    alert("退出失败,请重新登录");
+                }
+            }
+        });
+    }
+</script>
+
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="javascript:void(0);"><img alt="Brand" src="/xddesign/img/logo.png" id="logo"
+                                                                    style="width: 40px;display: inline">迅达智能家居</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav" id="menuitem">
+            </ul>
+            <ul class="nav navbar-nav navbar-right" id="uinfo">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><span id="cusname"></span><span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/xddesign/html/customer/editpassword.html">修改密码</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#" onclick="cuslogout()">退出</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right" id="login">
+                <form class="navbar-form navbar-left">
+                    <a href="/xddesign/html/login/cuslgi.html" class="btn btn-success btn-default">客户登录</a>
+                    <a href="/xddesign/html/login/userlogin.html" class="btn btn-success btn-default">设计人员登录</a>
+                </form>
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,23 @@
+img {
+    box-sizing: border-box;
+    border-width: 0px;
+    border-style: initial;
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin-right: auto;
+    margin-left: auto;
+    text-align: center;
+}
+
+.back {
+    margin: 0 5px 5px 0;
+}
+
+.product {
+    text-align: center;
+    height: 175px;
+    margin-top: 30px;
+    padding-left: 0px;
+    padding-right: 0px;
+}

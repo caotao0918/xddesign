@@ -5,14 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>方案列表</title>
     <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/xddesign/css/xddesign.css" rel="stylesheet">
     <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
     <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
+    <script src="/xddesign/js/xddesign.js"></script>
 
     <script>
         $(function () {
-            $("#menu").load("menu.html");
+            loadmenu();
             var cusName = window.localStorage.getItem("cusName");
-            var cusId = window.localStorage.getItem("cusId");
             var houseId = window.location.search.split("=")[1];
             $.get("/xddesign/public/customer/house/solutions", {
                 'houseId': houseId
@@ -44,16 +45,9 @@
             window.location.href = "showdesign.html?soluId=" + soluId;
         }
 
-        function backpage() {
-            history.go(-1);
-        }
+
     </script>
 
-    <style>
-        .back {
-            margin: 0 5px 5px 0;
-        }
-    </style>
 </head>
 <body>
 <div id="menu"></div>
