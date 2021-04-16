@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>效果图</title>
+    <link href="../../cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="../../css/xddesign.css" rel="stylesheet">
+    <script src="../../cmn/jquery/jquery-1.11.3.min.js"></script>
+    <script src="../../cmn/bootstrap/js/bootstrap.js"></script>
+    <script src="../../js/xddesign.js"></script>
+
+    <script>
+        $(function () {
+            loadmenu();
+            var soluId = window.location.search.split("=")[1];
+
+            $("#rid").html("soluId：" + soluId);
+
+            $.get("/xddesign/public/customer/renderings", {"soluId": soluId}, function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    var picpath = data[i].rendPath;
+                    // picpath = "/xddesign/img/cusloginlogo.png";
+                    $("#rndpics").append("<img src='" + picpath + "'>");
+                    $("#rndpics").append("名称：" + data[i].rendName + "<br>");
+                    $("#rndpics").append("描述：" + data[i].rendDesc);
+                }
+            }, "json");
+        });
+
+    </script>
+
+</head>
+<body>
+<div id="menu"></div>
+<span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
+                                                                         onclick="backpage()">返回</button>
+    <span>效果图</span>
+</span>
+<br><span style="font-size: 40px" id="rid"></span>
+<div style="text-align: center" id="rndpics">
+</div>
+</body>
+</html>

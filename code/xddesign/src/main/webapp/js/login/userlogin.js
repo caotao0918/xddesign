@@ -63,6 +63,7 @@ $(function(){
                         lightbox_tip(data.msg);
                         return false;
                     }else {
+                        window.localStorage.clear();
                         window.localStorage.setItem("username",data.data.username);
                         window.localStorage.setItem("userId",data.data.id);
                         let roleName = data.data.role.name;
@@ -74,6 +75,8 @@ $(function(){
                             window.location.href = "../dsg/main.html";
                         }else if (roleName === "管理员") {
                             window.location.href = "../admin/views/index.html";
+                        }else if (roleName === "施工人员") {
+                            window.location.href = "../worker/tasklist.html";
                         }else {
                             lightbox_tip("敬请期待");
                         }

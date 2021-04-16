@@ -52,7 +52,7 @@ public class LoginController {
         code.write(response.getOutputStream());
     }
 
-    //系统用户登录
+    // 系统用户登录
     @RequestMapping(value = "/user/login",method = RequestMethod.POST,produces = {"application/json;charset=UTF-8;"})
     @ResponseBody
     public EntityResult<User> login(String mobile, String password, String imgcode, HttpSession session, Model model, HttpServletRequest request,HttpServletResponse response) {
@@ -85,6 +85,9 @@ public class LoginController {
             }
             msg = "登陆成功";
             status = 1;
+
+            // 清空cookie
+            boolean removeCookie = CookieUtil.removeCookie(request, response, "customerId");
 
             //保存用户id、角色保存到cookie中
             CookieUtil.setCookie(request,response,"userId",user.getId().toString(),60*60*24*30);
@@ -151,6 +154,10 @@ public class LoginController {
                 customerResult.setMsg("密码错误");
                 return customerResult;
             }
+
+            // 清空cookie
+            CookieUtil.removeCookie(request, response, "userId");
+            CookieUtil.removeCookie(request, response, "roleName");
 
             //保存用户id到cookie中
             CookieUtil.setCookie(request,response,"customerId",customer.getId().toString(),60*60*24*30);

@@ -235,7 +235,7 @@ public final class CookieUtil {
     }
 
     /**
-     * 删除cookie
+     * 删除指定cookie
      */
     public static boolean removeCookie(HttpServletRequest request, HttpServletResponse response,
                                        String name) {

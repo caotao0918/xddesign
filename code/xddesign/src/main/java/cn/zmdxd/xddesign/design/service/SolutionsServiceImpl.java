@@ -4,6 +4,7 @@ import cn.zmdxd.xddesign.design.dao.*;
 import cn.zmdxd.xddesign.entity.*;
 import cn.zmdxd.xddesign.util.CookieUtil;
 import cn.zmdxd.xddesign.util.ReturnResult;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -81,16 +82,23 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
         ReturnResult result = new ReturnResult();
         Template template = null;
         Integer oldSoluId = null;
-        if (solutions.getSoluId() != null) {   //修改方案
+        String workName = null;
+        Timestamp workTime = null;
 
-            //删除方案之前要先得到该方案对应的模板方案信息
+        if (solutions.getSoluId() != null) {
+            // 修改方案
+
+            // 删除方案之前要先得到该方案对应的模板方案信息
             template = templateDao.selectTemplateBySoluId(solutions.getSoluId());
-            //得到方案id，以更新效果图t_renderings表
+            // 得到方案id，以更新效果图t_renderings表
             oldSoluId = solutions.getSoluId();
+            Solutions solu = solutionsDao.selectOne(new QueryWrapper<Solutions>().eq("solu_id", oldSoluId).select("work_name", "work_time"));
+            workName = solu.getWorkName();
+            workTime = solu.getWorkTime();
 
             /*
-            删除此id对应的方案
-            因为数据库中设置的级联删除，所以这个方案的房间信息、房间内的产品信息、方案对应的报价单信息也一并删除
+                删除此id对应的方案
+                因为数据库中设置的级联删除，所以这个方案的房间信息、房间内的产品信息、方案对应的报价单信息也一并删除
              */
             int removeById = solutionsDao.deleteById(solutions.getSoluId());
             if (removeById != 1) {
@@ -105,6 +113,8 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
         design.setId(designId);
         solutions.setDesign(design);
         solutions.setState(SolutionsStateEnum.DESIGNING.getMsg());
+        solutions.setWorkName(workName);
+        solutions.setWorkTime(workTime);
         solutions.setAddTime(Timestamp.valueOf(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
         Integer customerId = houseDao.selectById(solutions.getHouseId()).getCustomerId();
 
@@ -117,7 +127,7 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
 
         int saveSolutions =  solutionsDao.insertSolutions(solutions);//将方案基本信息插入t_solutions
 
-        //将更新后的方案id同步更新到模板方案表里
+        // 将更新后的方案id同步更新到模板方案表里
         if (template != null) {
             Map<String,Object> map = new HashMap<>();
             template.setSolutions(solutions);
@@ -133,7 +143,7 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
             }
         }
 
-        //将更新后的方案id同步更新到方案效果图表里
+        // 将更新后的方案id同步更新到方案效果图表里
         if (oldSoluId != null) {
             Renderings renderings = new Renderings();
             renderings.setSoluId(solutions.getSoluId());
@@ -141,7 +151,8 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
         }
 
         if (saveSolutions != 1) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+            // 事务回滚
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             result.setMsg("添加失败，请稍后重试");
             result.setStatus(0);
             return result;
@@ -151,28 +162,34 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
         int saveRoom,saveProductNum,saveQuote;
         for (Room room:roomList) {
             room.setSoluId(solutions.getSoluId());
-            saveRoom = roomDao.insertRoom(room);//将房间信息插入表t_room
+            // 将房间信息插入表t_room
+            saveRoom = roomDao.insertRoom(room);
             if (saveRoom != 1) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                // 事务回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 result.setMsg("添加失败，请稍后重试");
                 result.setStatus(0);
                 return result;
             }
             List<ProductNum> productNumList = room.getProductNumList();
-            productNumList = getProductNumList(productNumList);//list去除重复并统计产品数量
+            // list去除重复并统计产品数量
+            productNumList = getProductNumList(productNumList);
 
             for (ProductNum productNum:productNumList) {
                 productNum.setRoomId(room.getRoomId());
-                saveProductNum = productNumDao.insertProductNum(productNum);//将房间内的产品及数量插入表t_product_num
+                // 将房间内的产品及数量插入表t_product_num
+                saveProductNum = productNumDao.insertProductNum(productNum);
                 quote.setSoluId(solutions.getSoluId());
                 quote.setRoomId(room.getRoomId());
                 quote.setRoomName(room.getRoomName());
                 quote.setProductName(productNum.getProduct().getProductName());
                 quote.setProductNum(productNum.getPnNum());
                 quote.setPrice(productNum.getProduct().getPrice());
-                saveQuote = quoteDao.insert(quote);//将报价单保存到t_quote
+                // 将报价单保存到t_quote
+                saveQuote = quoteDao.insert(quote);
                 if (saveProductNum != 1 || saveQuote != 1) {
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                    // 事务回滚
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     result.setMsg("添加失败，请稍后重试");
                     result.setStatus(0);
                     return result;

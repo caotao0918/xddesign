@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zmdxd.xddesign.worker.dao.TaskDao">
+
+    <select id="selectUnfinishedTask" resultType="TaskVO">
+        select solu.solu_id, solu.solu_name, cus.username as cusName, cus.mobile as cusMobile
+             , house.house_address as address, design.username as designName, design.mobile as designMobile
+        from t_solutions solu, t_customer cus, t_user design, t_house house
+        where
+            solu.designer_id=design.id
+          and solu.house_id=house.house_id
+          and cus.design_id=design.id
+          and house.customer_id=cus.id
+          and solu.state='设计完毕'
+    </select>
+
+    <select id="selectFinishedTask" resultType="TaskVO">
+        select solu.solu_id, solu.solu_name, solu.work_name as workerName, solu.work_time, cus.username as cusName, cus.mobile as cusMobile
+             , house.house_address as address, design.username as designName, design.mobile as designMobile
+        from t_solutions solu, t_customer cus, t_user design, t_house house
+        where
+            solu.designer_id=design.id
+          and solu.house_id=house.house_id
+          and cus.design_id=design.id
+          and house.customer_id=cus.id
+          and solu.state='施工完毕'
+    </select>
+
+</mapper>

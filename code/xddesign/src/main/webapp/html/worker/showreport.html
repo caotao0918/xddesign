@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>方案报价表</title>
+    <link href="../../cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="../../css/xddesign.css" rel="stylesheet">
+    <script src="../../cmn/jquery/jquery-1.11.3.min.js"></script>
+    <script src="../../cmn/bootstrap/js/bootstrap.js"></script>
+    <script src="../../js/xddesign.js"></script>
+
+    <script>
+        soluId = window.location.search.split("=")[1];
+        $(function () {
+            loadmenu();
+
+            $.get("/xddesign/public/customer/quotes", {"soluId": soluId}, function (data) {
+                var totalnum = 0;
+                var totalprice = 0
+                for (var i = 0; i < data.length; i++) {
+                    var content = $("<tr><td>" + (i + 1) + "</td>");
+                    content.append("<td>" + data[i].roomName + "</td>");
+                    content.append("<td>" + data[i].productName + "</td>");
+                    content.append("<td>" + data[i].productNum + "</td>");
+                    content.append("<td>" + data[i].price + "</td>");
+                    content.append("<td>" + data[i].totalPrice + "</td></tr>");
+                    totalnum += data[i].productNum;
+                    totalprice += data[i].totalPrice;
+                    $("#tablelist").append(content);
+                }
+                $("#tablelist").append("<tr style='text-align: left' class='tablecss'><td colspan='5' style='text-align: center'>价格总计</td><td>" + totalprice + "</td></tr>");
+            }, "json");
+
+            $.get("/xddesign/public/customer/quotes/info", {"soluId": soluId}, function (data) {
+                $("#tableinfo").append("<tr><td colspan='4' style='border-right: 0px'>报价单号：" + data.quoteNum + "</td><td colspan='2' style='text-align: right;border-left: 0px'>日期：" + data.addTime.split(" ")[0] + "</td></tr>");
+                $("#tableinfo").append("<tr><td colspan='3' style='width: 50%'>设计师：" + data.designName + "</td><td colspan='3'>客户：" + data.cusName + "</td></tr>");
+                $("#tableinfo").append("<tr><td colspan='3'>联系方式：" + data.designMobile + "</td><td colspan='3'>联系方式：" + data.cusMobile + "</td></tr>");
+                $("#tableinfo").append("<tr><td colspan='6'>以下为智能家居方案产品明细，请详阅，如有疑问及时与设计师联系，谢谢</td></tr>");
+                $("#tablelist").append("<br>");
+                $("#tablelist").append("<tr><td style='line-height: 10px' colspan='6'>备注：</td></tr>");
+                $("#tablelist").append("<tr><td style='line-height: 10px' colspan='6'>" + data.descr + "</td></tr>");
+            }, "json");
+        });
+
+        function toexcel() {
+            window.location.href = "/xddesign/public/customer/quote/toexcel?soluId=" + soluId;
+        }
+    </script>
+
+    <style>
+        .tablecss {
+            font-weight: bold;
+            background-color: #2F4056;
+            color: white;
+            text-align: center;
+        }
+    </style>
+
+</head>
+<body>
+<div id="menu"></div>
+<span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
+                                                                         onclick="backpage()">返回</button>
+<span></span>
+</span>
+<div style="width: 100%;margin: 0 auto;">
+    <table class="table table-bordered" style="margin-bottom: 0px">
+        <thead>
+        <tr>
+            <td colspan="6" class="tablecss" style="font-size: 30px">智能家居方案报价单</td>
+        </tr>
+        </thead>
+        <tbody id="tableinfo">
+
+        </tbody>
+    </table>
+    <table class="table table-bordered">
+        <thead>
+        <tr style="font-weight: bold" class="tablecss">
+            <td>序号</td>
+            <td>房间名称</td>
+            <td>产品名称</td>
+            <td>产品数量/个</td>
+            <td>产品单价/元</td>
+            <td>合计/元</td>
+        </tr>
+        </thead>
+        <tbody id="tablelist"></tbody>
+    </table>
+
+    <button type="button" class="btn btn-default" style="float: right" onclick="toexcel()">下载报表</button>
+</div>
+
+</body>
+</html>

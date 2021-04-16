@@ -42,6 +42,7 @@
                         if (data.status == 0) {
                             setinfo(data.msg);
                         } else {
+                            window.localStorage.clear();
                             window.localStorage.setItem("cusName", data.data.username);
                             window.localStorage.setItem("cusId", data.data.id);
                             window.location.href = "../customer/houselist.html";

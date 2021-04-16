@@ -1,10 +1,168 @@
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <title>网站设置</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="../../../layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../../layuiadmin/style/admin.css" media="all">
+    <style>
+        .btnAndInp{
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+        }
+    </style>
+    <script src="../../../../../cmn/jquery/jquery-1.8.3.js"></script>
 </head>
 <body>
-<h1>hi,今晚的月色真美</h1>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">网站设置</div>
+                <div class="layui-card-body" pad15>
+
+                    <div class="layui-form" lay-filter="">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">logo</label>
+                            <div class="layui-input-block">
+                                <div class="btnAndInp">
+                                    <button type="button" class="layui-btn" id="uploadLogo" style="width: 110px;position: relative;z-index: 10;">
+                                        <i class="layui-icon layui-icon-upload"></i>上传图片</button>
+                                    <input type="text" name="logo" lay-verify="url" autocomplete="off" placeholder="" class="layui-input">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item" hidden>
+                            <label class="layui-form-label">Id</label>
+                            <div class="layui-input-block">
+                                <label>
+                                    <input type="text" name="id" class="layui-input">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">网站标题</label>
+                            <div class="layui-input-block">
+                                <label>
+                                    <input type="text" name="title" lay-verify="required" class="layui-input">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">公司首页</label>
+                            <div class="layui-input-block">
+                                <label>
+                                    <input type="text" name="home" value="" lay-verify="url" placeholder="http://" autocomplete="off" class="layui-input">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">公司简介</label>
+                            <div class="layui-input-block">
+                                <label>
+                                    <input type="text" name="intro" value="" lay-verify="url" placeholder="http://"  autocomplete="off" class="layui-input">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">联系我们</label>
+                            <div class="layui-input-block">
+                                <label>
+                                    <input type="text" name="contact" value="" lay-verify="url" placeholder="http://" autocomplete="off" class="layui-input">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button class="layui-btn" lay-submit lay-filter="updateInfo">确认修改</button>
+                                <!--                  <button type="reset" class="layui-btn layui-btn-primary">重新填写</button>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../../../layuiadmin/layui/layui.js"></script>
+<script>
+    layui.config({
+        base: '../../../layuiadmin/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'set', 'element', 'form', 'layer', 'upload'], function () {
+        const element = layui.element;
+        const $ = layui.$;
+        const form = layui.form;
+        const layer = layui.layer;
+        const upload = layui.upload;
+
+        $(function () {
+
+            $.ajax({
+                url:"/xddesign/admin/company/info",
+                dataType:"json",
+                success:function(res) {
+                    if (res != null) {
+                        $("input[name='id']").val(res.id);
+                        $("input[name='logo']").val(res.logo);
+                        $("input[name='title']").val(res.title);
+                        $("input[name='home']").val(res.home);
+                        $("input[name='intro']").val(res.intro);
+                        $("input[name='contact']").val(res.contact);
+                    }
+
+                }
+            })
+
+        });
+        form.on('submit(updateInfo)', function (data) {
+
+            $.ajax({
+                url:"/xddesign/admin/company/updateinfo",
+                data: data.field,
+                dataType:"json",
+                type:"POST",
+                success:function(res) {
+                    layer.msg(res.msg, {icon:5});
+                    window.location.reload();
+                }
+            })
+
+        });
+
+        var loadindex;
+        // 上传产品手册
+        upload.render({
+            elem: '#uploadLogo'
+            ,url: '/xddesign/admin/company/logo'
+            ,accept: "images"
+            ,multiple: false
+            ,size: 20*1024
+            ,before: function(obj){
+                loadindex = layer.load();//上传loading
+            }
+            ,error: function(index, upload){
+                return layer.msg("服务器出现错误，请重试", {icon:5});
+            }
+            ,done: function (res, index, upload) {
+                layer.close(loadindex);
+                //上传失败
+                if (res.status === 0) {
+                    return layer.msg(res.msg, {icon:5});
+                }
+                $('input[name="logo"]').val(res.data.src);
+            }
+        });
+
+    });
+</script>
 </body>
 </html>

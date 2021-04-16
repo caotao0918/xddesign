@@ -28,6 +28,10 @@ public class Solutions {
     private Timestamp addTime;  //方案设计时间
     private Boolean shareSign;  //是否共享为模板方案
     private String soluDesc;    //方案描述
+    // 施工负责人姓名
+    private String workName;
+    // 施工日期
+    private Timestamp workTime;
 
     @TableField(exist = false)
     private List<Room> roomList;//方案内房间列表
@@ -50,6 +54,8 @@ public class Solutions {
     private Timestamp getAddTime() {
         return addTime;
     }
-
-
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    public Timestamp getWorkTime() {
+        return workTime;
+    }
 }

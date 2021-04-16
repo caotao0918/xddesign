@@ -34,5 +34,10 @@ function showproduct(id) {
 
 //加载菜单
 function loadmenu() {
+    let userId = window.localStorage.getItem("userId");
+    let cusId = window.localStorage.getItem("cusId");
     $("#menu").load("/xddesign/html/menu.html");
+    if (cusId != null) {
+        // $("#menu").load("/xddesign/html/menu.html");
+    }
 }

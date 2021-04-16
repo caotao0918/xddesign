@@ -34,7 +34,20 @@
 <script>
     $(function () {
         loadmenu();
+        loadtitle();
     });
+    function loadtitle() {
+        $.ajax({
+            url:"/xddesign/admin/company/info",
+            dataType:"json",
+            success:function(res) {
+                if (res.title !== '') {
+                    document.title = res.title + "-与您一起见证智能家居的发展";
+                }
+
+            }
+        })
+    }
     layui.use('carousel', function () {
         var carousel = layui.carousel;
         //建造实例

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>方案</title>
+    <link href="../../cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="../../css/xddesign.css" rel="stylesheet">
+    <script src="../../cmn/jquery/jquery-1.11.3.min.js"></script>
+    <script src="../../cmn/bootstrap/js/bootstrap.js"></script>
+    <script src="../../js/xddesign.js"></script>
+
+    <script>
+        var soluId = window.location.search.split("=")[1];
+        $(function () {
+            $("#pinfo").load("/xddesign/html/showproduct.html");
+
+            $.get("/xddesign/public/customer/solution", {"soluId": soluId}, function (data) {
+                $("#dname").html(data.soluName);
+                roomlist = data.roomList;
+                for (var i = roomlist.length - 1; i >= 0; i--) {
+                    $("#all").after("<div class='col-xs-3 col-sm-2 col-md-2 col-lg-1'><button type='button' onclick='showproducts(this," + roomlist[i].roomId + ")' class='btn btn-default btn-xs' style='width: 100%'>" + roomlist[i].roomName + "</button></div>");
+                }
+                showproducts();
+            }, "json");
+
+            loadmenu();
+        });
+
+        function showproducts(obj, id) {
+            if (obj != undefined) {
+                setclass();
+                $(obj).addClass("btn-primary");
+            }
+            $("#products").empty();
+            if (id == undefined) {
+                for (var i = 0; i < roomlist.length; i++) {
+                    productNumList = roomlist[i].productNumList;
+                    list(productNumList);
+                }
+            } else {
+                for (var i = 0; i < roomlist.length; i++) {
+                    if (id == roomlist[i].roomId) {
+                        productNumList = roomlist[i].productNumList;
+                        list(productNumList);
+                    }
+                }
+            }
+        }
+
+        function setclass() {
+            $("#rooms>div>button").removeClass("btn-primary");
+            $("#rooms>div>button").addClass("btn-default");
+        }
+
+        function list(productNumList) {
+            for (var j = 0; j < productNumList.length; j++) {
+                productNum = productNumList[j];
+                for (var k = 0; k < productNum.pnNum; k++) {
+                    var pid = productNum.product.productId;
+                    $("#products").append("<div onclick='showproduct(" + pid + ")' class='col-xs-6 col-sm-4 col-md-4 col-lg-2 product'><img style='width: auto;height: 80%' src='" + productNum.product.pictureList[0].pictureLink + "' \><br>" + productNum.product.productName + "</div>");
+                }
+            }
+        }
+
+
+    </script>
+
+    <style>
+        .show {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+<div id="menu"></div>
+<span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
+                                                                         onclick="backpage();">返回</button>
+    <span id="dname"></span>
+</span>
+<div class="container-fluid show" id="rooms">
+    <div class="col-xs-3 col-sm-2 col-md-2 col-lg-1" id="all">
+        <button type="button" class="btn btn-xs btn-primary" style="width: 100%" onclick="showproducts(this,)">所有
+        </button>
+    </div>
+</div>
+<div class="container-fluid" id="products" style="height: 100px;">
+</div>
+
+<div id="pinfo">
+</div>
+
+</body>
+</html>

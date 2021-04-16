@@ -74,6 +74,8 @@ public class AdminController {
     private QuoteService quoteService;//产品报价单接口
     @Autowired
     private RenderingsService renderingsService;//方案效果图接口
+    @Autowired
+    private CompanyService companyService; // 公司信息接口
 
     @Value("${upload_path}")
     private String uploadPath;
@@ -971,16 +973,47 @@ public class AdminController {
         return ReturnResult.returnResult(update);
     }
 
-    @RequestMapping(value = "test", method = RequestMethod.POST)
-    public void test(@RequestParam(value = "file") MultipartFile file) throws IOException {
-        InputStream ips = null;
-        File file1 = File.createTempFile("temp", null);
-        file.transferTo(file1);
-        ips = new FileInputStream(file1);
-        FileType fileType = FileUtil.getFileType(ips);
-        System.out.println("++++++++++++++");
-        System.out.println(fileType);
-        System.out.println("++++++++++++++");
+    /**
+     * @description: 查询公司信息
+     */
+    @RequestMapping(value = "company/info")
+    public Company findCompanyInfo() {
+        if (companyService.list().isEmpty()) {
+            return null;
+        }
+        return companyService.list().get(0);
     }
+
+    /**
+     * @description: 上传公司logo
+     */
+    @RequestMapping(value = "company/logo", method = RequestMethod.POST)
+    public JSONObject uploadLogo(@RequestParam(value = "file") MultipartFile file) {
+        JSONObject res = new JSONObject();
+        JSONObject data = new JSONObject();
+        if (file.getSize() != 0) {
+            String date = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+            String saveFileName = FileUtil.saveFile(file, uploadPath + uploadPath2 + "/logo/" + date, uploadPath);
+            String link = fileHost + saveFileName;
+            res.put("status", 1);
+            res.put("msg", "上传成功");
+            data.put("src", link);
+            res.put("data", data);
+        }else {
+            res.put("status", 0);
+            res.put("msg", "上传失败");
+        }
+        return res;
+    }
+
+    /**
+     * @description: 修改公司信息
+     */
+    @RequestMapping(value = "company/updateinfo")
+    public ReturnResult updateInfo(Company company) {
+        boolean saveOrUpdate = companyService.saveOrUpdate(company);
+        return ReturnResult.returnResult(saveOrUpdate);
+    }
+
 
 }

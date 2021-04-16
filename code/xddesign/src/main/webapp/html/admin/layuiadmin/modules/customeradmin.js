@@ -24,14 +24,14 @@
         },
         parseData: function(res){ //res 即为原始返回的数据
 
-            if(res.total == 0) {
+            if(res.total === 0) {
                 return {
                     'code': 201, //接口状态
                     'msg': '无数据', //提示文本
                     'count': 0, //数据长度
                     'data': [] //数据列表，是直接填充进表格中的数组
                 }
-            }else if (res.records.length == 0) {
+            }else if (res.records.length === 0) {
                 return {
                     'code': 201, //接口状态
                     'msg': '无数据', //提示文本
@@ -95,7 +95,7 @@
                             ,data: field
                             ,dataType: 'json'
                             ,success: function (res) {
-                                if (res.status == 0) {
+                                if (res.status === 0) {
                                     layer.msg(res.msg, {icon:5});
                                     return false;
                                 }
@@ -142,7 +142,7 @@
                 "houseType.typeId":0
             },
             parseData: function(res){ //res 即为原始返回的数据
-                if(res.total == 0) {
+                if(res.total === 0) {
                     return {
                         'code': 201, //接口状态
                         'msg': '无数据', //提示文本

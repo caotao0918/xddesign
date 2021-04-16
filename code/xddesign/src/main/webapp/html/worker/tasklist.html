@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>施工任务页面</title>
+    <link href="../../cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <script src="../../cmn/jquery/jquery-1.11.3.min.js"></script>
+    <script src="../../cmn/bootstrap/js/bootstrap.js"></script>
+    <script src="../../js/xddesign.js"></script>
+
+    <script>
+        $(function () {
+            loadmenu();
+
+            // 未完成施工
+            $.get("/xddesign/worker/order/unfinished", function (data) {
+                if (data.length === 0) {
+                    $("#tasklist_no").append("没有待完成的施工任务哦...");
+                }else {
+                    for (var i = 0; i < data.length; i++) {
+                        var house = $("<div class='alert alert-success' role='alert' style='height: 335px'>");
+                        house.append("<p class='pname'><b>客户名称</b></p>");
+                        house.append("<p class='pval'>" + data[i].cusName + "</p>");
+                        house.append("<p class='pname'><b>客户电话</b></p>");
+                        house.append("<p class='pval'>" + data[i].cusMobile + "</p>");
+                        house.append("<p class='pname'><b>客户住址</b></p>");
+                        house.append("<p class='pval'>" + data[i].address + "</p>");
+                        house.append("<p class='pname'><b>设计人员姓名</b></p>");
+                        house.append("<p class='pval'>" + data[i].designName + "</p>");
+                        house.append("<p class='pname'><b>设计人员电话</b></p>");
+                        house.append("<p class='pval'>" + data[i].designMobile + "</p>");
+                        house.append("<p class='pname'><b>方案名称</b></p>");
+                        house.append("<p class='pval'>" + data[i].soluName + "</p>");
+                        house.append("<p class='pbtn'><button type='button' class='btn btn-success' onclick='soluDetail(" + data[i].soluId + ");'>方案详情</button></p>");
+                        house.append("<p class='pbtn'><button type='button' class='btn btn-success' onclick='quoteDetail(" + data[i].soluId + ");'>报价单详情</button></p>");
+                        house.append("<p class='pbtn'><button type='button' class='btn btn-success' onclick='renderingsDetail(" + data[i].soluId + ");'>效果图详情</button></p>");
+                        house.append("<p class='pbtn1'><button type='button' class='btn btn-success' onclick='workover(" + data[i].soluId + ");'>施工完毕</button></p>");
+                        house.append("</div>");
+
+                        var houseblock = $("<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'></div>");
+                        houseblock.append(house);
+                        $("#tasklist_no").append(houseblock);
+                    }
+                }
+            });
+
+            // 已完成施工
+            $.get("/xddesign/worker/order/finished", function (data) {
+                if (data.length === 0) {
+                    $("#tasklist_yes").append("没有已完成的施工任务哦...");
+                }else {
+                    for (var i = 0; i < data.length; i++) {
+                        var house = $("<div class='alert alert-success' role='alert' style='height: 360px'>");
+                        house.append("<p class='pname'><b>客户名称</b></p>");
+                        house.append("<p class='pval'>" + data[i].cusName + "</p>");
+                        house.append("<p class='pname'><b>客户电话</b></p>");
+                        house.append("<p class='pval'>" + data[i].cusMobile + "</p>");
+                        house.append("<p class='pname'><b>客户住址</b></p>");
+                        house.append("<p class='pval'>" + data[i].address + "</p>");
+                        house.append("<p class='pname'><b>设计人员姓名</b></p>");
+                        house.append("<p class='pval'>" + data[i].designName + "</p>");
+                        house.append("<p class='pname'><b>设计人员电话</b></p>");
+                        house.append("<p class='pval'>" + data[i].designMobile + "</p>");
+                        house.append("<p class='pname'><b>方案名称</b></p>");
+                        house.append("<p class='pval'>" + data[i].soluName + "</p>");
+                        house.append("<p class='pname'><b>施工负责人</b></p>");
+                        house.append("<p class='pval'>" + data[i].workerName + "</p>");
+                        house.append("<p class='pname'><b>施工日期</b></p>");
+                        house.append("<p class='pval'>" + data[i].workTime + "</p>");
+                        house.append("<p class='pbtn'><button type='button' class='btn btn-success' onclick='soluDetail(" + data[i].soluId + ");'>方案详情</button></p>");
+                        house.append("<p class='pbtn'><button type='button' class='btn btn-success' onclick='quoteDetail(" + data[i].soluId + ");'>报价单详情</button></p>");
+                        house.append("<p class='pbtn'><button type='button' class='btn btn-success' onclick='renderingsDetail(" + data[i].soluId + ");'>效果图详情</button></p>");
+                        house.append("</div>");
+
+                        var houseblock = $("<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'></div>");
+                        houseblock.append(house);
+                        $("#tasklist_yes").append(houseblock);
+                    }
+                }
+            });
+
+            $('#myTabs a').click(function (e) {
+                e.preventDefault()
+                $(this).tab('show')
+            })
+        });
+
+        function soluDetail(id) {
+            window.location.href = "showdesign.html?soluId=" + id;
+        }
+        function quoteDetail(id) {
+            window.location.href = "showreport.html?soluId=" + id;
+        }
+        function renderingsDetail(id) {
+            window.location.href = "showrendering.html?soluId=" + id;
+        }
+        function workover(id) {
+            let b = confirm("确定施工完成了吗？");
+            if (b) {
+                $.ajax({
+                    type: "POST",
+                    url: "/xddesign/worker/over",
+                    data: {
+                        'soluId': id
+                        ,'workName': window.localStorage.getItem("username")
+                    },
+                    dataType: "json",
+                    beforeSend: function () {
+                    },
+                    complete: function () {
+                    },
+                    success: function (data) {
+                        if (data.status === 0) {
+                            alert(data.msg);
+                            return false;
+                        }
+                        window.location.reload();
+                    }
+                });
+            }
+        }
+    </script>
+    <style>
+        table {
+            width: 100%;
+            height: 100%;
+        }
+
+        p {
+            padding-top: 10px;
+        }
+
+        .pname {
+            display: inline-block;
+            width: 30%;
+            font-size: 12px;
+        }
+
+        .pval {
+            display: inline-block;
+            width: 65%;
+            font-size: 15px;
+        }
+
+        .pbtn {
+            display: inline-block;
+        }
+
+        .pbtn1 {
+            text-align: right;
+        }
+
+    </style>
+</head>
+<body>
+<div id="menu"></div>
+<span style="font-weight: bold;margin-left: 5%;font-size: 30px;">施工</span>
+
+<!--<div class="container-fluid">-->
+<!--    <div class="row" id="houselist">-->
+<!--    </div>-->
+<!--</div>-->
+
+<div>
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#no" aria-controls="no" role="tab" data-toggle="tab">未施工</a></li>
+        <li role="presentation"><a href="#yes" aria-controls="yes" role="tab" data-toggle="tab">已施工</a></li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="no">
+            <div class="container-fluid">
+                <div class="row" id="tasklist_no">
+                </div>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="yes">
+            <div class="container-fluid">
+                <div class="row" id="tasklist_yes">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

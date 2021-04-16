@@ -15,9 +15,14 @@ import javax.servlet.http.HttpServletResponse;
 @Configuration
 public class MyInterceptor implements HandlerInterceptor {
 
+    private static final String adminRoleName = "管理员";
+    private static final String designRoleName = "设计人员";
+    private static final String workRoleName = "施工人员";
+    private static final String cusLoginPage = "/xddesign/html/login/cuslgi.html";
+    private static final String userLoginPage = "/xddesign/html/login/userlogin.html";
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String contextPath = "/xddesign";
         String path = request.getServletPath();
         String userId = CookieUtil.getCookieValue(request, "userId");
         String cusId = CookieUtil.getCookieValue(request, "customerId");
@@ -29,36 +34,49 @@ public class MyInterceptor implements HandlerInterceptor {
                     //告诉ajax我是重定向
                     response.setHeader("REDIRECT", "REDIRECT");
                     //告诉ajax我重定向的路径
-                    response.setHeader("CONTENTPATH", "/xddesign/html/login/cuslgi.html");
+                    response.setHeader("CONTENTPATH", cusLoginPage);
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 } else {
-                    response.sendRedirect("/xddesign/html/login/cuslgi.html");
+                    response.sendRedirect(cusLoginPage);
                 }
                 return false;
             }
         }else if (path.startsWith("/html/dsg")){
-            if (userId == null || !"设计人员".equals(roleName)) {
+            if (userId == null || !designRoleName.equals(roleName)) {
                 if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
                     //告诉ajax我是重定向
                     response.setHeader("REDIRECT", "REDIRECT");
                     //告诉ajax我重定向的路径
-                    response.setHeader("CONTENTPATH", "/xddesign/html/login/userlogin.html");
+                    response.setHeader("CONTENTPATH", userLoginPage);
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 } else {
-                    response.sendRedirect("/xddesign/html/login/userlogin.html");
+                    response.sendRedirect(userLoginPage);
                 }
                 return false;
             }
         }else if (path.startsWith("/html/admin")){
-            if (userId == null || !"管理员".equals(roleName)) {
+            if (userId == null || !adminRoleName.equals(roleName)) {
                 if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
                     //告诉ajax我是重定向
                     response.setHeader("REDIRECT", "REDIRECT");
                     //告诉ajax我重定向的路径
-                    response.setHeader("CONTENTPATH", "/xddesign/html/login/userlogin.html");
+                    response.setHeader("CONTENTPATH", userLoginPage);
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 } else {
-                    response.sendRedirect("/xddesign/html/login/userlogin.html");
+                    response.sendRedirect(userLoginPage);
+                }
+                return false;
+            }
+        }else if (path.startsWith("/html/worker")){
+            if (userId == null || !workRoleName.equals(roleName)) {
+                if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+                    //告诉ajax我是重定向
+                    response.setHeader("REDIRECT", "REDIRECT");
+                    //告诉ajax我重定向的路径
+                    response.setHeader("CONTENTPATH", userLoginPage);
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                } else {
+                    response.sendRedirect(userLoginPage);
                 }
                 return false;
             }
@@ -68,14 +86,13 @@ public class MyInterceptor implements HandlerInterceptor {
                     //告诉ajax我是重定向
                     response.setHeader("REDIRECT", "REDIRECT");
                     //告诉ajax我重定向的路径
-                    response.setHeader("CONTENTPATH", "/xddesign/html/login/userlogin.html");
+                    response.setHeader("CONTENTPATH", userLoginPage);
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 } else {
-                    response.sendRedirect("/xddesign/html/login/userlogin.html");
+                    response.sendRedirect(userLoginPage);
                 }
                 return false;
             }
-        }else {
         }
         return true;
     }
