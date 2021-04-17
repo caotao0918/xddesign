@@ -215,7 +215,6 @@ public class PublicController {
     // 根据报价单生成Excel
     @RequestMapping(value = "customer/quote/toexcel")
     public void quoteToExcelTest(Integer soluId, HttpServletResponse response) throws IOException {
-
         List<Quote> quoteList = quoteService.list(new QueryWrapper<Quote>().eq("solu_id",soluId));
         int i = 1;
         Quote quote = new Quote();
@@ -254,7 +253,18 @@ public class PublicController {
             map.put("cusName", quoteInfo.getCusName());
             map.put("cusMobile", quoteInfo.getCusMobile());
             map.put("descr", quoteInfo.getDescr());
+            // 产品合计
             map.put("total", totalPrice);
+            // 施工费用称呼
+            map.put("workPriceName", quoteInfo.getWorkPriceName());
+            // 施工（其他）费用
+            if (quoteInfo.getWorkPrice() == 0) {
+                map.put("workPrice", totalPrice * 0.1);
+            }else {
+                map.put("workPrice", quoteInfo.getWorkPrice());
+            }
+            // 总价
+            map.put("total2", quoteInfo.getWorkPrice() + totalPrice);
             excelWriter.fill(map, writeSheet);
             excelWriter.finish();
         } catch (Exception e) {

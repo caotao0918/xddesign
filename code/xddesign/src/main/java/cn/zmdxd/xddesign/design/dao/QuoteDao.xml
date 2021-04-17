@@ -24,7 +24,7 @@
     </select>
 
     <select id="selectQuoteInfo" resultType="QuoteVo">
-        select cus.username as cusName, cus.mobile as cusMobile, solu.quote_num, solu.add_time, solu.solu_desc as descr, design.mobile as designMobile, design.username as designName
+        select cus.username as cusName, cus.mobile as cusMobile, solu.quote_num, solu.work_price_name, solu.work_price, solu.add_time, solu.solu_desc as descr, design.mobile as designMobile, design.username as designName
         from t_customer cus, t_solutions solu, t_user design, t_house house
         where cus.design_id=design.id
           and cus.id = house.customer_id

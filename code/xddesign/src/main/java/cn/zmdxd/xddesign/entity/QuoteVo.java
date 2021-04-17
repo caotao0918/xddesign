@@ -17,5 +17,8 @@ public class QuoteVo {
     private String cusName;    // 客户名字
     private String cusMobile;   // 客户电话
     private String descr;        // 备注
+    // 施工费用称呼(施工费或安装费)
+    private String workPriceName;
+    private Double workPrice;   // 施工费用
 
 }

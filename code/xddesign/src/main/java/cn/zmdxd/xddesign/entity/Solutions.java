@@ -32,6 +32,10 @@ public class Solutions {
     private String workName;
     // 施工日期
     private Timestamp workTime;
+    // 施工费用称呼(施工费或安装费)
+    private String workPriceName;
+    // 施工(其他)费用
+    private Double workPrice;
 
     @TableField(exist = false)
     private List<Room> roomList;//方案内房间列表

@@ -589,6 +589,25 @@ public class DesignController {
     }
 
     /**
+     * @description: 编辑施工费用
+     */
+    @RequestMapping(value = "customer/quote/editWorkPrice", method = RequestMethod.POST)
+    public ReturnResult editWorkPrice(Solutions solutions) {
+        boolean updateById = solutionsService.updateById(solutions);
+        return ReturnResult.returnResult(updateById);
+    }
+
+    /**
+     * @description: 编辑备注
+     */
+    @RequestMapping(value = "customer/quote/editSoluDesc", method = RequestMethod.POST)
+    public ReturnResult editSoluDesc(Solutions solutions) {
+        boolean updateById = solutionsService.updateById(solutions);
+        return ReturnResult.returnResult(updateById);
+    }
+
+
+    /**
      * @description: 上传方案效果图
      * @param soluId:方案id
      * @param soluName:方案名称
