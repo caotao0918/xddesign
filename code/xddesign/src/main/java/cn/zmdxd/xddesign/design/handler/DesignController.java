@@ -646,9 +646,9 @@ public class DesignController {
             quote1.setCountyTotalPrice(quote1.getCountyPrice() * quote1.getProductNum());
             // 客户每行合计
             quote1.setTotalPrice(quote1.getPrice() * quote1.getProductNum());
-            provincePriceTotal += quote1.getProvincePrice();
-            cityPriceTotal += quote1.getCityPrice();
-            countyPriceTotal += quote1.getCountyPrice();
+            provincePriceTotal += (quote1.getProvincePrice() * quote1.getProductNum());
+            cityPriceTotal += (quote1.getCityPrice() * quote1.getProductNum());
+            countyPriceTotal += (quote1.getCountyPrice() * quote1.getProductNum());
             totalPrice += quote1.getTotalPrice();
             i = i + 1;
         }
