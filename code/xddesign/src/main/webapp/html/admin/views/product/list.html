@@ -180,6 +180,9 @@
               formData.append("productLink", field.productLink);
               formData.append("productDesc", field.productDesc);
               formData.append("secondId", field.secondId);
+              formData.append("provincePrice", field.provincePrice);
+              formData.append("cityPrice", field.cityPrice);
+              formData.append("countyPrice", field.countyPrice);
               for (let i = 0; i < propertyList.length; i++) {
                 formData.append("propertyValueList["+i+"]['valueName']", propertyList[i].get('valueName'));
                 formData.append("propertyValueList["+i+"]['propertyId']", propertyList[i].get('propertyId'));

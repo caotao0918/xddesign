@@ -56,7 +56,7 @@
   <div class="layui-card">
     <div class="layui-card-body">
       <div style="padding-bottom: 10px;">
-<!--        <button class="layui-btn layuiadmin-btn-useradmin" data-type="batchdel">删除</button>-->
+        <button class="layui-btn layuiadmin-btn-useradmin" data-type="download"><i class="layui-icon layui-icon-download-circle"></i>下载报价单</button>
 <!--        <button class="layui-btn layuiadmin-btn-useradmin" data-type="add">添加</button>-->
       </div>
       <table id="LAY-dsg-quote" lay-filter="LAY-dsg-quote"></table>
@@ -78,6 +78,12 @@
     var $ = layui.$;
     var table = layui.table;
     var layer = layui.layer;
+
+    var active = {
+      download: function(){
+        window.location.href = "/xddesign/design/quote/toexcel?soluId=" + soluId;
+      }
+    }
 
     table.render({
       elem: "#LAY-dsg-quote",

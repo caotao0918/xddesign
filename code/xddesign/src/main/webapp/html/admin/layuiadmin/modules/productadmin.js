@@ -6,10 +6,12 @@
         elem: "#LAY-product-manage",
         url: "/xddesign/public/products",
         cols: [[{field: "productId", width: 80, title: "ID", sort: !0},
-            {field: "productName", title: "产品名", minWidth: 100}, {field: "productModels", title: "产品型号"}
-            , {field: "productLink", title: "产品官网链接",templet:'<div><a href="{{d.productLink}}">{{d.productLink}}</a></div>'},
-            {field: "price", title: "产品价格", sort: !0}, {field: "productDesc", title: "产品描述"},
-            {title: "操作", width: 440, align: "center", fixed: "right", toolbar: "#table-useradmin-admin"}]],
+            {field: "productName", title: "产品名", minWidth: 150}, {field: "productModels", title: "产品型号"},
+            // , {field: "productLink", title: "产品官网链接",templet:'<div><a href="{{d.productLink}}">{{d.productLink}}</a></div>'},
+            {field: "provincePrice", title: "省代价", sort: !0},{field: "cityPrice", title: "市代价", sort: !0},{field: "countyPrice", title: "县代价", sort: !0},
+            {field: "price", title: "产品价格", sort: !0}
+            // , {field: "productDesc", title: "产品描述"}
+            , {title: "操作", width: 440, align: "center", fixed: "right", toolbar: "#table-useradmin-admin"}]],
         request:{
           pageName: 'current'
             ,limitName: 'size'
@@ -108,6 +110,9 @@
                     $("input[name='productName']").val(e.data.productName);
                     $("input[name='productModels']").val(e.data.productModels);
                     $("input[name='price']").val(e.data.price);
+                    $("input[name='provincePrice']").val(e.data.provincePrice);
+                    $("input[name='cityPrice']").val(e.data.cityPrice);
+                    $("input[name='countyPrice']").val(e.data.countyPrice);
                     $("input[name='productLink']").val(e.data.productLink);
                     $("textarea[name='productDesc']").val(e.data.productDesc);
                 }

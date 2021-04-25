@@ -11,13 +11,22 @@
     <script src="/xddesign/js/xddesign.js"></script>
 
     <script>
+        function toDecimal(x) {
+            var f = parseFloat(x);
+            if (isNaN(f)) {
+                return;
+            }
+            f = Math.round(x*100)/100;
+            return f;
+        }
         soluId = window.location.search.split("=")[1];
         $(function () {
             loadmenu();
-
+            var totalprice = 0;
+            $.ajaxSettings.async = false;
             $.get("/xddesign/public/customer/quotes", {"soluId": soluId}, function (data) {
                 var totalnum = 0;
-                var totalprice = 0
+
                 for (var i = 0; i < data.length; i++) {
                     var content = $("<tr><td>" + (i + 1) + "</td>");
                     content.append("<td>" + data[i].roomName + "</td>");
@@ -29,7 +38,8 @@
                     totalprice += data[i].totalPrice;
                     $("#tablelist").append(content);
                 }
-                $("#tablelist").append("<tr style='text-align: left' class='tablecss'><td colspan='5' style='text-align: center'>价格总计</td><td>" + totalprice + "</td></tr>");
+                totalprice = totalprice.toFixed(2);
+                $("#tablelist").append("<tr style='text-align: left;font-weight: bold'><td colspan='5' style='text-align: center'>产品总价</td><td>" + totalprice + "</td></tr>");
             }, "json");
 
             $.get("/xddesign/public/customer/quotes/info", {"soluId": soluId}, function (data) {
@@ -37,6 +47,8 @@
                 $("#tableinfo").append("<tr><td colspan='3' style='width: 50%'>设计师：" + data.designName + "</td><td colspan='3'>客户：" + data.cusName + "</td></tr>");
                 $("#tableinfo").append("<tr><td colspan='3'>联系方式：" + data.designMobile + "</td><td colspan='3'>联系方式：" + data.cusMobile + "</td></tr>");
                 $("#tableinfo").append("<tr><td colspan='6'>以下为智能家居方案产品明细，请详阅，如有疑问及时与设计师联系，谢谢</td></tr>");
+                $("#tablelist").append("<tr style='text-align: left;font-weight: bold'><td colspan='5' style='text-align: center'>施工费</td><td>" + toDecimal(totalprice*0.1) + "</td></tr>");
+                $("#tablelist").append("<tr style='text-align: left;font-weight: bold' class='tablecss'><td colspan='5' style='text-align: center'>总价</td><td>" + toDecimal(totalprice*1.1) + "</td></tr>");
                 $("#tablelist").append("<br>");
                 $("#tablelist").append("<tr><td style='line-height: 10px' colspan='6'>备注：</td></tr>");
                 $("#tablelist").append("<tr><td style='line-height: 10px' colspan='6'>" + data.descr + "</td></tr>");

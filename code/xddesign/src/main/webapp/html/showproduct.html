@@ -21,6 +21,18 @@
                         </div>
                     </div>
                 </div>
+                <br>
+                <div id="btn" style="padding-left: 15px">
+                    <input class="btn btn-xs btn-default" type="button" id="queryqabtn" onclick="showqa(this)"
+                           value="常见问题" style="display: none">
+                    <input class="btn btn-xs btn-default" type="button" id="queryguidebtn" onclick="showguide(this)"
+                           value="安装手册" style="display: none">
+                    <input class="btn btn-xs btn-default" type="button" id="queryvideobtn" onclick="showvideo(this)"
+                           value="安装视频" style="display: none">
+                </div>
+                <br>
+                <div id="aftersale">
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal" style="width: 100%">关闭</button>
@@ -29,11 +41,98 @@
     </div>
 </div>
 <script>
+    var qadata;
+    var guidedata;
+    var videodata;
     $(function () {
         $('#myModal').on('hidden.bs.modal', function (e) {
-            $("#pname,#pdesc,#pimg,#ptool,#pdetail").empty();
+            $("#pname,#pdesc,#pimg,#ptool,#pdetail,#aftersale").empty();
+            $("#queryqabtn,#queryguidebtn,#queryvideobtn").hide();
+            setshow();
         })
     });
+
+    function showproduct(id) {
+        $.get("/xddesign/public/product", {"productId": id}, function (product) {
+            $("#pname").html("<b>名称：</b>" + product.productName);
+            var pimg = product.pictureList[0].pictureLink.replace("\\", "/");
+            $("#pimg").append("<img src='" + pimg + "'>");
+            $("#pdesc").append("<b>描述：</b><br>" + product.productDesc);
+
+            var content = "";
+            propertylist = product.productPropertyList;
+            for (var i = 0; i < propertylist.length; i++) {
+                property = propertylist[i];
+                var name = property.value.property.propertyName;
+                var val = property.value.valueName;
+                content += "<div class='col-xs-6 col-md-3'><b>" + name + "</b>：" + val + "</div>";
+            }
+            $("#ptool").append(content);
+            $("#pdetail").append(product.productDetail);
+            // alert(product.productDetail);
+        }, "json");
+        $("#myModal").modal("show");
+
+        $.get("/xddesign/public/questions", {"productId": id}, function (data) {
+            if (data.length > 0) {
+                $("#queryqabtn").show();
+                qadata = data;
+            }
+        }, "json");
+
+
+        $.get("/xddesign/public/guide", {"productId": id}, function (data) {
+            if (data.length > 0) {
+                $("#queryguidebtn").show();
+                guidedata = data;
+
+            }
+        }, "json");
+
+        $.get("/xddesign/public/video", {"productId": id}, function (data) {
+            if (data.length > 0) {
+                $("#queryvideobtn").show();
+                videodata = data;
+
+            }
+        }, "json");
+    }
+
+    function showqa(obj) {
+        setshow(obj);
+        for (var i = 0; i < qadata.length; i++) {
+            var question = qadata[i].question;
+            var answer = qadata[i].answer;
+            $("#aftersale").append("<div class=''><div class='panel panel-default'><div class='panel-heading'><h3 class='panel-title'>" + question + "</h3></div><div class='panel-body'>" + answer + "</div></div></div>");
+        }
+    }
+
+    function showguide(obj) {
+        setshow(obj);
+        for (var i = 0; i < guidedata.length; i++) {
+            var piclink = guidedata[i].pictureLink;
+            var guidelink = guidedata[i].guideLink;
+            var guidename = guidedata[i].guideName;
+            $("#aftersale").append("<div onclick='window.open(\"" + guidelink + "\");' class='' style='text-align:center;height: 165px'><img style='width: 130px;' src='" + piclink + "'><br>" + guidename + "</div>");
+        }
+    }
+
+    function showvideo(obj) {
+        setshow(obj);
+        for (var i = 0; i < videodata.length; i++) {
+            $("#aftersale").append("<div class=''><video width='100%' controls='controls'><source src='" + videodata[i].videoLink + "' type='video/mp4'/></video><span>" + videodata[i].videoName + "</span><br><span>" + videodata[i].videoAddTime + "</span></div>");
+        }
+    }
+
+    function setshow(obj) {
+        $("#aftersale").empty();
+        $("#btn>input").removeClass("btn-primary");
+        $("#btn>input").addClass("btn-default")
+        if (obj != undefined) {
+            $(obj).addClass("btn-primary");
+        }
+    }
+
 </script>
 <style>
     .modal-lg {

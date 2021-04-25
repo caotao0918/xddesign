@@ -6,8 +6,10 @@
 
     <select id="selectQuotes" resultType="Quote">
         select quote.quote_id, quote.room_name, quote.product_name, quote.product_num, quote.price
+        ,product.province_price as provincePrice, product.city_price as cityPrice, product.county_price as countyPrice
         from t_quote quote
         left join t_solutions solutions on quote.solu_id = solutions.solu_id
+        left join t_product product on quote.product_id = product.product_id
         left join t_house house on solutions.house_id = house.house_id
         left join t_customer cus on house.customer_id = cus.id
         <where>
@@ -31,6 +33,12 @@
           and house.house_id=solu.house_id
           and design.id=solu.designer_id
           and solu.solu_id=#{soluId}
+    </select>
+
+    <select id="selectQuoteById" resultType="Quote">
+        select quote.*, product.province_price, product.city_price, product.county_price
+        from t_quote quote, t_product product
+        where quote.product_id = product.product_id and quote.solu_id = #{soluId}
     </select>
 
 </mapper>

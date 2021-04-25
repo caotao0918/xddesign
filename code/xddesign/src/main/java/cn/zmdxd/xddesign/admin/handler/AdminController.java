@@ -536,7 +536,7 @@ public class AdminController {
 
     // 产品视频上传
     @RequestMapping(value = "video/upload", method = RequestMethod.POST)
-    public JSONObject uploadProductVideo(@RequestParam(value = "file", required = false) MultipartFile file) {
+    public JSONObject uploadProductVideo(@RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
         JSONObject res = new JSONObject();
         JSONObject data = new JSONObject();
         if (file.getSize() != 0) {
@@ -585,7 +585,7 @@ public class AdminController {
 
     // 上传产品手册和产品手册封面
     @RequestMapping(value = "guide/upload", method = RequestMethod.POST)
-    public JSONObject uploadGuide(@RequestParam(value = "file") MultipartFile file) {
+    public JSONObject uploadGuide(@RequestParam(value = "file") MultipartFile file) throws IOException {
         JSONObject res = new JSONObject();
         JSONObject data = new JSONObject();
         if (file.getSize() != 0) {
@@ -691,6 +691,7 @@ public class AdminController {
      */
     @RequestMapping(value = "product/save", method = RequestMethod.POST)
     public ReturnResult saveProduct(ProductVo productVo, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
+        System.err.println(productVo);
         if (files.length == 0) {
             return ReturnResult.returnResult(false, "必须上传至少一张图片");
         }
@@ -750,7 +751,13 @@ public class AdminController {
                     return ReturnResult.returnResult(false, "图片格式错误");
                 }
 
-                String saveFileName = FileUtil.saveFile(file, uploadPath + uploadPath2 + "/picture/" + productVo.getProductName(), uploadPath);//上传图片到nginx服务器
+                // 上传图片到nginx服务器
+                String saveFileName;
+                try {
+                    saveFileName = FileUtil.saveFile(file, uploadPath + uploadPath2 + "/picture/" + productVo.getProductName(), uploadPath);
+                } catch (IOException e) {
+                    return ReturnResult.returnResult(false, "产品名称不能包含 \\ / : * ?  < > | 等特殊字符！");
+                }
                 String pictureLink = fileHost + saveFileName;
                 String pictureDesc = "这是一张"+productVo.getProductName()+"图片";
                 picture.setPictureName(productVo.getProductName());
@@ -838,7 +845,7 @@ public class AdminController {
      * @param file:上传的图片
      */
     @RequestMapping(value = "product/picture/save", method = RequestMethod.POST)
-    public ReturnResult saveProductPicture(Integer productId, String productName, @RequestParam(value = "file", required = false) MultipartFile file) {
+    public ReturnResult saveProductPicture(Integer productId, String productName, @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
         if (productId == null) {
             return ReturnResult.returnResult(false, "需要选择一个产品");
         }
@@ -908,7 +915,7 @@ public class AdminController {
      * @description: 产品详情-添加图片
      */
     @RequestMapping(value = "product/detail/uploadpicture", method = RequestMethod.POST)
-    public JSONObject uploadPicture(@RequestParam(value = "file") MultipartFile file) {
+    public JSONObject uploadPicture(@RequestParam(value = "file") MultipartFile file) throws IOException {
         String date = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
         String saveFileName, link;
         saveFileName = FileUtil.saveFile(file, uploadPath + uploadPath2 + "/productdetail/picture/" +  date, uploadPath);
@@ -926,7 +933,7 @@ public class AdminController {
      * @description: 产品详情-添加视频
      */
     @RequestMapping(value = "product/detail/uploadvideo", method = RequestMethod.POST)
-    public JSONObject uploadVideo(@RequestParam(value = "file") MultipartFile file) {
+    public JSONObject uploadVideo(@RequestParam(value = "file") MultipartFile file) throws IOException {
         String date = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
         String saveFileName, link;
         saveFileName = FileUtil.saveFile(file, uploadPath + uploadPath2 + "/productdetail/video/" +  date, uploadPath);
@@ -988,7 +995,7 @@ public class AdminController {
      * @description: 上传公司logo
      */
     @RequestMapping(value = "company/logo", method = RequestMethod.POST)
-    public JSONObject uploadLogo(@RequestParam(value = "file") MultipartFile file) {
+    public JSONObject uploadLogo(@RequestParam(value = "file") MultipartFile file) throws IOException {
         JSONObject res = new JSONObject();
         JSONObject data = new JSONObject();
         if (file.getSize() != 0) {

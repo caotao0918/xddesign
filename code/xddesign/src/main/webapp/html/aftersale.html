@@ -12,39 +12,61 @@
 
     <script>
         var category;
-        var querypid = null;
+        // var querypid;
+        var pids = [];
         var querybtn = 1;
         $(function () {
+
             loadmenu();
+
             $.get("/xddesign/public/secondlevels/products", {}, function (data) {
                 category = data;
                 for (var item in category) {
-                    $("#item").append("<div id='productmenu' style='font-size: 15px;' onclick='showsubitem(this,\"" + item + "\");'>" + item + "[" + category[item].length + "]</div>");
+                    $("#item").append("<div id='productmenu' style='font-size: 17px;' onclick='showsubitem(this);'>" + item + "[" + category[item].length + "]</div>");
+
+                    var products = category[item];
+                    var content = "<ul class='list-unstyled'>";
+                    for (var i = 0; i < products.length; i++) {
+                        var pid = products[i].productId;
+                        var pname = products[i].productName;
+                        content += "<li onclick='query(this," + pid + ",\"" + pname + "\")'>&nbsp;&nbsp;&nbsp;&nbsp;" + pname + "</li>";
+                    }
+                    content += "</ul>";
+                    $("#item").append(content);
+                    $("#item>ul").hide();
                 }
+                allpids();
+                queryqa();
             }, "json");
-            // 使得页面一加载就显示全部产品常见问题
-            queryqa();
+
+            $('#myModal').on('show.bs.modal', function (e) {
+                if ($("#pname").html() != "请选择产品") {
+                    $("#item li").each(function () {
+                        if ($.trim($(this).text()) == $.trim($("#pname").html())) {
+                            $(this).css("color", "#2e6da4");
+                            $("#item>ul").hide();
+                            $(this).parent().show();
+                            return false;
+                        }
+                    });
+                }
+            });
         });
 
-        function showsubitem(obj, item) {
-            $(obj).siblings().css("color", "");
-            $(obj).css("color", "#2e6da4");
-            $("#item>ul").remove();
-            var products = category[item];
-            var content = "<ul class='list-unstyled'>";
-            for (var i = 0; i < products.length; i++) {
-                var pid = products[i].productId;
-                var pname = products[i].productName;
-                content += "<li onclick='query(this," + pid + ",\"" + pname + "\")'>&nbsp;&nbsp;&nbsp;&nbsp;" + pname + "</li>";
-            }
-            content += "</ul>";
-            $(obj).after(content);
+        function showsubitem(obj) {
+            $("#kw").val("");
+            $("#item>ul").hide();
+            $(obj).next().show();
         }
 
         function query(obj, pid, pname) {
+
+            $("#item li").css("color", "");
+            $(obj).css("color", "#2e6da4");
             $("#myModal").modal("hide");
             if (pid != null) {
-                querypid = pid;
+                // querypid = pid;
+                pids = [pid];
             }
             if (pname != null) {
                 $("#pname").html(pname);
@@ -55,18 +77,20 @@
             } else if (querybtn == 2) {
                 queryguide(obj, pid, pname);
             } else {
-                alert(querybtn);
+                queryvideo(obj, pid, pname);
             }
         }
 
         function setshow(obj) {
             if (obj == undefined) {
                 $("#btn>input").removeClass("btn-primary");
-                $("#btn>input").addClass("btn-default");
+                $("#btn>input").addClass("btn-default")
                 if (querybtn == 1) {
                     $("#btn>input:nth-child(1)").addClass("btn-primary");
                 } else if (querybtn == 2) {
                     $("#btn>input:nth-child(2)").addClass("btn-primary");
+                } else {
+                    $("#btn>input:nth-child(3)").addClass("btn-primary");
                 }
             } else {
                 $(obj).siblings().css("background-color", "");
@@ -78,51 +102,82 @@
         function queryqa(obj) {
             querybtn = 1;
             setshow(obj);
-            if (obj === undefined && querypid === null) {
-                querypid = null;
+
+            for (var i in pids) {
+                var pid = pids[i];
+                $.get("/xddesign/public/questions", {"productId": pid}, function (data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var question = data[i].question;
+                        var answer = data[i].answer;
+                        $("#support").append("<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'><div class='panel panel-default'><div class='panel-heading'><h3 class='panel-title'>" + question + "</h3></div><div class='panel-body'>" + answer + "</div></div></div>");
+                    }
+                }, "json");
             }
-            $.get("/xddesign/public/questions", {"productId": querypid}, function (data) {
-                for (var i = 0; i < data.length; i++) {
-                    var question = data[i].question;
-                    var answer = data[i].answer;
-                    $("#support").append("<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'><div class='panel panel-default'><div class='panel-heading'><h3 class='panel-title'>" + question + "</h3></div><div class='panel-body'>" + answer + "</div></div></div>");
-                }
-            }, "json");
+
         }
 
         function queryguide(obj) {
             querybtn = 2;
             setshow(obj);
-            if (obj === undefined && querypid === null) {
-                querypid = null;
+            for (var i in pids) {
+                var pid = pids[i];
+                $.get("/xddesign/public/guide", {"productId": pid}, function (data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var piclink = data[i].pictureLink;
+                        // var piclink = "/xddesign/img/cusloginlogo.png";
+                        var guidelink = data[i].guideLink;
+                        // var guidelink = "http://zmdxd.cn:8089/xddesign/guide/2021/03/23/f1d62a17%E7%87%83%E6%B0%94%E4%BC%A0%E6%84%9F%E5%99%A8%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf";
+                        var guidename = data[i].guideName;
+                        guidelink = guidelink.replace('\\', '/');
+                        $("#support").append("<div onclick='window.open(\"" + guidelink + "\");' class='col-xs-6 col-sm-3 col-md-3 col-lg-2 product' style='text-align:center;height: 165px'><img style='width: 130px;' src='" + piclink + "'><br>" + guidename + "</div>");
+                    }
+                }, "json");
             }
-            $.get("/xddesign/public/guide", {"productId": querypid}, function (data) {
-                for (var i = 0; i < data.length; i++) {
-                    var piclink = data[i].pictureLink;
-                    // var piclink = "/xddesign/img/cusloginlogo.png";
-                    var guidelink = data[i].guideLink;
-                    guidelink = guidelink.replace("\\", "/");
-                    // var guidelink = "http://zmdxd.cn:8089/xddesign/guide/2021/03/23/f1d62a17%E7%87%83%E6%B0%94%E4%BC%A0%E6%84%9F%E5%99%A8%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf";
-                    $("#support").append("<div onclick='window.open(\"" + guidelink + "\");' class='col-xs-6 col-sm-3 col-md-3 col-lg-2' style='text-align:center;height: 190px'><img style='width: auto; height: 110px' src='"+piclink+"'><br>" + data[i].guideName + "</div>");
-                }
-            }, "json");
         }
 
-        function showproductmenu() {
-            var pm = $("#productmenu");
-            if (pm.is(":hidden")) {
-                pm.show();
-            } else {
-                pm.hide();
+        function queryvideo(obj) {
+            querybtn = 3;
+            setshow(obj);
+            for (var i in pids) {
+                var pid = pids[i];
+                $.get("/xddesign/public/video", {"productId": pid}, function (data) {
+                    for (var i = 0; i < data.length; i++) {
+                        $("#support").append("<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'><video width='100%' controls='controls'><source src='" + data[i].videoLink + "' type='video/mp4'/></video><span>" + data[i].videoName + "</span><br><span>" + data[i].videoAddTime + "</span></div>");
+                    }
+                }, "json");
             }
         }
+
+        function searchkw() {
+            pids = [];
+            var kw = $("#kw").val();
+            if (kw != "") {
+                $("#pname").html(kw);
+                allpids(kw);
+            } else {
+                $("#pname").html("请选择产品");
+                allpids();
+            }
+            query();
+        }
+
+        function allpids(kw) {
+            $("#item ul li").each(function () {
+                var text = $(this).text();
+                if (kw != undefined && text.indexOf(kw) == -1) {
+                    return true;
+                }
+                pids.push($(this).attr("onclick").split(",")[1]);
+            });
+        }
+
     </script>
 
 
 </head>
 <body>
 <div id="menu"></div>
-<button class="btn btn-default" style="float: right;margin-top: 5px;margin-right: 10px" data-toggle="modal"
+<button class="btn btn-default" style="float: right;margin-top: 5px;margin-right: 5%" data-toggle="modal"
         data-target="#myModal">产品菜单
 </button>
 <span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
@@ -130,31 +185,36 @@
     <span>售后支持</span>
 </span><br>
 
+<div style="text-align: center;margin-top: 30px">
+    <input type="text" class="form-control" style="display: inline;width: 70%;" placeholder="请输入名称" id="kw">
+    <button type="button" class="btn btn-default" style="margin-bottom: 3px" onclick="searchkw()">搜索
+    </button>
+</div>
+
 <div class="container" style="width: 100%;margin-top: 20px">
     <div class="row">
         <div style="font-weight: bold;font-size: 17px;margin-bottom: 10px;margin-left: 15px" id="pname">请选择产品</div>
 
         <div>
             <div id="btn" style="padding-left: 15px">
-                <input class="btn btn-sm btn-primary" type="button" onclick="queryqa()" value="常见问题">
-                <input class="btn btn-sm btn-default" type="button" onclick="queryguide()" value="安装手册">
+                <input class="btn btn-xs btn-primary" type="button" onclick="queryqa()" value="常见问题">
+                <input class="btn btn-xs btn-default" type="button" onclick="queryguide()" value="安装手册">
+                <input class="btn btn-xs btn-default" type="button" onclick="queryvideo()" value="安装视频">
             </div>
             <div id="support" style="margin-top: 10px;" class="row">
+
             </div>
         </div>
     </div>
 </div>
 
-
-<div class="modal col-xs-12 col-sm-6 col-md-4 col-lg-4" id="myModal" style="margin: 0 0 0 auto;" tabindex="-1"
+<div class="modal" id="myModal" tabindex="-1"
      role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-
-            <div class="modal-body" style="padding: 5px">
-                <div id="productmenu"
-                     style="background-color: #E6E6E6">
-                    <ul class="list-unstyled" id="item">
+            <div class="modal-body">
+                <div>
+                    <ul class="list-unstyled" id="item" style="font-size: 15px">
                     </ul>
                 </div>
             </div>

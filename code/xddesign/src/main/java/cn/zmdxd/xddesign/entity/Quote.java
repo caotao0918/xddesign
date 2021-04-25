@@ -61,4 +61,21 @@ public class Quote {
     @ExcelIgnore
     private Integer roomId;//房间id
 
+    @ExcelIgnore
+    // 产品id
+    private Integer productId;
+
+    // 省级代理价
+    @ColumnWidth(18)
+    @TableField(exist = false)
+    private Double provincePrice;
+    // 市级代理价
+    @ColumnWidth(18)
+    @TableField(exist = false)
+    private Double cityPrice;
+    // 县级代理价
+    @ColumnWidth(18)
+    @TableField(exist = false)
+    private Double countyPrice;
+
 }

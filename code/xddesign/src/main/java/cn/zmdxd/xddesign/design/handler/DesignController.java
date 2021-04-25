@@ -9,6 +9,11 @@ import cn.zmdxd.xddesign.util.CookieUtil;
 import cn.zmdxd.xddesign.util.EnumUtil;
 import cn.zmdxd.xddesign.util.FileUtil;
 import cn.zmdxd.xddesign.util.ReturnResult;
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.write.metadata.WriteSheet;
+import com.alibaba.excel.write.metadata.fill.FillConfig;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -16,12 +21,17 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -606,6 +616,111 @@ public class DesignController {
         return ReturnResult.returnResult(updateById);
     }
 
+    /**
+     * @description: 设计人员查看报价单
+     * @param soluId : 方案id
+     * @throws IOException
+     */
+    @RequestMapping(value = "quote/toexcel")
+    public void quoteToExcel(Integer soluId, HttpServletResponse response) throws IOException {
+        List<Quote> quoteList = quoteService.findQuoteById(soluId);
+        int i = 1;
+        Quote quote = new Quote();
+        double provincePriceTotal = 0, cityPriceTotal = 0, countyPriceTotal = 0;
+        double totalPrice = 0,price = 0;//价格总计-报价单总价
+        Integer productNum = 0;
+        for (Quote quote1:quoteList) {
+            quote1.setId(i);//设置序号
+            quote1.setTotalPrice(quote1.getPrice() * quote1.getProductNum());//每行合计
+            provincePriceTotal += quote1.getProvincePrice();
+            cityPriceTotal += quote1.getCityPrice();
+            countyPriceTotal += quote1.getCountyPrice();
+            totalPrice += quote1.getTotalPrice();//所有产品价格总计
+            productNum += quote1.getProductNum();//产品总数
+            price += quote1.getPrice();//单件产品价格总计
+            i = i + 1;
+        }
+
+        QuoteVo quoteInfo = quoteService.findQuoteInfo(soluId);
+
+        String templateFileName ="xlsx" + File.separator + "template2.xlsx";
+        try {
+            response.setContentType("application/vnd.ms-excel");
+            response.setHeader("Pragma", "No-cache");//设置头
+            response.setHeader("Cache-Control", "no-cache");//设置头
+            response.setDateHeader("Expires", 0);//设置日期头
+            response.setCharacterEncoding("utf-8");
+            // 这里URLEncoder.encode可以防止中文乱码
+            String fileName = URLEncoder.encode(quoteInfo.getCusName() + "的智能家居方案报价单(仅供内部查看)", "UTF-8").replaceAll("\\+", "%20");
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+            ExcelWriter excelWriter = EasyExcel.write(response.getOutputStream()).withTemplate(new ClassPathResource(templateFileName).getInputStream()).build();
+            WriteSheet writeSheet = EasyExcel.writerSheet(0).build();
+            WriteSheet writeSheet2 = EasyExcel.writerSheet(1).build();
+            WriteSheet writeSheet3 = EasyExcel.writerSheet(2).build();
+            WriteSheet writeSheet4 = EasyExcel.writerSheet(3).build();
+            FillConfig fillConfig = FillConfig.builder().forceNewRow(Boolean.TRUE).build();
+            excelWriter.fill(quoteList, fillConfig, writeSheet);
+            excelWriter.fill(quoteList, fillConfig, writeSheet2);
+            excelWriter.fill(quoteList, fillConfig, writeSheet3);
+            excelWriter.fill(quoteList, fillConfig, writeSheet4);
+            Map<String, Object> map = new HashMap<>();
+            map.put("date", quoteInfo.getAddTime());
+            map.put("quoteNum", quoteInfo.getQuoteNum());
+            map.put("designName", quoteInfo.getDesignName());
+            map.put("designMobile", quoteInfo.getDesignMobile());
+            map.put("cusName", quoteInfo.getCusName());
+            map.put("cusMobile", quoteInfo.getCusMobile());
+            map.put("descr", quoteInfo.getDescr());
+
+            // 代理总价
+            map.put("provincePriceTotal", provincePriceTotal);
+            map.put("cityPriceTotal", cityPriceTotal);
+            map.put("countyPriceTotal", countyPriceTotal);
+            // 利润
+            map.put("provincePriceProfit", totalPrice - provincePriceTotal);
+            map.put("cityPriceProfit", totalPrice - cityPriceTotal);
+            map.put("countyPriceProfit", totalPrice - countyPriceTotal);
+            // 产品合计
+            map.put("totalPrice", totalPrice);
+            // 施工费用称呼
+            map.put("workPriceName", quoteInfo.getWorkPriceName());
+            // 施工（其他）费用
+            double provinceWorkPrice, cityWorkPrice, countyWorkPrice, workPrice;
+            provinceWorkPrice = provincePriceTotal * 0.1;
+            cityWorkPrice = cityPriceTotal * 0.1;
+            countyWorkPrice = countyPriceTotal * 0.1;
+            if (quoteInfo.getWorkPrice() == 0) {
+                workPrice = totalPrice * 0.1;
+            }else {
+                workPrice = quoteInfo.getWorkPrice();
+            }
+            map.put("provinceWorkPrice", provinceWorkPrice);
+            map.put("cityWorkPrice", cityWorkPrice);
+            map.put("countyWorkPrice", countyWorkPrice);
+            map.put("workPrice", workPrice);
+            // 总价
+            map.put("provinceTotal", provinceWorkPrice + provincePriceTotal);
+            map.put("cityTotal", cityWorkPrice + cityPriceTotal);
+            map.put("countyTotal", countyWorkPrice + countyPriceTotal);
+            map.put("total", workPrice + totalPrice);
+            excelWriter.fill(map, writeSheet);
+            excelWriter.fill(map, writeSheet2);
+            excelWriter.fill(map, writeSheet3);
+            excelWriter.fill(map, writeSheet4);
+            excelWriter.finish();
+        } catch (Exception e) {
+            // 重置response
+            response.reset();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("utf-8");
+            Map<String, String> map = new HashMap<>();
+            map.put("status", "0");
+            map.put("msg", "下载文件失败" + e.getMessage());
+            response.getWriter().println(JSON.toJSONString(map));
+        }
+
+    }
+
 
     /**
      * @description: 上传方案效果图
@@ -615,7 +730,7 @@ public class DesignController {
      * @return ReturnResult
      */
     @RequestMapping(value = "customer/renderings/save", method = RequestMethod.POST)
-    public ReturnResult saveRenderings(Integer soluId, String soluName, @RequestParam(value = "file",required = false) MultipartFile file) {
+    public ReturnResult saveRenderings(Integer soluId, String soluName, @RequestParam(value = "file",required = false) MultipartFile file) throws IOException {
         if (soluId == null) {
             return ReturnResult.returnResult(false, "需要选择一个方案");
         }

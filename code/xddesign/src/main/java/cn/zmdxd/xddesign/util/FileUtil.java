@@ -31,9 +31,9 @@ public class FileUtil {
      * @param destination:文件保存路径
      * @throws IllegalStateException
      */
-    public static String saveFile(MultipartFile file, String destination, String uploadPath) throws IllegalStateException {
+    public static String saveFile(MultipartFile file, String destination, String uploadPath) throws IOException {
         // 获取上传的文件名称，并结合存放路径，构建新的文件名称
-        String filename = file.getOriginalFilename();
+        String filename = file.getOriginalFilename().replace(" ", "");
         File filepath = new File(destination, filename);
 
         // 判断路径是否存在，不存在则新创建一个
@@ -43,11 +43,12 @@ public class FileUtil {
 
         // 将上传文件保存到目标文件目录
         String substring = IdUtils.getUUID().substring(0, 8);
-        try {
-            file.transferTo(new File(destination + File.separator + substring + filename));
-        } catch (IOException e) {
-            throw new RuntimeException("上传文件异常，请稍后重试");
-        }
+//        try {
+//            file.transferTo(new File(destination + File.separator + substring + filename));
+//        } catch (IOException e) {
+//            throw new RuntimeException("上传文件异常，请稍后重试");
+//        }
+        file.transferTo(new File(destination + File.separator + substring + filename));
         return destination.substring(uploadPath.length()) + "/" + substring + filename;
     }
 

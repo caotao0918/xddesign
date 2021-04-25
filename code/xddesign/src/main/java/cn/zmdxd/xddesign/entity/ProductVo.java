@@ -22,9 +22,9 @@ public class ProductVo{
 
     private List<Map<String,Object>> propertyValueList;
 
-    private Double productReserve1;//保留字段
-    private Double productReserve2;//保留字段
-    private Double productReserve3;//保留字段
+    private Double provincePrice;//保留字段
+    private Double cityPrice;//保留字段
+    private Double countyPrice;//保留字段
     private String productReserve4;//保留字段
     private String productReserve5;//保留字段
 

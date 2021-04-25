@@ -10,6 +10,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author 曹涛
  * @date 2021/2/1 17:03
@@ -29,5 +31,10 @@ public class QuoteServiceImpl extends ServiceImpl<QuoteDao, Quote> implements Qu
     @Override
     public QuoteVo findQuoteInfo(Integer soluId) {
         return quoteDao.selectQuoteInfo(soluId);
+    }
+
+    @Override
+    public List<Quote> findQuoteById(Integer soluId) {
+        return quoteDao.selectQuoteById(soluId);
     }
 }

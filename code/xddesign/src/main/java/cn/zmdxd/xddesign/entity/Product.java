@@ -40,9 +40,12 @@ public class Product {
     @TableField(exist = false)
     private Video video;//产品对应的安装联网视频
 
-    private Double productReserve1;//保留字段
-    private Double productReserve2;//保留字段
-    private Double productReserve3;//保留字段
+    // 省级代理价
+    private Double provincePrice;
+    // 市级代理价
+    private Double cityPrice;
+    // 县级代理价
+    private Double countyPrice;
     private String productReserve4;//保留字段
     private String productReserve5;//保留字段
 

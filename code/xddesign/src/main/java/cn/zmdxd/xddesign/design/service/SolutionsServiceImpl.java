@@ -83,7 +83,10 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
         Template template = null;
         Integer oldSoluId = null;
         String workName = null;
+        Double workPrice = null;
+        String soluDesc = null;
         Timestamp workTime = null;
+        String state = null;
 
         if (solutions.getSoluId() != null) {
             // 修改方案
@@ -92,9 +95,12 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
             template = templateDao.selectTemplateBySoluId(solutions.getSoluId());
             // 得到方案id，以更新效果图t_renderings表
             oldSoluId = solutions.getSoluId();
-            Solutions solu = solutionsDao.selectOne(new QueryWrapper<Solutions>().eq("solu_id", oldSoluId).select("work_name", "work_time"));
+            Solutions solu = solutionsDao.selectOne(new QueryWrapper<Solutions>().eq("solu_id", oldSoluId).select("work_name", "work_time", "work_price", "solu_desc", "state"));
             workName = solu.getWorkName();
             workTime = solu.getWorkTime();
+            workPrice = solu.getWorkPrice();
+            soluDesc = solu.getSoluDesc();
+            state = solu.getState();
 
             /*
                 删除此id对应的方案
@@ -112,9 +118,15 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
         User design = new User();
         design.setId(designId);
         solutions.setDesign(design);
-        solutions.setState(SolutionsStateEnum.DESIGNING.getMsg());
+        if (state == null) {
+            solutions.setState(SolutionsStateEnum.DESIGNING.getMsg());
+        }else {
+            solutions.setState(state);
+        }
         solutions.setWorkName(workName);
         solutions.setWorkTime(workTime);
+        solutions.setWorkPrice(workPrice);
+        solutions.setSoluDesc(soluDesc);
         solutions.setAddTime(Timestamp.valueOf(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
         Integer customerId = houseDao.selectById(solutions.getHouseId()).getCustomerId();
 
@@ -182,6 +194,7 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
                 quote.setSoluId(solutions.getSoluId());
                 quote.setRoomId(room.getRoomId());
                 quote.setRoomName(room.getRoomName());
+                quote.setProductId(productNum.getProduct().getProductId());
                 quote.setProductName(productNum.getProduct().getProductName());
                 quote.setProductNum(productNum.getPnNum());
                 quote.setPrice(productNum.getProduct().getPrice());
