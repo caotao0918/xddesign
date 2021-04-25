@@ -54,8 +54,6 @@ public class DesignController {
     @Autowired
     private RoomService roomService;
     @Autowired
-    private ProductNumService productNumService;
-    @Autowired
     private QuoteService quoteService;//方案报价单接口
     @Autowired
     private RenderingsService renderingsService;//效果图接口
@@ -83,20 +81,20 @@ public class DesignController {
      */
     @RequestMapping(value = "customer/saveOrUpdate", method = RequestMethod.POST)
     public ReturnResult saveOrUpdateCustomer(Customer customer, HttpServletRequest request) {
-        //设计人员添加
+        // 设计人员添加
         if ("设计人员".equals(CookieUtil.getCookieValue(request,"roleName","UTF-8"))) {
             User user = new User();
             user.setId(Integer.valueOf(CookieUtil.getCookieValue(request, "userId")));
             customer.setDesign(user);
         }
-        //管理员添加客户时指定由哪个设计人员负责该客户
+        // 管理员添加客户时指定由哪个设计人员负责该客户
         ReturnResult result = customerService.saveOrUpdateCustomer(customer);
         result.setId(customer.getId());
         return result;
 
     }
 
-    //客户类别列表
+    // 客户类别列表
     @RequestMapping(value = "customer/category")
     public List<Map<String,Object>> findCustomerCategory() {
         return EnumUtil.enumToListMap(CustomerEnum.class);
@@ -121,7 +119,7 @@ public class DesignController {
         return customerService.findCustomers(page, customer);
     }
 
-    //不分页查询全部客户
+    // 不分页查询全部客户
     @RequestMapping(value = "customers/nopage")
     public List<Customer> findCustomerList(HttpServletRequest request) {
         if ("设计人员".equals(CookieUtil.getCookieValue(request, "roleName", "utf-8"))) {
@@ -131,16 +129,15 @@ public class DesignController {
             return customerService.list(new QueryWrapper<Customer>().select("id", "username"));
          else   //这里先暂时这样处理，方便测试
             return customerService.list(new QueryWrapper<Customer>().select("id", "username"));
-//            return new ArrayList<>();
     }
 
-    //根据id查询客户信息
+    // 根据id查询客户信息
     @RequestMapping("customer")
     public Customer findCustomer(Integer id) {
         return customerService.findCustomer(id);
     }
 
-    //删除客户
+    // 删除客户
     @RequestMapping(value = "customer/del", method = RequestMethod.POST)
     public ReturnResult delCustomer(Integer id) {
 //        ReturnResult result;
@@ -154,12 +151,12 @@ public class DesignController {
 //        }
 //        boolean removeById = customerService.removeById(id);
 
-        //假删除
+        // 假删除
         boolean update = customerService.update(new UpdateWrapper<Customer>().eq("id", id).set("del_sign", true));
         return ReturnResult.returnResult(update);
     }
 
-    //批量删除客户
+    // 批量删除客户
     @RequestMapping(value = "customer/batchdel",method = RequestMethod.POST)
     public ReturnResult deleteCustomer(@RequestBody List<Customer> customerList) {
 //        boolean removeById;
@@ -172,14 +169,15 @@ public class DesignController {
         for (Customer customer:customerList) {
             boolean update = customerService.update(new UpdateWrapper<Customer>().eq("id", customer.getId()).set("del_sign", true));
             if (!update) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                // 事务回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return ReturnResult.returnResult(false);
             }
         }
         return ReturnResult.returnResult(true);
     }
 
-    //查询户型列表
+    // 查询户型列表
     @RequestMapping(value = "customer/houseType")
     public List<HouseType> findHouseTypeList() {
         return houseTypeService.list(new QueryWrapper<HouseType>().orderByDesc("type_num"));
@@ -202,7 +200,8 @@ public class DesignController {
             if (!save) {
                 result.setStatus(0);
                 result.setMsg("添加失败");
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                // 事务回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return result;
             }
             house.setHouseType(houseType1);
@@ -213,7 +212,8 @@ public class DesignController {
             if (!updateById) {
                 result.setStatus(0);
                 result.setMsg("添加失败");
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                // 事务回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return result;
             }
             house.setHouseType(houseType);
@@ -221,13 +221,13 @@ public class DesignController {
         }
 
         if (house.getHouseId() == null) {
-            //新增房子信息
+            // 新增房子信息
             ReturnResult saveHouse = houseService.saveHouse(house);
             saveHouse.setId(house.getHouseId());
             return saveHouse;
 
         }else {
-            //修改房子信息 可供修改的项有：房子名称、房子地址、房子户型
+            // 修改房子信息 可供修改的项有：房子名称、房子地址、房子户型
             boolean update = houseService.update(new UpdateWrapper<House>().eq("house_id", house.getHouseId()).set("house_name", house.getHouseName()).set("house_address", house.getHouseAddress()).set("type_id", typeId).set("house_reserve1",house.getHouseReserve1()).set("house_reserve2",house.getHouseReserve2()).set("house_reserve3",house.getHouseReserve3()));
             ReturnResult returnResult = ReturnResult.returnResult(update);
             returnResult.setId(house.getHouseId());
@@ -235,9 +235,9 @@ public class DesignController {
         }
     }
 
-    //查询客户房子列表
+    // 查询客户房子列表
     @RequestMapping(value = "customer/house")
-    public IPage<House> findHouse(House house, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size, HttpServletRequest request) {
+    public IPage<House> findHouse(House house, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
         Page<House> page = new Page<>(current, size);
         Customer customer = house.getCustomer();
         if (customer != null) {
@@ -253,39 +253,40 @@ public class DesignController {
         return houseService.findHouse(page, house);
     }
 
-    //根据客户id查询客户房子列表
+    // 根据客户id查询客户房子列表
     @RequestMapping(value = "customer/house/nopage")
     public List<House> findHouse(Integer customerId) {
         return houseService.list(new QueryWrapper<House>().eq("customer_id", customerId).select("house_id", "house_name"));
     }
-    //根据房子id查询客户方案列表
+    // 根据房子id查询客户方案列表
     @RequestMapping(value = "customer/solutions/nopage")
     public List<Solutions> findSolutions(Integer houseId) {
         return solutionsService.list(new QueryWrapper<Solutions>().eq("house_id", houseId).select("solu_id", "solu_name"));
     }
-    //根据方案id查询房间列表
+    // 根据方案id查询房间列表
     @RequestMapping(value = "customer/room/nopage")
     public List<Room> findRoom(Integer soluId) {
         return roomService.list(new QueryWrapper<Room>().eq("solu_id", soluId).select("room_id", "room_name"));
     }
 
-    //批量删除房子信息
+    // 批量删除房子信息
     @RequestMapping(value = "customer/house/batchdel", method=RequestMethod.POST)
     public ReturnResult deleteHouse(@RequestBody List<House> houseList) {
         for (House house:houseList) {
             ReturnResult result = deleteHouse(house.getHouseId());
             if (result.getStatus() == 0) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                // 事务回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return ReturnResult.returnResult(false, result.getMsg());
             }
         }
         return ReturnResult.returnResult(true);
     }
 
-    //删除客户房子信息
+    // 删除客户房子信息
     @RequestMapping(value = "customer/house/del",method = RequestMethod.POST)
     public ReturnResult deleteHouse(Integer houseId) {
-        //检查该房子是否关联了模板方案
+        // 检查该房子是否关联了模板方案
         if (templateService.findTemplateByHouseId(houseId) != null) {
             return ReturnResult.returnResult(false, "关联了模板方案，不能删除");
         }
@@ -311,13 +312,13 @@ public class DesignController {
         return templateService.findTemplateList(page, template);
     }
 
-    //根据id查询模板方案详情
+    // 根据id查询模板方案详情
     @RequestMapping(value = "customer/template")
     public Template findTemplateById(Integer tempId) {
         return templateService.findTemplateById(tempId);
     }
 
-    //根据id删除模板方案
+    // 根据id删除模板方案
     @RequestMapping(value = "customer/template/delete", method = RequestMethod.POST)
     public ReturnResult deleteTemplate(Integer tempId, Integer userId, HttpServletRequest request) {
         Integer designId = null;
@@ -332,16 +333,16 @@ public class DesignController {
             }
         }
 
-        //修改方案状态为未共享
+        // 修改方案状态为未共享
         Template template = templateService.findTemplateById(tempId);
         Integer soluId = template.getSolutions().getSoluId();
         solutionsService.update(new UpdateWrapper<Solutions>().eq("solu_id",soluId).set("share_sign",false));
         boolean remove;
         if (designId != null) {
-            //设计人员删除
+            // 设计人员删除
             remove = templateService.remove(new QueryWrapper<Template>().eq("temp_id", tempId).eq("designer_id", designId));
         }else {
-            //管理员删除
+            // 管理员删除
             remove = templateService.remove(new QueryWrapper<Template>().eq("temp_id", tempId));
         }
         return ReturnResult.returnResult(remove);
@@ -371,20 +372,22 @@ public class DesignController {
         if (solutions.getShareSign()) {
             return ReturnResult.returnResult(false, "已经是模板方案啦");
         }
-        Integer typeId = templateService.findTypeIdBySoluId(template.getSolutions().getSoluId());//得到户型id
-        Integer designId = Integer.valueOf(CookieUtil.getCookieValue(request, "userId"));//得到设计人员或管理员id
+        // 得到户型id
+        Integer typeId = templateService.findTypeIdBySoluId(template.getSolutions().getSoluId());
+        // 得到设计人员或管理员id
+        Integer designId = Integer.valueOf(CookieUtil.getCookieValue(request, "userId"));
         boolean saveTemplate = templateService.saveTemplate(template, typeId, designId);
 
-        //修改方案状态为已共享
+        // 修改方案状态为已共享
         Integer soluId = template.getSolutions().getSoluId();
         solutionsService.update(new UpdateWrapper<Solutions>().eq("solu_id",soluId).set("share_sign",true));
         return ReturnResult.returnResult(saveTemplate);
     }
 
-    //修改模板方案
+    // 修改模板方案
     @RequestMapping(value = "customer/template/update", method = RequestMethod.POST)
     public ReturnResult updateTemplate(Template template) {
-        //可供修改的项有模板方案名称和描述
+        // 可供修改的项有模板方案名称和描述
         boolean updateById = templateService.updateById(template);
         return ReturnResult.returnResult(updateById);
     }
@@ -402,7 +405,8 @@ public class DesignController {
         if (templateVo.getSoluId() == null) {
             return ReturnResult.returnResult(false, "该户型没有匹配的方案");
         }
-        Customer customer = customerService.getOne(new QueryWrapper<Customer>().select("id", "username").eq("mobile", templateVo.getMobile()), true);//根据手机号查询客户存在与否
+        // 根据手机号查询客户存在与否
+        Customer customer = customerService.getOne(new QueryWrapper<Customer>().select("id", "username").eq("mobile", templateVo.getMobile()), true);
         String cusName;
         if (customer == null) {
             customer = new Customer();
@@ -420,9 +424,11 @@ public class DesignController {
                 return result;
             }
         }else {
-            cusName = customer.getUsername();// 还用原来的名称
+            // 还用原来的名称
+            cusName = customer.getUsername();
         }
-        Integer customerId = customer.getId();//得到客户id
+        // 得到客户id
+        Integer customerId = customer.getId();
         House house = new House();
         house.setCustomerId(customerId);
         HouseType houseType = new HouseType();
@@ -430,19 +436,20 @@ public class DesignController {
         house.setHouseName("客户" + cusName + "的" + templateVo.getTypeName() + "的家");
         house.setHouseAddress(templateVo.getAddress());
         house.setHouseType(houseType);
-        ReturnResult result = houseService.saveHouse(house);//添加客户房子
+        // 添加客户房子
+        ReturnResult result = houseService.saveHouse(house);
         if (result.getStatus() == 0) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+            // 事务回滚
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return result;
         }
-        Integer houseId = house.getHouseId();//得到房子id
+        // 得到房子id
+        Integer houseId = house.getHouseId();
 
-        //根据方案id查询方案详情
+        // 根据方案id查询方案详情
         Solutions solutions = solutionsService.findSolutions(templateVo.getSoluId());
         solutions.setHouseId(houseId);
         solutions.setSoluId(null);
-//        solutions.setSoluName("客户"+templateVo.getUsername()+"的快速方案");
-//        solutions.setSoluDesc("客户"+templateVo.getUsername()+"的快速方案描述");
         solutions.setSoluName("客户"+cusName+"的快速方案");
         solutions.setSoluDesc("客户"+cusName+"的快速方案描述");
         solutions.setState(SolutionsStateEnum.DESIGNING.getMsg());
@@ -455,10 +462,11 @@ public class DesignController {
                 productNum.setPnId(null);
             }
         }
-        //快速建方案
+        // 快速建方案
         ReturnResult saveOrUpdateSolution = solutionsService.saveOrUpdateSolution(solutions, request);
         if (saveOrUpdateSolution.getStatus() == 0) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+            // 事务回滚
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return ReturnResult.returnResult(false);
         }else {
             // 复制效果图
@@ -551,14 +559,15 @@ public class DesignController {
         for (Solutions solutions:solutionsList) {
             ReturnResult result = deleteSolutions(solutions.getSoluId());
             if (result.getStatus() == 0) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                // 事务回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return ReturnResult.returnResult(false, "其中一些方案关联了模板方案，不能删除");
             }
         }
         return ReturnResult.returnResult(true);
     }
 
-    //分页查询方案列表
+    // 分页查询方案列表
     @RequestMapping(value = "customer/solutions")
     public IPage<Solutions> findSolutions(Solutions solutions, HttpServletRequest request, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
         if ("设计人员".equals(CookieUtil.getCookieValue(request,"roleName","utf-8"))) {
@@ -571,13 +580,13 @@ public class DesignController {
         return solutionsService.findSolutionsList(page,solutions);
     }
 
-    //根据id查询单条报价数据
+    // 根据id查询单条报价数据
     @RequestMapping(value = "customer/quote")
     public Quote findQuote(Integer quoteId) {
         return quoteService.getById(quoteId);
     }
 
-    //根据id修改单条报价数据
+    // 根据id修改单条报价数据
     @RequestMapping(value = "customer/quote/update",method = RequestMethod.POST)
     public ReturnResult updateQuote(Quote quote) {
         boolean update = quoteService.update(quote, new UpdateWrapper<Quote>().eq("quote_id", quote.getQuoteId()));
@@ -617,27 +626,30 @@ public class DesignController {
     }
 
     /**
-     * @description: 设计人员查看报价单
+     * @description: 设计人员下载报价单
      * @param soluId : 方案id
-     * @throws IOException
      */
     @RequestMapping(value = "quote/toexcel")
     public void quoteToExcel(Integer soluId, HttpServletResponse response) throws IOException {
         List<Quote> quoteList = quoteService.findQuoteById(soluId);
         int i = 1;
-        Quote quote = new Quote();
-        double provincePriceTotal = 0, cityPriceTotal = 0, countyPriceTotal = 0;
-        double totalPrice = 0,price = 0;//价格总计-报价单总价
-        Integer productNum = 0;
+        // 省级-市级-县级-客户 产品总价
+        double provincePriceTotal = 0, cityPriceTotal = 0, countyPriceTotal = 0, totalPrice = 0;
         for (Quote quote1:quoteList) {
-            quote1.setId(i);//设置序号
-            quote1.setTotalPrice(quote1.getPrice() * quote1.getProductNum());//每行合计
+            // 设置序号
+            quote1.setId(i);
+            // 省级每行合计
+            quote1.setProvinceTotalPrice(quote1.getProvincePrice() * quote1.getProductNum());
+            // 市级每行合计
+            quote1.setCityTotalPrice(quote1.getCityPrice() * quote1.getProductNum());
+            // 县级每行合计
+            quote1.setCountyTotalPrice(quote1.getCountyPrice() * quote1.getProductNum());
+            // 客户每行合计
+            quote1.setTotalPrice(quote1.getPrice() * quote1.getProductNum());
             provincePriceTotal += quote1.getProvincePrice();
             cityPriceTotal += quote1.getCityPrice();
             countyPriceTotal += quote1.getCountyPrice();
-            totalPrice += quote1.getTotalPrice();//所有产品价格总计
-            productNum += quote1.getProductNum();//产品总数
-            price += quote1.getPrice();//单件产品价格总计
+            totalPrice += quote1.getTotalPrice();
             i = i + 1;
         }
 
@@ -646,45 +658,59 @@ public class DesignController {
         String templateFileName ="xlsx" + File.separator + "template2.xlsx";
         try {
             response.setContentType("application/vnd.ms-excel");
-            response.setHeader("Pragma", "No-cache");//设置头
-            response.setHeader("Cache-Control", "no-cache");//设置头
-            response.setDateHeader("Expires", 0);//设置日期头
+            // 设置头
+            response.setHeader("Pragma", "No-cache");
+            response.setHeader("Cache-Control", "no-cache");
+            response.setDateHeader("Expires", 0);
             response.setCharacterEncoding("utf-8");
-            // 这里URLEncoder.encode可以防止中文乱码
+
+            // 防止中文乱码
             String fileName = URLEncoder.encode(quoteInfo.getCusName() + "的智能家居方案报价单(仅供内部查看)", "UTF-8").replaceAll("\\+", "%20");
+
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+
             ExcelWriter excelWriter = EasyExcel.write(response.getOutputStream()).withTemplate(new ClassPathResource(templateFileName).getInputStream()).build();
+
             WriteSheet writeSheet = EasyExcel.writerSheet(0).build();
             WriteSheet writeSheet2 = EasyExcel.writerSheet(1).build();
             WriteSheet writeSheet3 = EasyExcel.writerSheet(2).build();
             WriteSheet writeSheet4 = EasyExcel.writerSheet(3).build();
+
             FillConfig fillConfig = FillConfig.builder().forceNewRow(Boolean.TRUE).build();
+
+            // 填充excel
             excelWriter.fill(quoteList, fillConfig, writeSheet);
             excelWriter.fill(quoteList, fillConfig, writeSheet2);
             excelWriter.fill(quoteList, fillConfig, writeSheet3);
             excelWriter.fill(quoteList, fillConfig, writeSheet4);
+
             Map<String, Object> map = new HashMap<>();
+            // 日期
             map.put("date", quoteInfo.getAddTime());
+            // 报价单号
             map.put("quoteNum", quoteInfo.getQuoteNum());
+            // 设计人员姓名
             map.put("designName", quoteInfo.getDesignName());
+            // 电话
             map.put("designMobile", quoteInfo.getDesignMobile());
+            // 客户姓名
             map.put("cusName", quoteInfo.getCusName());
+            // 电话
             map.put("cusMobile", quoteInfo.getCusMobile());
+            // 描述
             map.put("descr", quoteInfo.getDescr());
 
-            // 代理总价
+            // 代理 产品总价
             map.put("provincePriceTotal", provincePriceTotal);
             map.put("cityPriceTotal", cityPriceTotal);
             map.put("countyPriceTotal", countyPriceTotal);
-            // 利润
-            map.put("provincePriceProfit", totalPrice - provincePriceTotal);
-            map.put("cityPriceProfit", totalPrice - cityPriceTotal);
-            map.put("countyPriceProfit", totalPrice - countyPriceTotal);
-            // 产品合计
+            // 客户 产品总价
             map.put("totalPrice", totalPrice);
-            // 施工费用称呼
+
+            // 施工费用名称
             map.put("workPriceName", quoteInfo.getWorkPriceName());
-            // 施工（其他）费用
+
+            // 施工费用
             double provinceWorkPrice, cityWorkPrice, countyWorkPrice, workPrice;
             provinceWorkPrice = provincePriceTotal * 0.1;
             cityWorkPrice = cityPriceTotal * 0.1;
@@ -694,19 +720,24 @@ public class DesignController {
             }else {
                 workPrice = quoteInfo.getWorkPrice();
             }
+
             map.put("provinceWorkPrice", provinceWorkPrice);
             map.put("cityWorkPrice", cityWorkPrice);
             map.put("countyWorkPrice", countyWorkPrice);
             map.put("workPrice", workPrice);
-            // 总价
+
+            // 报价单总价
             map.put("provinceTotal", provinceWorkPrice + provincePriceTotal);
             map.put("cityTotal", cityWorkPrice + cityPriceTotal);
             map.put("countyTotal", countyWorkPrice + countyPriceTotal);
             map.put("total", workPrice + totalPrice);
+
+            // 填充excel
             excelWriter.fill(map, writeSheet);
             excelWriter.fill(map, writeSheet2);
             excelWriter.fill(map, writeSheet3);
             excelWriter.fill(map, writeSheet4);
+
             excelWriter.finish();
         } catch (Exception e) {
             // 重置response
@@ -720,7 +751,6 @@ public class DesignController {
         }
 
     }
-
 
     /**
      * @description: 上传方案效果图
@@ -750,7 +780,8 @@ public class DesignController {
         renderings.setSoluId(soluId);
         save = renderingsService.save(renderings);
         if (!save) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+            // 事务回滚
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return ReturnResult.returnResult(false, "上传失败，请稍后重试");
         }
         return ReturnResult.returnResult(true);
@@ -764,12 +795,11 @@ public class DesignController {
     @RequestMapping(value = "customer/renderings/delete", method = RequestMethod.POST)
     public ReturnResult deleteRenderings(Integer rendId) {
         String path;
-        boolean deleteFile;
         Renderings renderings = renderingsService.getById(rendId);
         path = uploadPath + renderings.getRendPath().substring(fileHost.length());
-        //删除本地的图片
-        deleteFile = FileUtil.deleteFile(path);
-        //删除数据库中的信息
+        // 删除服务器的图片
+        FileUtil.deleteFile(path);
+        // 删除数据库中的信息
         boolean removeById = renderingsService.removeById(rendId);
         return ReturnResult.returnResult(removeById);
     }

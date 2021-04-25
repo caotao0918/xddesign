@@ -1,15 +1,11 @@
 package cn.zmdxd.xddesign.entity;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
-import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.*;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
-import org.apache.poi.ss.usermodel.*;
-
-
 
 /**
  * @author 曹涛
@@ -54,9 +50,21 @@ public class Quote {
     private Double price;//产品价格
 
     @TableField(exist = false)
-//    @ExcelProperty(value = {"智能家居方案报价表","合计/元"})
     @ColumnWidth(18)
     private Double totalPrice;//单个产品合计价格
+
+    @TableField(exist = false)
+    @ColumnWidth(18)
+    // 省级单个产品合计价格
+    private Double provinceTotalPrice;
+    @TableField(exist = false)
+    @ColumnWidth(18)
+    // 市级单个产品合计价格
+    private Double cityTotalPrice;
+    @TableField(exist = false)
+    @ColumnWidth(18)
+    // 县级单个产品合计价格
+    private Double countyTotalPrice;
 
     @ExcelIgnore
     private Integer roomId;//房间id

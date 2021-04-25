@@ -11,7 +11,7 @@
 
   <name>xddesign Maven Webapp</name>
   <!-- FIXME change it to the project's website -->
-  <url>http://www.example.com</url>
+  <url>http://zmdxd.cn/xddesign</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -258,7 +258,7 @@
     <dependency>
       <groupId>com.alibaba</groupId>
       <artifactId>druid</artifactId>
-      <version>1.1.12</version>
+      <version>1.1.22</version>
     </dependency>
     <!-- jstl的jar包 2个-->
     <dependency>
