@@ -52,6 +52,7 @@
             <if test="solutions.customerId != null and solutions.customerId != 0">
                 and cus.id = #{solutions.customerId}
             </if>
+            and cus.del_sign = 0
         </where>
     </select>
 
