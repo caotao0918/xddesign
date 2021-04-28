@@ -751,5 +751,123 @@
                 }
             })
         }
-    }) , e("customeradmin", {})
+    }), i.render({
+        elem: "#LAY-housetype-manage",
+        url: "/xddesign/admin/customer/houseType",
+        cols: [[{type: "checkbox", fixed: "left"}, {field: "typeId", width: 80, title: "ID", sort: !0},
+            {field: "typeName", title: "户型名称"},{field: "typeDesc", title: "户型描述"},
+            {field: "typeNum", title: "户型数量"},
+            {title: "操作", width: 150, align: "center", fixed: "right", toolbar: "#table-housetype-admin"}]],
+        request:{
+            pageName: 'current'
+            ,limitName: 'size'
+        },
+        page: !0,
+        limit: 10,
+        skin:'row',
+        even:true,
+        parseData: function(res){ //res 即为原始返回的数据
+            if(res.total === 0) {
+                return {
+                    'code': 201, //接口状态
+                    'msg': '无数据', //提示文本
+                    'count': 0, //数据长度
+                    'data': [] //数据列表，是直接填充进表格中的数组
+                }
+            }else if (res.records.length == 0) {
+                return {
+                    'code': 201, //接口状态
+                    'msg': '无数据', //提示文本
+                    'count': 0, //数据长度
+                    'data': [] //数据列表，是直接填充进表格中的数组
+                }
+            }else {
+                return {
+                    "code": 0,
+                    "count": res.total, //解析数据长度
+                    "data": res.records //解析数据列表
+                }
+            }
+        },
+        height: "full-220",
+        text: "对不起，加载出现异常！"
+    }), i.on("tool(LAY-housetype-manage)", function (e) {
+        if ("del" === e.event){
+            layer.confirm("真的删除行么", {icon:3, title: '提示'}, function (t) {
+                layui.$.ajax({
+                    url: '/xddesign/design/customer/housetype/del'
+                    ,type: 'POST'
+                    ,data: {"housetypeId":e.data.housetypeId}
+                    ,dataType: 'json'
+                    ,success: function (res) {
+                        if (res.status == 0) {
+                            layer.msg(res.msg, {icon:5});
+                            return false;
+                        }
+                        e.del();
+                        layui.table.reload('LAY-housetype-manage');
+                    }
+                });
+                layer.close(t);
+            });
+        }else if ("edit" === e.event) {
+            layer.open({
+                type: 2,
+                title: "编辑房子",
+                content: "housetypeform.html",
+                maxmin: !0,
+                area: ["550px", "700px"],
+                btn: ["确定", "取消"]
+                ,yes: function(index, layero){
+                    let iframeWindow = window['layui-layer-iframe'+ index]
+                        ,submitID = 'LAY-housetype-front-submit'
+                        ,submit = layero.find('iframe').contents().find('#'+ submitID);
+                    //监听提交
+                    iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
+                        let field = {};
+                        let name_shi = iframeWindow.layui.$('#name_shi').val() + '室';
+                        let name_ting = iframeWindow.layui.$('#name_ting').val() + '厅';
+                        let name_chu = iframeWindow.layui.$('#name_chu').val() + '厨';
+                        let name_wei = iframeWindow.layui.$('#name_wei').val() + '卫';
+                        let name_tai = iframeWindow.layui.$('#name_tai').val() + '阳台';
+                        field.typeName = name_shi + name_ting + name_chu + name_wei + name_tai;
+                        field.typeDesc = iframeWindow.layui.$('#typeDesc').val();
+                        //提交 Ajax 成功后，静态更新表格中的数据
+                        layui.$.ajax({
+                            url: '/xddesign/admin/housetype/save'
+                            ,type: 'POST'
+                            ,data: field
+                            ,dataType: 'json'
+                            ,success: function (res) {
+                                if (res.status === 0) {
+                                    layer.msg(res.msg, {icon:5});
+                                    return false;
+                                }
+                                layui.table.reload('LAY-housetype-manage'); //数据刷新
+                                layer.close(index); //关闭弹层
+                            }
+                        });
+                    });
+
+                    submit.trigger('click');
+                }
+                , success: function (layero,index) {
+                    // 获取子页面的iframe
+                    let iframe = window['layui-layer-iframe' + index];
+                    let $ = iframe.layui.$;
+                    let type_name = e.data.typeName;
+                    let name_shi = type_name.split('室')[0];
+                    let name_ting = type_name.split('厅')[0];
+                    name_ting = name_ting.charAt();
+                    console.log(name_shi);
+                    console.log(name_ting);
+                    $('#name_shi').val();
+                    $('#name_ting').val();
+                    $('#name_chu').val();
+                    $('#name_wei').val();
+                    $('#name_tai').val();
+                }
+            })
+        }
+    }), e("customeradmin", {})
 });

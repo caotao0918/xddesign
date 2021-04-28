@@ -37,56 +37,81 @@ import java.util.*;
 @Transactional
 public class AdminController {
 
+    // 用户service
     @Autowired
-    private UserService userService;//用户接口
+    private UserService userService;
+    // 角色service
     @Autowired
-    private RoleService roleService;//角色接口
+    private RoleService roleService;
+    // 产品一级分类service
     @Autowired
-    private FirstLevelService firstLevelService;//产品一级分类接口
+    private FirstLevelService firstLevelService;
+    // 产品二级分类service
     @Autowired
-    private SecondLevelService secondLevelService;//产品二级分类接口
+    private SecondLevelService secondLevelService;
+    // 产品视频service
     @Autowired
-    private VideoService videoService;//视频接口
+    private VideoService videoService;
+    // 产品手册service
     @Autowired
-    private GuideService guideService;//产品手册接口
+    private GuideService guideService;
+    // 常见问题service
     @Autowired
-    private QuestionService questionService;//常见问题接口
+    private QuestionService questionService;
+    // 产品属性service
     @Autowired
-    private PropertyService propertyService;//产品属性接口
+    private PropertyService propertyService;
+    // 产品信息service
     @Autowired
-    private ProductService productService;//产品信息接口
+    private ProductService productService;
+    // 产品属性值service
     @Autowired
-    private ValueService valueService;//产品属性值接口
+    private ValueService valueService;
+    // 产品图片service
     @Autowired
-    private PictureService pictureService;//产品图片接口
+    private PictureService pictureService;
+    // 客户接口
     @Autowired
-    private CustomerService customerService;//客户接口
+    private CustomerService customerService;
+    // 方案接口
     @Autowired
-    private SolutionsService solutionsService;//方案接口
+    private SolutionsService solutionsService;
+    // 房间接口
     @Autowired
-    private RoomService roomService;//房间接口
+    private RoomService roomService;
+    // 模板方案接口
     @Autowired
-    private TemplateService templateService;//模板方案接口
+    private TemplateService templateService;
+    // 产品数量接口
     @Autowired
-    private ProductNumService productNumService;//产品数量接口
+    private ProductNumService productNumService;
+    // 产品报价单接口
     @Autowired
-    private QuoteService quoteService;//产品报价单接口
+    private QuoteService quoteService;
+    // 方案效果图接口
     @Autowired
-    private RenderingsService renderingsService;//方案效果图接口
+    private RenderingsService renderingsService;
+    // 公司信息接口
     @Autowired
-    private CompanyService companyService; // 公司信息接口
+    private CompanyService companyService;
+    // 户型service
+    @Autowired
+    private HouseTypeService houseTypeService;
 
-    @Value("${upload_path}")
-    private String uploadPath;
+    // 上传文件服务器地址
     @Value("${file_host}")
     private String fileHost;
+    // 上传文件服务器一级目录
+    @Value("${upload_path}")
+    private String uploadPath;
+    // 上传文件服务器二级目录
     @Value("${upload_path_2}")
     private String uploadPath2;
 
     // 角色添加和修改
     @RequestMapping(value = "role/saveorupdate", method = RequestMethod.POST)
     public ReturnResult saveOrUpdateRole(Role role) {
-        //id存在，则为修改，否则新增
+        // id存在，则为修改，否则新增
         if (role.getId() == null) {
             Role one = roleService.getOne(new QueryWrapper<Role>().eq("name", role.getName()), true);
             if (one != null) {
@@ -103,7 +128,9 @@ public class AdminController {
 
     // 查看角色列表
     @RequestMapping(value = "roles")
-    public IPage<Role> findRoles(@RequestParam(defaultValue = "0")Integer id, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+    public IPage<Role> findRoles(@RequestParam(defaultValue = "0")Integer id
+            , @RequestParam(defaultValue = "1") Integer current
+            , @RequestParam(defaultValue = "10") Integer size) {
         Page<Role> page = new Page<>(current,size);
         if (id == 0) {
             return roleService.page(page);
@@ -142,7 +169,8 @@ public class AdminController {
         for (Role role:roleList) {
             result = delRole(role.getId());
             if (result.getStatus() == 0) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                // 事务回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return ReturnResult.returnResult(false, "其中一些角色不能删除，操作失败");
             }
         }
@@ -163,7 +191,8 @@ public class AdminController {
     * @return 没有id时返回分页数据IPage，有id时返回单个User
     */
     @RequestMapping(value = "user")
-    public Object findUser(User user, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+    public Object findUser(User user, @RequestParam(defaultValue = "1") Integer current
+            , @RequestParam(defaultValue = "10") Integer size) {
         return userService.findUser(user, current, size);
     }
 
@@ -180,10 +209,12 @@ public class AdminController {
         for (User user:userList) {
             customerList = customerService.list(new QueryWrapper<Customer>().eq("design_id", user.getId()));
             if (!customerList.isEmpty()) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                // 事务回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return ReturnResult.returnResult(false, "其中一些用户不能删除");
             }
-            boolean update = userService.update(new UpdateWrapper<User>().eq("id", user.getId()).set("del_sign", true));
+            boolean update = userService.update(new UpdateWrapper<User>().eq("id", user.getId())
+                    .set("del_sign", true));
             if (!update) {
                 return ReturnResult.returnResult(false);
             }
@@ -193,11 +224,13 @@ public class AdminController {
     // 删除用户
     @RequestMapping(value = "user/del", method = RequestMethod.POST)
     public ReturnResult delUser(@RequestBody User user) {
-        List<Customer> customerList = customerService.list(new QueryWrapper<Customer>().eq("design_id", user.getId()));
+        List<Customer> customerList = customerService.list(new QueryWrapper<Customer>()
+                .eq("design_id", user.getId()));
         if (!customerList.isEmpty()) {
             return ReturnResult.returnResult(false, "不能删除此设计人员");
         }
-        boolean update = userService.update(new UpdateWrapper<User>().eq("id", user.getId()).set("del_sign", true));
+        boolean update = userService.update(new UpdateWrapper<User>().eq("id", user.getId())
+                .set("del_sign", true));
         return ReturnResult.returnResult(update);
     }
 
@@ -210,21 +243,24 @@ public class AdminController {
 
     // 管理员查询客户方案效果图
     @RequestMapping(value = "solutions/renderings")
-    public IPage<Renderings> findRenderings(Room room, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+    public IPage<Renderings> findRenderings(Room room, @RequestParam(defaultValue = "1") Integer current
+            , @RequestParam(defaultValue = "10") Integer size) {
         Page<Renderings> page = new Page<>(current, size);
         return renderingsService.findRenderings(page, room);
     }
 
     // 管理员查询客户方案报价表
     @RequestMapping(value = "solutions/quotes")
-    public IPage<Quote> findQuotes(Room room, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+    public IPage<Quote> findQuotes(Room room, @RequestParam(defaultValue = "1") Integer current
+            , @RequestParam(defaultValue = "10") Integer size) {
         Page<Quote> page = new Page<>(current, size);
         return quoteService.findQuotes(page ,room);
     }
 
     // 查询客户房间信息
     @RequestMapping(value = "customer/room")
-    public IPage<Room> findRoom(Room room, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+    public IPage<Room> findRoom(Room room, @RequestParam(defaultValue = "1") Integer current
+            , @RequestParam(defaultValue = "10") Integer size) {
         Page<Room> page = new Page<>(current, size);
         return roomService.findRoom(page, room);
     }
@@ -236,9 +272,11 @@ public class AdminController {
             return ReturnResult.returnResult(false, "该房间关联了模板方案，不能删除");
         }
         boolean removeById = roomService.removeById(room.getRoomId());
-        boolean removeQuoteByRoomId = quoteService.remove(new QueryWrapper<Quote>().eq("room_id", room.getRoomId()));
+        boolean removeQuoteByRoomId = quoteService.remove(new QueryWrapper<Quote>()
+                .eq("room_id", room.getRoomId()));
         if (!removeById || !removeQuoteByRoomId) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+            // 事务回滚
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return ReturnResult.returnResult(false);
         }
         return ReturnResult.returnResult(true);
@@ -250,7 +288,8 @@ public class AdminController {
         for (Room room:roomList) {
             ReturnResult result = deleteRoom(room);
             if (result.getStatus() == 0) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                // 事务回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return ReturnResult.returnResult(false, "其中一些房间关联了模板方案，不能删除");
             }
         }
@@ -266,7 +305,8 @@ public class AdminController {
 
     // 查询房间内产品数量信息
     @RequestMapping(value = "customer/pn")
-    public IPage<ProductNum> findProductNum(ProductNum productNum, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+    public IPage<ProductNum> findProductNum(ProductNum productNum, @RequestParam(defaultValue = "1") Integer current
+            , @RequestParam(defaultValue = "10") Integer size) {
         Page<ProductNum> page = new Page<>(current,size);
         return productNumService.findProductNum(page, productNum);
     }
@@ -298,6 +338,27 @@ public class AdminController {
         return ReturnResult.returnResult(updateById);
     }
 
+    // 查询户型列表
+    @RequestMapping(value = "customer/houseType")
+    public IPage<HouseType> findHouseTypeList(@RequestParam(defaultValue = "1") Integer current
+            , @RequestParam(defaultValue = "10") Integer size) {
+        Page<HouseType> page = new Page<>(current, size);
+        return houseTypeService.page(page, new QueryWrapper<HouseType>().orderByDesc("type_num"));
+    }
+
+    /**
+     * @description: 户型管理-添加户型
+     */
+    @RequestMapping(value = "housetype/save", method = RequestMethod.POST)
+    public ReturnResult saveHouseType(HouseType houseType) {
+        List<HouseType> list = houseTypeService.list(new QueryWrapper<HouseType>().eq("type_name", houseType.getTypeName()));
+        if (list.isEmpty()) {
+            boolean save = houseTypeService.saveOrUpdate(houseType);
+            return ReturnResult.returnResult(save);
+        }
+        return ReturnResult.returnResult(false, "该户型已存在");
+    }
+
     // 添加或修改产品一级分类信息
     @RequestMapping(value = "firstlevel/saveorupdate", method = RequestMethod.POST)
     public ReturnResult saveOrUpdateFirstLevel(FirstLevel firstLevel) {
@@ -307,23 +368,26 @@ public class AdminController {
 
     // 查询一级分类列表
     @RequestMapping(value = "firstlevel")
-    public Object findFirstLevelList(Integer firstId, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "100") Integer size) {
+    public Object findFirstLevelList(Integer firstId, @RequestParam(defaultValue = "1") Integer current
+            , @RequestParam(defaultValue = "10") Integer size) {
         Page<FirstLevel> page = new Page<>(current,size);
         if (firstId == null) {
             return firstLevelService.page(page);
         }
-        return firstLevelService.page(page, new QueryWrapper<FirstLevel>().eq("first_id",firstId)).getRecords().get(0);
+        return firstLevelService.page(page, new QueryWrapper<FirstLevel>()
+                .eq("first_id",firstId)).getRecords().get(0);
     }
-    //查询一级分类列表（不分页）
+    // 查询一级分类列表（不分页）
     @RequestMapping(value = "firstlevel/nopage")
     public List<FirstLevel> findFirstLevelList() {
         return firstLevelService.list();
     }
 
-    //根据id删除一级分类
+    // 根据id删除一级分类
     @RequestMapping(value = "firstlevel/delete", method = RequestMethod.POST)
     public ReturnResult deleteFirstLevel(Integer firstId) {
-        List<SecondLevel> secondLevelList = secondLevelService.list(new QueryWrapper<SecondLevel>().eq("first_id", firstId));
+        List<SecondLevel> secondLevelList = secondLevelService.list(new QueryWrapper<SecondLevel>()
+                .eq("first_id", firstId));
         if (secondLevelList.isEmpty()) {
             boolean removeById = firstLevelService.removeById(firstId);
             return ReturnResult.returnResult(removeById);
@@ -332,13 +396,14 @@ public class AdminController {
         }
 
     }
-    //批量删除一级分类
+    // 批量删除一级分类
     @RequestMapping(value = "firstlevel/batchdelete", method = RequestMethod.POST)
     public ReturnResult deleteFirstLevel(@RequestBody List<FirstLevel> firstLevelList) {
         for (FirstLevel firstLevel:firstLevelList) {
             ReturnResult result = deleteFirstLevel(firstLevel.getFirstId());
             if (result.getStatus() == 0) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                // 事务回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return ReturnResult.returnResult(false, "其中一行或多行不能删除");
             }
         }
@@ -353,11 +418,13 @@ public class AdminController {
     public ReturnResult saveOrUpdate(SecondLevel secondLevel) {
         Boolean state;
         if (secondLevel.getSecondId() == null) {
-            //新增二级分类信息
+            // 新增二级分类信息
             state = secondLevelService.saveSecondLevel(secondLevel);
         } else {
-            //修改信息，可供修改的项有 二级分类名称、二级分类描述、一级分类归属
-            state = secondLevelService.update(secondLevel, new UpdateWrapper<SecondLevel>().eq("second_id", secondLevel.getSecondId()).set("first_id", secondLevel.getFirstLevel().getFirstId()));
+            // 修改信息，可供修改的项有 二级分类名称、二级分类描述、一级分类归属
+            state = secondLevelService.update(secondLevel, new UpdateWrapper<SecondLevel>()
+                    .eq("second_id", secondLevel.getSecondId())
+                    .set("first_id", secondLevel.getFirstLevel().getFirstId()));
         }
 
         return ReturnResult.returnResult(state);
@@ -377,7 +444,9 @@ public class AdminController {
      * @param size:每页条数
      */
     @RequestMapping(value = "secondlevels")
-    public IPage<SecondLevel> findSecondLevels(SecondLevel secondLevel, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+    public IPage<SecondLevel> findSecondLevels(SecondLevel secondLevel
+            , @RequestParam(defaultValue = "1") Integer current
+            , @RequestParam(defaultValue = "10") Integer size) {
         Page<SecondLevel> page = new Page<>(current,size);
         return secondLevelService.findSecondLevels(page, secondLevel);
     }
@@ -388,23 +457,26 @@ public class AdminController {
         return secondLevelService.findSecondLevel(secondId);
     }
 
-    //查询二级分类列表（不分页）
+    // 查询二级分类列表（不分页）
     @RequestMapping(value = "secondlevel/nopage")
     public List<SecondLevel> findSecondLevelList(Integer firstId) {
-        return secondLevelService.list(new QueryWrapper<SecondLevel>().eq("first_id", firstId).select("second_id","second_name"));
+        return secondLevelService.list(new QueryWrapper<SecondLevel>()
+                .eq("first_id", firstId).select("second_id","second_name"));
     }
 
-    //查询二级分类产品属性列表
+    // 查询二级分类产品属性列表
     @RequestMapping(value = "secondlevel/property")
-    public IPage<Property> findPropertyList(Property property, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+    public IPage<Property> findPropertyList(Property property, @RequestParam(defaultValue = "1") Integer current
+            , @RequestParam(defaultValue = "10") Integer size) {
         Page<Property> page = new Page<>(current, size);
         return propertyService.findPropertyList(page, property);
     }
 
-    //查询二级分类产品属性列表（不分页）
+    // 查询二级分类产品属性列表（不分页）
     @RequestMapping(value = "secondlevel/property/nopage")
     public List<Property> findPropertyList(Integer secondId) {
-        return propertyService.list(new QueryWrapper<Property>().eq("second_id", secondId).select("property_id", "property_name", "common_value"));
+        return propertyService.list(new QueryWrapper<Property>().eq("second_id", secondId)
+                .select("property_id", "property_name", "common_value"));
     }
 
     /**
@@ -441,7 +513,8 @@ public class AdminController {
     // 根据id删除属性信息
     @RequestMapping(value = "property/delete")
     public ReturnResult deleteProperty(Integer propertyId) {
-        List<PropertyValue> valueList = valueService.list(new QueryWrapper<PropertyValue>().eq("property_id", propertyId));
+        List<PropertyValue> valueList = valueService.list(new QueryWrapper<PropertyValue>()
+                .eq("property_id", propertyId));
         if (valueList.isEmpty()) {
             boolean removeById = propertyService.removeById(propertyId);
             return ReturnResult.returnResult(removeById);
@@ -457,7 +530,8 @@ public class AdminController {
         for (Property property:propertyList) {
             result = deleteProperty(property.getPropertyId());
             if (result.getStatus() == 0) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                // 事务回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return ReturnResult.returnResult(false, "其中一些行关联了产品属性，不能删除");
             }
         }
@@ -467,12 +541,15 @@ public class AdminController {
     // 根据二级分类id查询产品列表（不分页）
     @RequestMapping(value = "secondlevel/products/nopage")
     public List<Product> findProductsBySecondLevel(Integer secondId) {
-        return productService.list(new QueryWrapper<Product>().eq("second_id", secondId).select("product_id", "product_name"));
+        return productService.list(new QueryWrapper<Product>().eq("second_id", secondId)
+                .select("product_id", "product_name"));
     }
 
     // 查询产品属性信息
     @RequestMapping(value = "product/property")
-    public IPage<ProductVo> findProductPropertyValueList(ProductVo productVo, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+    public IPage<ProductVo> findProductPropertyValueList(ProductVo productVo
+            , @RequestParam(defaultValue = "1") Integer current
+            , @RequestParam(defaultValue = "10") Integer size) {
         Page<ProductVo> page = new Page<>(current, size);
         String productName = productVo.getProductName();
         if (productName != null) {
@@ -499,7 +576,8 @@ public class AdminController {
             if (save != 1) {
                 return ReturnResult.returnResult(false);
             }
-            boolean state = productService.saveProductProperty(productVo.getProductId(), propertyValue.getValueId());//将产品id和属性值id保存到t_product_property中
+            // 将产品id和属性值id保存到t_product_property中
+            boolean state = productService.saveProductProperty(productVo.getProductId(), propertyValue.getValueId());
             if (!state) {
                 return ReturnResult.returnResult(false);
             }
@@ -513,7 +591,9 @@ public class AdminController {
     // 修改产品某个属性信息
     @RequestMapping(value = "product/property/update", method = RequestMethod.POST)
     public ReturnResult updateProductProperty(PropertyValue propertyValue) {
-        boolean state = valueService.update(new UpdateWrapper<PropertyValue>().eq("value_id",propertyValue.getValueId()).set("value_name",propertyValue.getValueName()));
+        boolean state = valueService.update(new UpdateWrapper<PropertyValue>()
+                .eq("value_id",propertyValue.getValueId())
+                .set("value_name",propertyValue.getValueName()));
         return ReturnResult.returnResult(state);
     }
 
@@ -535,12 +615,14 @@ public class AdminController {
 
     // 产品视频上传
     @RequestMapping(value = "video/upload", method = RequestMethod.POST)
-    public JSONObject uploadProductVideo(@RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
+    public JSONObject uploadProductVideo(@RequestParam(value = "file", required = false) MultipartFile file)
+            throws IOException {
         JSONObject res = new JSONObject();
         JSONObject data = new JSONObject();
         if (file.getSize() != 0) {
             String date = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
-            String saveFileName = FileUtil.saveFile(file, uploadPath + uploadPath2 + "/video/" + date, uploadPath);
+            String saveFileName = FileUtil.saveFile(file, uploadPath
+                    + uploadPath2 + "/video/" + date, uploadPath);
             String link = fileHost + saveFileName;
             res.put("status", 1);
             res.put("msg", "上传成功");
@@ -576,9 +658,11 @@ public class AdminController {
         Video video;
         for (Integer id:ids){
             video = videoService.getById(id);
-            FileUtil.deleteFile(uploadPath + video.getVideoLink().substring(fileHost.length()));//删除视频文件
+            // 删除视频文件
+            FileUtil.deleteFile(uploadPath + video.getVideoLink().substring(fileHost.length()));
         }
-        boolean removeByIds = videoService.removeByIds(ids);//删除数据库中的视频信息
+        // 删除数据库中的信息
+        boolean removeByIds = videoService.removeByIds(ids);
         return ReturnResult.returnResult(removeByIds);
     }
 
@@ -589,7 +673,8 @@ public class AdminController {
         JSONObject data = new JSONObject();
         if (file.getSize() != 0) {
             String date = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
-            String saveFileName = FileUtil.saveFile(file, uploadPath + uploadPath2 + "/guide/" + date, uploadPath);
+            String saveFileName = FileUtil.saveFile(file, uploadPath
+                    + uploadPath2 + "/guide/" + date, uploadPath);
             String link = fileHost + saveFileName;
             res.put("status", 1);
             res.put("msg", "上传成功");
@@ -664,21 +749,24 @@ public class AdminController {
 
     // 查询常见问题列表
     @RequestMapping(value = "questions")
-    public IPage<Question> findQuestions(ProductVo productVo, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+    public IPage<Question> findQuestions(ProductVo productVo, @RequestParam(defaultValue = "1") Integer current
+            , @RequestParam(defaultValue = "10") Integer size) {
         Page<Question> page = new Page<>(current, size);
         return questionService.findQuestions(page, productVo);
     }
 
     // 查询产品视频列表
     @RequestMapping(value = "videos")
-    public IPage<Video> findVideos(ProductVo productVo, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+    public IPage<Video> findVideos(ProductVo productVo, @RequestParam(defaultValue = "1") Integer current
+            , @RequestParam(defaultValue = "10") Integer size) {
         Page<Video> page = new Page<>(current,size);
         return videoService.findVideos(page, productVo);
     }
 
     // 查询产品手册列表
     @RequestMapping(value = "guides")
-    public IPage<Guide> findGuideList(ProductVo productVo, @RequestParam(defaultValue = "1") Integer current, @RequestParam(defaultValue = "10") Integer size) {
+    public IPage<Guide> findGuideList(ProductVo productVo, @RequestParam(defaultValue = "1") Integer current
+            , @RequestParam(defaultValue = "10") Integer size) {
         Page<Guide> page = new Page<>(current, size);
         return guideService.findGuides(page, productVo);
     }
@@ -689,39 +777,50 @@ public class AdminController {
      * @param files:产品图片列表
      */
     @RequestMapping(value = "product/save", method = RequestMethod.POST)
-    public ReturnResult saveProduct(ProductVo productVo, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
-        System.err.println(productVo);
+    public ReturnResult saveProduct(ProductVo productVo
+            , @RequestParam(value = "files", required = false) MultipartFile[] files)
+            throws IOException {
         if (files.length == 0) {
             return ReturnResult.returnResult(false, "必须上传至少一张图片");
         }
         ReturnResult result = new ReturnResult();
-        Integer productId = productService.saveProduct(productVo);//将产品基本信息保存到t_product表中
+        // 将产品基本信息保存到t_product表中
+        Integer productId = productService.saveProduct(productVo);
         if (productId != 1) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+            // 事务回滚
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             result.setStatus(0);
             result.setMsg("添加失败，请稍后重试");
         }else {
-            List<Map<String, Object>> propertyValueList = productVo.getPropertyValueList();//获取属性id-属性值列表
+            // 获取属性id-属性值列表
+            List<Map<String, Object>> propertyValueList = productVo.getPropertyValueList();
             if (propertyValueList == null) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                // 事务回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return ReturnResult.returnResult(false, "需要为产品添加属性信息");
             }
             PropertyValue propertyValue = new PropertyValue();
             Property property = new Property();
             for (Map<String, Object> pv:propertyValueList) {
-                propertyValue.setValueName(pv.get("valueName").toString());//获取属性值
-                property.setPropertyId(Integer.valueOf(pv.get("propertyId").toString()));//获取属性id
+                // 获取属性值
+                propertyValue.setValueName(pv.get("valueName").toString());
+                // 获取属性id
+                property.setPropertyId(Integer.valueOf(pv.get("propertyId").toString()));
                 propertyValue.setProperty(property);
-                Integer valueId = valueService.saveValue(propertyValue);//将属性值和属性id保存到表t_property_value中
+                // 将属性值和属性id保存到表t_property_value中
+                Integer valueId = valueService.saveValue(propertyValue);
                 if (valueId != 1) {
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                    // 事务回滚
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     result.setStatus(0);
                     result.setMsg("添加失败，请稍后重试");
                     return result;
                 }else {
-                    boolean state = productService.saveProductProperty(productVo.getProductId(),propertyValue.getValueId());//将产品id和属性值id保存到t_product_property中
+                    // 将产品id和属性值id保存到t_product_property中
+                    boolean state = productService.saveProductProperty(productVo.getProductId(), propertyValue.getValueId());
                     if(!state) {
-                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                        // 事务回滚
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                         result.setStatus(0);
                         result.setMsg("添加失败，请稍后重试");
                         return result;
@@ -730,7 +829,10 @@ public class AdminController {
             }
 
             Picture picture = new Picture();
-            Picture picture1 = pictureService.getOne(new QueryWrapper<Picture>().eq("product_id", productVo.getProductId()).eq("default_picture", true), true);//查看该产品图片是否已经有默认图片
+            // 查看该产品图片是否已经有默认图片
+            Picture picture1 = pictureService.getOne(new QueryWrapper<Picture>()
+                    .eq("product_id", productVo.getProductId())
+                    .eq("default_picture", true), true);
             int i = 0;
 
             CommonsMultipartFile commonsMultipartFile;
@@ -746,14 +848,16 @@ public class AdminController {
                 ips = fileItem.getInputStream();
                 fileType = FileUtil.getFileType(ips);
                 if (fileType == null) {
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                    // 事务回滚
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     return ReturnResult.returnResult(false, "图片格式错误");
                 }
 
                 // 上传图片到nginx服务器
                 String saveFileName;
                 try {
-                    saveFileName = FileUtil.saveFile(file, uploadPath + uploadPath2 + "/picture/" + productVo.getProductName(), uploadPath);
+                    saveFileName = FileUtil.saveFile(file, uploadPath
+                            + uploadPath2 + "/picture/" + productVo.getProductName(), uploadPath);
                 } catch (IOException e) {
                     return ReturnResult.returnResult(false, "产品名称不能包含 \\ / : * ?  < > | 等特殊字符！");
                 }
@@ -766,11 +870,14 @@ public class AdminController {
                     // 默认将第一张图片设置为默认图片
                     picture.setDefaultPicture(i == 0);
                 } else {
-                    picture.setDefaultPicture(false);//已经有默认图片则不设置
+                    // 已经有默认图片则不设置
+                    picture.setDefaultPicture(false);
                 }
-                boolean state = pictureService.savePicture(picture, productVo.getProductId());//将图片信息保存到t_picture表中
+                // 将图片信息保存到t_picture表中
+                boolean state = pictureService.savePicture(picture, productVo.getProductId());
                 if(!state) {
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+                    // 事务回滚
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     result.setStatus(0);
                     result.setMsg("添加失败，请稍后重试");
                     return result;
@@ -785,33 +892,39 @@ public class AdminController {
         return result;
     }
 
-    //修改产品基本信息
+    // 修改产品基本信息
     @RequestMapping(value = "product/update", method = RequestMethod.POST)
     public ReturnResult updateProduct(Product product, Integer secondId) {
         if (secondId == null || secondId == 0) {
             return ReturnResult.returnResult(false, "需要为产品指定分类");
         }
-        boolean update = productService.update(product, new UpdateWrapper<Product>().eq("product_id", product.getProductId()).set("second_id", secondId));
+        boolean update = productService.update(product, new UpdateWrapper<Product>()
+                .eq("product_id", product.getProductId())
+                .set("second_id", secondId));
         return ReturnResult.returnResult(update);
     }
 
     // 删除产品
     @RequestMapping(value = "product/del", method = RequestMethod.POST)
     public ReturnResult deleteProduct(Integer productId) {
-        List<ProductNum> productNumList = productNumService.list(new QueryWrapper<ProductNum>().eq("product_id", productId).select("pn_id"));
-        System.out.println(productNumList);
+        List<ProductNum> productNumList = productNumService.list(new QueryWrapper<ProductNum>()
+                .eq("product_id", productId)
+                .select("pn_id"));
         if (!productNumList.isEmpty()) {
             return ReturnResult.returnResult(false, "客户方案用到了该产品，不能删除");
         }
 
-        List<ProductProperty> productPropertyList = productService.findProductPropertyByProductId(productId);//查看t_product_property表中有无要删除的信息
+        // 查看t_product_property表中有无要删除的信息
+        List<ProductProperty> productPropertyList = productService.findProductPropertyByProductId(productId);
         if (!productPropertyList.isEmpty()) {
-            boolean removeProductPropertyByProductId = productService.removeProductPropertyByProductId(productId);// 删除t_product_property表的信息
+            // 删除t_product_property表的信息
+            boolean removeProductPropertyByProductId = productService.removeProductPropertyByProductId(productId);
             if (!removeProductPropertyByProductId) {
                 return ReturnResult.returnResult(false);
             }
             for (ProductProperty pp:productPropertyList) {
-                boolean removeByValueId = valueService.removeById(pp.getValue().getValueId());//删除t_property_value表中的信息
+                // 删除t_property_value表中的信息
+                boolean removeByValueId = valueService.removeById(pp.getValue().getValueId());
                 if (!removeByValueId) {
                     return ReturnResult.returnResult(false);
                 }
@@ -825,9 +938,11 @@ public class AdminController {
         return ReturnResult.returnResult(removeById);
     }
 
-    //查询产品图片列表
+    // 查询产品图片列表
     @RequestMapping(value = "product/picture")
-    public IPage<Picture> findPictures(ProductVo productVo, @RequestParam(value = "current", defaultValue = "1") Integer current, @RequestParam(value = "size", defaultValue = "10") Integer size) {
+    public IPage<Picture> findPictures(ProductVo productVo
+            , @RequestParam(value = "current", defaultValue = "1") Integer current
+            , @RequestParam(value = "size", defaultValue = "10") Integer size) {
         if (productVo != null) {
             if (productVo.getProductName() != null) {
                 productVo.setProductName(productVo.getProductName().trim());
@@ -839,20 +954,23 @@ public class AdminController {
 
     /**
      * @description: 单独添加产品图片
-     * @param productId:产品id
-     * @param productName:产品名称
-     * @param file:上传的图片
+     * @param productId: 产品id
+     * @param productName: 产品名称
+     * @param file: 上传的图片
      */
     @RequestMapping(value = "product/picture/save", method = RequestMethod.POST)
-    public ReturnResult saveProductPicture(Integer productId, String productName, @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
+    public ReturnResult saveProductPicture(Integer productId, String productName
+            , @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
         if (productId == null) {
             return ReturnResult.returnResult(false, "需要选择一个产品");
         }
         String saveFileName,pictureLink,pictureDesc;
         boolean state;
         Picture picture = new Picture();
-        //查看该产品图片是否已经有默认图片
-        Picture picture1 = pictureService.getOne(new QueryWrapper<Picture>().eq("product_id", productId).eq("default_picture", true), true);
+        // 查看该产品图片是否已经有默认图片
+        Picture picture1 = pictureService.getOne(new QueryWrapper<Picture>()
+                .eq("product_id", productId)
+                .eq("default_picture", true), true);
         saveFileName = FileUtil.saveFile(file, uploadPath + uploadPath2 + "/picture/" + productName, uploadPath);
         pictureLink = fileHost + saveFileName;
         pictureDesc = "这是一张" + productName + "图片";
@@ -862,29 +980,42 @@ public class AdminController {
         picture.setDefaultPicture(picture1 == null);
         state = pictureService.savePicture(picture, productId);
         if(!state) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+            // 事务回滚
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return ReturnResult.returnResult(false, "添加失败，请稍后重试");
         }
         return ReturnResult.returnResult(true);
     }
 
-    //更改产品的默认图片
+    /**
+     * @description: 更改产品的默认图片
+     * @param pictureId:图片id
+     * @return ReturnResult
+     */
     @RequestMapping(value = "product/picture/updatedefault", method = RequestMethod.POST)
     public ReturnResult updateDefault(Integer pictureId) {
         // 找到对应的产品id
-        Integer productId = pictureService.getOne(new QueryWrapper<Picture>().eq("picture_id", pictureId).select("product_id")).getProductId();
+        Integer productId = pictureService.getOne(new QueryWrapper<Picture>()
+                .eq("picture_id", pictureId)
+                .select("product_id")).getProductId();
         // 找到这个产品下的默认图片
-        Picture picture = pictureService.getOne(new QueryWrapper<Picture>().eq("product_id", productId).eq("default_picture", true).select("picture_id"), true);
+        Picture picture = pictureService.getOne(new QueryWrapper<Picture>()
+                .eq("product_id", productId)
+                .eq("default_picture", true)
+                .select("picture_id"), true);
         if (picture == null) {
             return ReturnResult.returnResult(false, "服务器错误");
         }
 
         // 将原默认图片改为false
-        boolean update1 = pictureService.update(new UpdateWrapper<Picture>().eq("picture_id", picture.getPictureId()).set("default_picture", false));
+        boolean update1 = pictureService.update(new UpdateWrapper<Picture>()
+                .eq("picture_id", picture.getPictureId())
+                .set("default_picture", false));
         if (!update1) {
             return ReturnResult.returnResult(false, "修改失败");
         }
-        boolean update2 = pictureService.update(new UpdateWrapper<Picture>().eq("picture_id", pictureId).set("default_picture", true));
+        boolean update2 = pictureService.update(new UpdateWrapper<Picture>().eq("picture_id", pictureId)
+                .set("default_picture", true));
         return ReturnResult.returnResult(update2);
 
     }
@@ -902,13 +1033,13 @@ public class AdminController {
         pictureLink = picture.getPictureLink();
         deleteFile = FileUtil.deleteFile(uploadPath + pictureLink.substring(fileHost.length()));
         if (!deleteFile) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//事务回滚
+            // 事务回滚
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return ReturnResult.returnResult(false, "删除失败");
         }
         boolean removeByIds = pictureService.removeById(id);
         return ReturnResult.returnResult(removeByIds);
     }
-
 
     /**
      * @description: 产品详情-添加图片
@@ -946,7 +1077,12 @@ public class AdminController {
         return res;
     }
 
-    //产品详情-删除文件
+    /**
+     * @description: 产品详情-删除文件
+     * @param imgpath: 图片路径
+     * @param filepath: 文件路径
+     * @return ReturnResult
+     */
     @RequestMapping(value = "product/detail/calldel", method = RequestMethod.POST)
     public ReturnResult calldel(String imgpath, String filepath) {
         boolean deleteFile;
@@ -975,7 +1111,9 @@ public class AdminController {
      */
     @RequestMapping(value = "product/detail/saveorupdate", method = RequestMethod.POST)
     public ReturnResult saveproductdetail(Product product) {
-        boolean update = productService.update(new UpdateWrapper<Product>().eq("product_id", product.getProductId()).set("product_detail", product.getProductDetail()));
+        boolean update = productService.update(new UpdateWrapper<Product>()
+                .eq("product_id", product.getProductId())
+                .set("product_detail", product.getProductDetail()));
         return ReturnResult.returnResult(update);
     }
 

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <title>户型管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="../../../admin/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../../admin/layuiadmin/style/admin.css" media="all">
+</head>
+<body>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <div style="padding-bottom: 10px;">
+                <button class="layui-btn layuiadmin-btn-useradmin" data-type="batchdel">删除</button>
+                <button class="layui-btn layuiadmin-btn-useradmin" data-type="add">添加</button>
+            </div>
+
+            <table id="LAY-housetype-manage" lay-filter="LAY-housetype-manage"></table>
+            <script type="text/html" id="table-housetype-admin">
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+            </script>
+        </div>
+    </div>
+</div>
+
+<script src="../../../admin/layuiadmin/layui/layui.js"></script>
+<script>
+    layui.config({
+        base: '../../../admin/layuiadmin/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'customeradmin', 'table'], function(){
+        var $ = layui.$
+            ,form = layui.form
+            ,admin = layui.admin
+            ,table = layui.table;
+
+        $(function () {
+
+            $.ajax({
+                url:"/xddesign/design/customer/houseType"
+                ,type:"GET"
+                ,dataType:"json"
+                ,async: false
+                ,success:function(res) {
+                    let select = $("select[name='houseType.typeId']");
+                    select.empty();
+                    let con = '<option value="0">全部</option>';
+                    for (let i = 0; i < res.length; i++) {
+                        con += '<option value='+'"'+res[i].typeId+'"'+'>'+res[i].typeName+'</option>';
+                    }
+                    select.html(con);
+                    //这一步必不可少
+                    form.render("select");
+                }
+            });
+        })
+
+        //监听搜索
+        form.on('submit(LAY-housetype-front-search)', function(data){
+            let field = data.field;
+
+            //执行重载
+            table.reload('LAY-housetype-manage', {
+                where: field
+            });
+        });
+
+        //事件
+        var active = {
+            batchdel: function(){
+                var checkStatus = table.checkStatus('LAY-housetype-manage')
+                    ,checkData = checkStatus.data; //得到选中的数据
+
+                if(checkData.length === 0){
+                    return layer.msg('请选择数据');
+                }
+                layer.confirm('确定删除吗？', {icon:3, title: '提示'}, function(index) {
+
+                    //执行 Ajax 后重载
+                    $.ajax({
+                        url: '/xddesign/design/customer/housetype/batchdel'
+                        ,type: 'POST'
+                        ,data: JSON.stringify(checkData)
+                        ,dataType: 'json'
+                        ,contentType: 'application/json;charset=utf-8'
+                        ,success: function (res) {
+                            if (res.status == 0) {
+                                layer.msg(res.msg, {icon:5});
+                                return false;
+                            }
+                            table.reload('LAY-housetype-manage');
+                            layer.msg('已删除');
+                        }
+                    });
+                });
+            }
+            ,add: function(){
+                layer.open({
+                    type: 2
+                    ,title: '添加户型'
+                    ,content: 'housetypeform.html'
+                    ,maxmin: true
+                    ,area: ['550px', '700px']
+                    ,btn: ['确定', '取消']
+                    ,yes: function(index, layero){
+                        var iframeWindow = window['layui-layer-iframe'+ index]
+                            ,submitID = 'LAY-housetype-front-submit'
+                            ,submit = layero.find('iframe').contents().find('#'+ submitID);
+
+                        //监听提交
+                        iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
+                            let field = {};
+                            let name_shi = iframeWindow.layui.$('#name_shi').val() + '室';
+                            let name_ting = iframeWindow.layui.$('#name_ting').val() + '厅';
+                            let name_chu = iframeWindow.layui.$('#name_chu').val() + '厨';
+                            let name_wei = iframeWindow.layui.$('#name_wei').val() + '卫';
+                            let name_tai = iframeWindow.layui.$('#name_tai').val() + '阳台';
+                            field.typeName = name_shi + name_ting + name_chu + name_wei + name_tai;
+                            field.typeDesc = iframeWindow.layui.$('#typeDesc').val();
+                            //提交 Ajax 成功后，静态更新表格中的数据
+                            $.ajax({
+                                url: '/xddesign/admin/housetype/save'
+                                ,type: 'POST'
+                                ,data: field
+                                ,dataType: 'json'
+                                ,success: function (res) {
+                                    if (res.status===0) {
+                                        layer.msg(res.msg, {icon:5});
+                                        return false;
+                                    }
+                                    table.reload('LAY-housetype-manage'); //数据刷新
+                                    layer.close(index); //关闭弹层
+                                }
+                            });
+
+                        });
+
+                        submit.trigger('click');
+                    }
+                });
+            }
+        };
+
+        $('.layui-btn.layuiadmin-btn-useradmin').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>
+</body>
+</html>
