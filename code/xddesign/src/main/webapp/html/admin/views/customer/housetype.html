@@ -37,39 +37,7 @@
     }).use(['index', 'customeradmin', 'table'], function(){
         var $ = layui.$
             ,form = layui.form
-            ,admin = layui.admin
             ,table = layui.table;
-
-        $(function () {
-
-            $.ajax({
-                url:"/xddesign/design/customer/houseType"
-                ,type:"GET"
-                ,dataType:"json"
-                ,async: false
-                ,success:function(res) {
-                    let select = $("select[name='houseType.typeId']");
-                    select.empty();
-                    let con = '<option value="0">全部</option>';
-                    for (let i = 0; i < res.length; i++) {
-                        con += '<option value='+'"'+res[i].typeId+'"'+'>'+res[i].typeName+'</option>';
-                    }
-                    select.html(con);
-                    //这一步必不可少
-                    form.render("select");
-                }
-            });
-        })
-
-        //监听搜索
-        form.on('submit(LAY-housetype-front-search)', function(data){
-            let field = data.field;
-
-            //执行重载
-            table.reload('LAY-housetype-manage', {
-                where: field
-            });
-        });
 
         //事件
         var active = {
@@ -80,13 +48,17 @@
                 if(checkData.length === 0){
                     return layer.msg('请选择数据');
                 }
+                let ids = [];
+                for (let i = 0; i < checkData.length; i++) {
+                    ids.push(checkData[i].typeId);
+                }
                 layer.confirm('确定删除吗？', {icon:3, title: '提示'}, function(index) {
 
                     //执行 Ajax 后重载
                     $.ajax({
-                        url: '/xddesign/design/customer/housetype/batchdel'
+                        url: '/xddesign/admin/housetype/batchdel'
                         ,type: 'POST'
-                        ,data: JSON.stringify(checkData)
+                        ,data: JSON.stringify(ids)
                         ,dataType: 'json'
                         ,contentType: 'application/json;charset=utf-8'
                         ,success: function (res) {

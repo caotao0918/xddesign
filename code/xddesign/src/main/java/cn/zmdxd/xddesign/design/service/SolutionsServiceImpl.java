@@ -126,7 +126,7 @@ public class SolutionsServiceImpl extends ServiceImpl<SolutionsDao, Solutions> i
         solutions.setWorkName(workName);
         solutions.setWorkTime(workTime);
         solutions.setWorkPrice(workPrice);
-        solutions.setSoluDesc(soluDesc);
+//        solutions.setSoluDesc(soluDesc);
         solutions.setAddTime(Timestamp.valueOf(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
         Integer customerId = houseDao.selectById(solutions.getHouseId()).getCustomerId();
 

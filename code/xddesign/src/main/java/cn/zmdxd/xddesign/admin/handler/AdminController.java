@@ -97,6 +97,9 @@ public class AdminController {
     // 户型service
     @Autowired
     private HouseTypeService houseTypeService;
+    // 房子service
+    @Autowired
+    private HouseService houseService;
 
     // 上传文件服务器地址
     @Value("${file_host}")
@@ -351,12 +354,49 @@ public class AdminController {
      */
     @RequestMapping(value = "housetype/save", method = RequestMethod.POST)
     public ReturnResult saveHouseType(HouseType houseType) {
-        List<HouseType> list = houseTypeService.list(new QueryWrapper<HouseType>().eq("type_name", houseType.getTypeName()));
-        if (list.isEmpty()) {
-            boolean save = houseTypeService.saveOrUpdate(houseType);
-            return ReturnResult.returnResult(save);
+        // 添加户型
+        if (houseType.getTypeId() == null) {
+            List<HouseType> list = houseTypeService.list(new QueryWrapper<HouseType>().eq("type_name", houseType.getTypeName()));
+            if (list.isEmpty()) {
+                boolean save = houseTypeService.saveOrUpdate(houseType);
+                return ReturnResult.returnResult(save);
+            }
+            return ReturnResult.returnResult(false, "该户型已存在");
         }
-        return ReturnResult.returnResult(false, "该户型已存在");
+        // 编辑户型
+        boolean save = houseTypeService.saveOrUpdate(houseType);
+        return ReturnResult.returnResult(save);
+    }
+
+    /**
+     * @description: 户型管理-删除户型
+     */
+    @RequestMapping(value = "housetype/del", method = RequestMethod.POST)
+    public ReturnResult delHouseType(Integer typeId) {
+        List<Template> templates = templateService.list(new QueryWrapper<Template>().eq("type_id", typeId).select("temp_id"));
+        List<House> houses = houseService.list(new QueryWrapper<House>().eq("type_id", typeId).select("house_id"));
+        if (templates.isEmpty() && houses.isEmpty()) {
+            boolean removeById = houseTypeService.removeById(typeId);
+            return ReturnResult.returnResult(removeById);
+        }
+        return ReturnResult.returnResult(false, "该户型关联其他数据，不能删除！");
+    }
+
+    /**
+     * @description: 户型管理-批量删除户型
+     */
+    @RequestMapping(value = "housetype/batchdel", method = RequestMethod.POST)
+    public ReturnResult delHouseType(@RequestBody List<Integer> ids) {
+        ReturnResult result;
+        for (Integer id:ids) {
+            result = delHouseType(id);
+            if (result.getStatus() == 0) {
+                // 事务回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return ReturnResult.returnResult(false, "其中一些户型关联的有其他数据");
+            }
+        }
+        return ReturnResult.returnResult(true);
     }
 
     // 添加或修改产品一级分类信息
