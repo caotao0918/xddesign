@@ -74,12 +74,14 @@
             dataType: "json",
             type: "POST",
             success: function (res) {
-                if (1 == res.status) {
+                if (1 === res.status) {
                     window.localStorage.clear();
                     location.href = '/xddesign/html/login/cuslgi.html';
                 } else {
+                    window.localStorage.clear();
                     alert("退出失败,请重新登录");
                 }
+                window.localStorage.clear();
             }
         });
     }
@@ -90,12 +92,14 @@
             dataType: "json",
             type: "POST",
             success: function (res) {
-                if (1 == res.status) {
+                if (1 === res.status) {
                     window.localStorage.clear();
                     location.href = '/xddesign/html/login/userlgi.html';
                 } else {
+                    window.localStorage.clear();
                     alert("退出失败,请重新登录");
                 }
+                window.localStorage.clear();
             }
         });
     }
