@@ -199,16 +199,19 @@
               let productSelect = $$('select[name="productId"]');
               let guideLink = $$('input[name="guideLink"]').val();
               let pictureLink = $$('input[name="pictureLink"]').val();
+              let guideName = $$('input[name="guideName"]').val();
+              let guideDesc = $$('input[name="guideDesc"]').val();
 
               //提交 Ajax 成功后，静态更新表格中的数据
               $.ajax({
                 url: '/xddesign/admin/guide/saveorupdate'
                 ,type: 'POST'
                 ,data: {
-                  "guideName": productSelect.find("option:selected").text()
+                  "guideName": guideName
                   ,"productId": productSelect.val()
                   ,"guideLink": guideLink
                   ,"pictureLink": pictureLink
+                  ,"guideDesc": guideDesc
                 }
                 ,dataType: 'json'
                 ,success: function (res) {

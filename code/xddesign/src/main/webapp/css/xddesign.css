@@ -21,3 +21,22 @@ img {
     padding-left: 0px;
     padding-right: 0px;
 }
+
+.tableheadcss {
+    font-weight: bold;
+    background-color: #2F4056;
+    color: white;
+    text-align: center;
+}
+
+.pname {
+    display: inline-block;
+    width: 30%;
+    font-size: 12px;
+}
+
+.pval {
+    display: inline-block;
+    width: 65%;
+    font-size: 15px;
+}

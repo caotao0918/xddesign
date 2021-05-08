@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>编辑方案</title>
+    <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/xddesign/css/xddesign.css" rel="stylesheet">
+    <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
+    <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
+    <script src="/xddesign/js/xddesign.js"></script>
+    <script>
+        var rooms = [];
+        var currentroom;
+        var maps;
+        var productstemp;
+        var roomproducts = {};
+        var roomproductsnum = [];
+        var urlstr = window.location.search;
+        var houseid = geturlparabyname(urlstr, "houseid");
+        var designid = geturlparabyname(urlstr, "designid");
+        var housename = decodeURI(geturlparabyname(urlstr, "housename"));
+        var cusname = decodeURI(geturlparabyname(urlstr, "cusname"));
+        var housetype = decodeURI(geturlparabyname(urlstr, "housetype"));
+        var houseaddr = decodeURI(geturlparabyname(urlstr, "houseaddr"));
+        var cusid = geturlparabyname(urlstr, "cusid");
+        var desc = "施工费=产品总价*10%";
+        $(function () {
+            loadmenu();
+            getproductsdata();
+            valsetel("roomnameinput", "roomnamebtn");
+            valsetel("savedesigninput", "savedesignbtn");
+            valsetel("changeroomnameinput", "changeroomnamebtn");
+            valsetel("descarea", "descbtn");
+            $("#savedesigninput").val(cusname + housename + housetype + "方案");
+            $("#addroomModal").on("hidden.bs.modal", function () {
+                $("#roomnameinput").val("");
+                $("#roomnamebtn").attr("onclick", "addroom()");
+                $(".info").hide();
+                $("#info").hide();
+            });
+            $("#editroomModal").on("hidden.bs.modal", function () {
+                $(".info").hide();
+                $("#info").hide();
+            });
+            $("#addproductModal").on("show.bs.modal", function () {
+                productstemp = [];
+                $("#menulist ul").hide();
+                $("#menuproducts").empty();
+                $("#menulist ul li").css("color", "");
+                if (roomproducts[currentroom] != undefined) {
+                    productstemp = roomproducts[currentroom];
+                }
+            });
+            $("#descModal").on("show.bs.modal", function () {
+                $("#descarea").val(desc);
+                $("#descbtn").attr("disabled", false);
+            });
+            $("#stateModal").on("hidden.bs.modal", function () {
+                $(".info").hide();
+                $("#info").hide();
+            });
+            $("#editproductModal").on("hidden.bs.modal", function () {
+                $(".info").hide();
+                $("#info").hide();
+            });
+            $("#pinfo").load("/xddesign/html/showproduct.html");
+        });
+
+        function getproductsdata() {
+            $.get("/xddesign/design/customer/solutions/level/products", {}, function (data) {
+                maps = data;
+                for (var i = 0; i < maps.length; i++) {
+                    var map = maps[i];
+                    for (var key in map) {
+                        var menuid1 = $.trim(key.split("firstId:")[1].split(",")[0]);
+                        var menuname1 = $.trim(key.split("firstName:")[1].split(",")[0]).replaceAll("'", "");
+                        var menuid2 = $.trim(key.split("secondId:")[1].split(",")[0]);
+                        var menuname2 = $.trim(key.split("secondName:")[1].split(",")[0]).replaceAll("'", "");
+                        addmenu(menuid1, menuname1, menuid2, menuname2);
+                    }
+                }
+                reshowroomproduct();
+            }, "json");
+        }
+
+        function reshowroomproduct() {
+            if (designid != undefined) {
+                $.get("/xddesign/public/customer/solution", {"soluId": designid}, function (data) {
+                    $("#savedesigninput").val(data.soluName);
+                    $("#statebtn").val(data.state);
+                    $("#statebtn").show();
+                    for (var i = 0; i < data.roomList.length; i++) {
+                        rooms.push(data.roomList[i].roomName);
+                        var productlist = [];
+                        for (var j = 0; j < data.roomList[i].productNumList.length; j++) {
+                            var pid = "p" + data.roomList[i].productNumList[j].product.productId;
+                            productlist.push(pid);
+                            setroomproductsnum(data.roomList[i].roomName, pid, data.roomList[i].productNumList[j].pnNum);
+                        }
+                        roomproducts[data.roomList[i].roomName] = productlist;
+                        addroombtn(data.roomList[i].roomName);
+                    }
+                    desc = data.soluDesc;
+                    $("input[value$=所有]").click();
+                    setstatebtn();
+                }, "json");
+
+            }
+        }
+
+        function changedesc() {
+            desc = $("#descarea").val();
+            $("#descModal").modal("hide");
+        }
+
+        function setstatebtn() {
+            $.get("/xddesign/design/solutions/state", {}, function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    var inputclass = "btn btn-default";
+                    if (data[i].msg == $("#statebtn").val()) {
+                        inputclass = "btn btn-primary";
+                    }
+                    $("#statediv").append("<input type='button' onclick='changestate(this," + data[i].code + ")' style='margin: 5px' class='" + inputclass + "' value='" + data[i].msg + "'>");
+                }
+            }, "json");
+        }
+
+        function changestate(obj, code) {
+            $.post("/xddesign/design/solutions/state/update", {
+                "soluId": designid,
+                "code": code
+            }, function (data) {
+                if (data.status == 1) {
+                    choosecurrbtn(obj);
+                    $("#statebtn").val($(obj).val());
+                    setinfo("状态成功修改为：" + $(obj).val(), true);
+                }
+            }, "json");
+        }
+
+        function addmenu(menuid1, menuname1, menuid2, menuname2) {
+            if (!$("#menulist div:contains('" + menuname1 + "')").text()) {//display: none
+                $("#menulist").append("<div onclick='showsubitem(this)' style='font-size: 17px;'>" + menuname1 + "</div><ul style='display: none;margin-bottom: 0px' class='list-unstyled'></ul>");
+            }
+            var menu2 = $("#menulist div:contains(" + menuname1 + ")").next();
+            if (menu2.children().length == 0 || menu2.html().indexOf("&nbsp;&nbsp;&nbsp;&nbsp;" + menuname2) == -1) {
+                menu2.append("<li id='" + menuid2 + "' style='font-size: 15px;' onclick='showitemproduct(this)'>&nbsp;&nbsp;&nbsp;&nbsp;" + menuname2 + "</li>");
+            }
+
+        }
+
+        function showsubitem(obj) {
+            $("#span2").html($(obj).html());
+            $("#menulist ul").hide();
+            $("#menulist li").css("color", "");
+            $("#menuproducts").empty();
+            $(obj).next().show();
+            for (var i = 0; i < $(obj).next().children().length; i++) {
+                showitemproduct1($(obj).next().children()[i]);
+            }
+        }
+
+        function showitemproduct(obj) {
+            $("#span2").html($(obj).html());
+            $("#menulist li").css("color", "");
+            $(obj).css("color", "#2e6da4");
+            $("#menuproducts").empty();
+            showitemproduct1(obj);
+        }
+
+        function showitemproduct1(obj) {
+            var menuid2 = $(obj).attr("id");
+            for (var i = 0; i < maps.length; i++) {
+                var break1 = false;
+                var map = maps[i];
+                for (var key in map) {
+                    if ($.trim(key.split("secondId:")[1].split(",")[0]).replaceAll("'", "") == menuid2) {
+                        var productlist = map[key];
+                        for (var j = 0; j < productlist.length; j++) {
+                            var pid = "p" + productlist[j].productId;
+                            $("#menuproducts").append("<div id='" + pid + "' class='col-xs-6 col-sm-4 col-md-3 col-lg-2 product' style='text-align: center;' onclick='chooseproduct(\"" + pid + "\")'><img style='width: auto;height: 80%' src='" + productlist[j].pictureList[0].pictureLink + "'>" + productlist[j].productName + "</div>");
+                            setdivclass("p" + productlist[j].productId);
+                        }
+                        break1 = true;
+                    }
+                }
+                if (break1) {
+                    return false;
+                }
+            }
+        }
+
+        function setdivclass(pid) {
+            if ($.inArray(pid, productstemp) != -1) {
+                $("#" + pid).css("background", "#2e6da4");
+            } else {
+                $("#" + pid).css("background", "");
+            }
+        }
+
+        function chooseproduct(pid) {
+            if ($.inArray(pid, productstemp) == -1) {
+                productstemp.push(pid);
+            } else {
+                productstemp.splice($.inArray(pid, productstemp), 1);
+            }
+            setdivclass(pid);
+        }
+
+        function addroomproducts() {
+            $("#addproductModal").modal("hide");
+            roomproducts[currentroom] = productstemp;
+            updatecurrentroomproductsnum();
+            productstemp = [];
+            $("#menuproducts div").css("background", "");
+            showroomproduct(currentroom);
+        }
+
+        function updatecurrentroomproductsnum() {
+            $.each(productstemp, function (i, val) {
+                var pnum = getproductnumbypid(currentroom, val);
+                setroomproductsnum(currentroom, val, "" + pnum);
+            });
+        }
+
+        function setroomproductsnum(room, pid, pnum) {
+            var num = getproductnumbypid(pid);
+            for (var i = 0; i < roomproductsnum.length; i++) {
+                if (roomproductsnum[i].split(",")[0] == room && roomproductsnum[i].split(",")[1] == pid) {
+                    roomproductsnum.splice($.inArray(room + "," + pid + "," + num, roomproductsnum), 1);
+                }
+            }
+            roomproductsnum.push(room + "," + pid + "," + pnum);
+        }
+
+        function showroomproduct(room) {
+            $("#addproductbtn").parent().siblings().remove();
+            if (room != "所有") {
+                var roomproduct = roomproducts[room];
+                showroomproduct1(roomproduct);
+            } else {
+                for (var key in roomproducts) {
+                    var roomproduct = roomproducts[key];
+                    showroomproduct1(roomproduct);
+                }
+            }
+
+        }
+
+        function showroomproduct1(roomproduct) {
+            if (roomproduct == undefined) {
+                return;
+            }
+            for (var i = 0; i < roomproduct.length; i++) {
+                var product = getproductbyid(roomproduct[i]);
+                $("#addproductbtn").parent().before("<div onclick='editproduct(this," + product.productId + ",\"" + product.productName + "\")' class='col-xs-6 col-sm-4 col-md-4 col-lg-2 product'><img style='width: auto;height: 80%' src='" + product.pictureList[0].pictureLink + "' \><br><span>" + product.productName + "</span></div>");
+            }
+        }
+
+        function editproduct(obj, pid, pname) {
+            if (currentroom == "所有") {
+                showproduct(pid);
+            } else {
+                $("#editproductModal").modal("show");
+                $("#pname").html(pname);
+                $("#showproductbtn").attr("onclick", "showproduct1(" + pid + ")");
+                $("#delproductbtn").attr("onclick", "delproduct(" + pid + ")");
+                $("#setproductnumselect").empty();
+                var pnum = getproductnumbypid(currentroom, "p" + pid);
+                for (var i = 1; i <= 10; i++) {
+                    var content = "<option>" + i + "</option>";
+                    if (i == parseInt(pnum)) {
+                        content = "<option selected='selected'>" + i + "</option>";
+                    }
+                    $("#setproductnumselect").append(content);
+                }
+                $("#setproductnumselect").attr("onchange", "changeroomproductnum(this,\"p" + pid + "\")");
+            }
+        }
+
+        function changeroomproductnum(obj, pid) {
+            setroomproductsnum(currentroom, pid, $(obj).val());
+            setinfo("成功修改为：" + $(obj).val(), true);
+        }
+
+        function getproductnumbypid(room, pid) {
+            var res = "1";
+            for (var i = 0; i < roomproductsnum.length; i++) {
+                if (roomproductsnum[i].split(",")[0] == room && roomproductsnum[i].split(",")[1] == pid) {
+                    res = roomproductsnum[i].split(",")[2];
+                }
+            }
+            return res;
+        }
+
+        function showproduct1(pid) {
+            $("#editproductModal").modal("hide");
+            showproduct(pid);
+        }
+
+        function delproduct(pid) {
+            var productlist = roomproducts[currentroom];
+            productlist.splice($.inArray("p" + pid, productlist), 1);
+            roomproducts[currentroom] = productlist;
+            $("input[value$=" + currentroom + "]").click();
+            $("#editproductModal").modal("hide");
+        }
+
+        function getproductbyid(pid) {
+            for (var i = 0; i < maps.length; i++) {
+                var map = maps[i];
+                for (key in map) {
+                    var productlist = map[key];
+                    for (var j = 0; j < productlist.length; j++) {
+                        var product = productlist[j];
+                        if (product.productId == pid.replace("p", "")) {
+                            return product;
+                        }
+                    }
+                }
+            }
+        }
+
+        function addroom() {
+            if ($.inArray($("#roomnameinput").val(), rooms) == -1) {
+                rooms.push($("#roomnameinput").val());
+                addroombtn($("#roomnameinput").val());
+                setbtnclassbyval($("#roomnameinput").val());
+                currentroom = $("#roomnameinput").val();
+                showaddproductbtn();
+                $("#roomnameinput").val("");
+                $("#roomnamebtn").attr("disabled", true);
+                $("#addproductbtn").parent().siblings().remove();
+                $("#addroomModal").modal("hide");
+            } else {
+                setinfo("该房间已经存在", false);
+            }
+        }
+
+        function addroombtn(roomname) {
+            $("#rooms").append("<div class='col-xs-3 col-sm-2 col-md-2 col-lg-1'><input type='button' class='btn btn-xs btn-default' style='width: 100%' ondblclick='editroom(this)' onclick='chooseroom(this)' value='" + roomname + "'></div>");
+        }
+
+        function editroom(obj) {
+            currentroom = $(obj).val();
+            $("#changeroomnameinput").val(currentroom);
+            $("#editroomModal").modal("show");
+        }
+
+        function changeroomname() {
+            var editname = $("#changeroomnameinput").val();
+            if (currentroom == editname) {
+                $("#editroomModal").modal("hide");
+            } else if ($.inArray(editname, rooms) != -1) {
+                setinfo("该房间名已存在", false);
+            } else {
+                rooms[$.inArray(currentroom, rooms)] = editname;
+                var obj = getroominputbyval(currentroom);
+                obj.value = editname;
+                var productlist = roomproducts[currentroom];
+                delete (roomproducts[currentroom]);
+                roomproducts[editname] = productlist;
+                setroomproductsnumupdateroomname(editname);
+                currentroom = editname;
+                $("#editroomModal").modal("hide");
+            }
+        }
+
+        function getroominputbyval(val) {
+            var roominputs = $("#rooms div input");
+            for (var i = 0; i < roominputs.length; i++) {
+                if (roominputs[i].value == val) {
+                    return roominputs[i];
+                }
+            }
+        }
+
+        function setroomproductsnumupdateroomname(name) {
+            for (var i = 0; i < roomproductsnum.length; i++) {
+                if (roomproductsnum[i].split(",")[0] == currentroom) {
+                    roomproductsnum.push(roomproductsnum[i].replace(currentroom, name));
+                    roomproductsnum.splice($.inArray(roomproductsnum[i], roomproductsnum), 1);
+                    i--;
+                }
+            }
+        }
+
+        function delroom() {
+            rooms.splice($.inArray(currentroom, rooms), 1);
+            delete (roomproducts[currentroom]);
+            setroomproductsnumdelroom();
+            $("input[value$=" + currentroom + "]").parent().remove();
+            $("#addproductbtn").parent().siblings().remove();
+            $("#editroomModal").modal("hide");
+            $("input[value$=所有]").click();
+        }
+
+        function setroomproductsnumdelroom() {
+            for (var i = 0; i < roomproductsnum.length; i++) {
+                if (roomproductsnum[i].split(",")[0] == currentroom) {
+                    roomproductsnum.splice($.inArray(roomproductsnum[i], roomproductsnum), 1);
+                    i--;
+                }
+            }
+        }
+
+        function chooseroom(obj) {
+            currentroom = $(obj).val();
+            showroomproduct($(obj).val());
+            setbtnclassbyval($(obj).val());
+            showaddproductbtn();
+        }
+
+        function setbtnclassbyval(val) {
+            var currinput = getroominputbyval(val);
+            $("#rooms div input").removeClass("btn-primary");
+            $("#rooms div input").addClass("btn-default");
+            currinput.classList.add("btn-primary");
+        }
+
+        function showaddproductbtn() {
+            if (currentroom != "所有") {
+                $("#addproductbtn").show();
+            } else {
+                $("#addproductbtn").hide();
+            }
+        }
+
+        function savedesign() {
+            var count = 0;
+            for (var key in roomproducts) {
+                var roomproducts1 = roomproducts[key];
+                if (roomproducts1 != undefined) {
+                    count += roomproducts1.length;
+                }
+            }
+            if (count == 0) {
+                $("#alertcontext").html("至少选择一个产品");
+                $("#alertModal").modal("show");
+            } else {
+                var design = {};
+                if (designid != undefined) {
+                    design["soluId"] = designid;
+                }
+                design["soluName"] = $("#savedesigninput").val();
+                design["design"] = {'id': window.localStorage.getItem("userid")};
+                design["houseId"] = houseid;
+                design["soluDesc"] = desc;
+                design["roomList"] = [];
+
+                for (var key in roomproducts) {
+                    var productlist = [];
+                    $.each(roomproducts[key], function (i, pid) {
+                        var product = getproductbyid(pid.substr(1));
+                        var pnum = getproductnumbypid(key, pid);
+                        productlist.push({
+                            "pnNum": parseInt(pnum),
+                            "product": {
+                                "productId": pid.substr(1),
+                                "price": product.price.toString(),
+                                "productName": product.productName
+                            }
+                        });
+                    });
+                    design["roomList"].push({"roomName": key, "productNumList": productlist});
+                }
+                $.ajax({
+                    url: "/xddesign/design/customer/solutions/saveorupdate",
+                    data: JSON.stringify(design),
+                    contentType: "application/json",
+                    dataType: "json",
+                    type: "post",
+                    success: function (data) {
+                        if (data.status == 1) {
+                            if (housename == undefined || housename == "undefined") {
+                                window.location.href = "designlist.html";
+                            } else {
+                                window.location.href = "edithouse.html?cusid=" + cusid + "&cusname=" + name + "&houseid=" + houseid + "&housename=" + housename + "&houseaddr=" + houseaddr + "&housetype=" + housetype;
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+    </script>
+</head>
+<body>
+<div id="menu"></div>
+<input type="button" class="btn btn-default" value="备注" style="float: right;margin-right: 5%;margin-top: 5px;"
+       data-toggle="modal" data-target="#descModal">
+<input type="button" id="statebtn" class="btn btn-default" data-toggle="modal" data-target="#stateModal"
+       style="float: right;margin-top: 5px;margin-right: 5%;display: none">
+<span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
+                                                                         onclick="backpage()">返回</button>
+    <span>编辑方案</span>
+</span>
+<div style="margin-left:5%;margin-top: 30px">
+    <input type="text" class="form-control" style="display: inline;width: 50%;" placeholder="请输入方案名"
+           id="savedesigninput">
+    <button type="button" class="btn btn-default" style="margin-bottom: 3px;" id="savedesignbtn" onclick="savedesign()">
+        保存方案
+    </button>
+    <button class="btn btn-default" style="float:right;margin-bottom: 3px;margin-right:5%;"
+            id="adddesignbtn" data-toggle="modal" data-target="#addroomModal">添加房间
+    </button>
+
+</div>
+
+<div class="container-fluid show" id="rooms">
+    <div class="col-xs-3 col-sm-2 col-md-2 col-lg-1">
+        <input type="button" class="btn btn-xs btn-primary" style="width: 100%" onclick="chooseroom(this)" value="所有">
+    </div>
+
+</div>
+<div class="container-fluid" id="products" style="height: 100px;">
+    <div class="col-xs-6 col-sm-4 col-md-4 col-lg-2 product">
+        <input type="button" class="btn btn-default" value="添加产品" id="addproductbtn" data-toggle="modal"
+               data-target="#addproductModal"
+               style="margin-top: 75px;display: none">
+    </div>
+</div>
+
+<div class="modal" id="stateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">点击按钮修改方案状态</h4>
+            </div>
+            <div class="modal-body">
+                <div id="statediv" style="text-align: center;"></div>
+                <div class="alert info" role="alert"
+                     style="display: none;margin-bottom: 0px;margin-top: 10px;text-align: left"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" style="width: 100%" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="editproductModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title"><span id="pname"></span></h4>
+            </div>
+            <div class="modal-body" style="">
+                数量：
+                <select class="form-control" style="width: 20%;display: inline" id="setproductnumselect"></select>
+                <div class="alert info" role="alert"
+                     style="display: none;margin-bottom: 0px;margin-top: 10px;text-align: left"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="showproductbtn">查看产品</button>
+                <button type="button" class="btn btn-default" id="delproductbtn">删除产品</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="addroomModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">请输入房间名</h4>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="form-control" id="roomnameinput">
+                <div class="alert" role="alert" id="info"
+                     style="display: none;margin-bottom: 0px;margin-top: 10px"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" disabled id="roomnamebtn" onclick="addroom()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="editroomModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body" style="text-align: right">
+                <input type="text" class="form-control" id="changeroomnameinput">
+                <div class="alert info" role="alert"
+                     style="display: none;margin-bottom: 0px;margin-top: 10px;text-align: left"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="changeroomnamebtn"
+                        onclick="changeroomname()">修改房间名
+                </button>
+                <button type="button" class="btn btn-default" onclick="delroom()">删除房间
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal bs-example-modal-lg" id="addproductModal" tabindex="-1" role="dialog"
+     aria-labelledby="myLargeModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">当前分类：<span id="span2"></span></h4>
+            </div>
+            <div class="modal-body">
+                <div id="menulist" style="width: 26%;float: left">
+                </div>
+                <div id="menuproducts" style="width:73%;float: right"></div>
+            </div>
+            <div class="modal-footer" style="clear: both">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="addroomproductbtn"
+                        onclick="addroomproducts()">确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal bs-example-modal-lg" id="descModal" tabindex="-1" role="dialog"
+     aria-labelledby="myLargeModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">请编辑备注</h4>
+            </div>
+            <div class="modal-body">
+                <textarea class="form-control" style="resize: none;height: 200px" id="descarea"></textarea>
+            </div>
+            <div class="modal-footer" style="clear: both">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="descbtn" disabled
+                        onclick="changedesc()">确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="alertModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body" style="text-align: center">
+                <span id="alertcontext" style="font-size: 25px;font-weight: bold"></span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" style="width: 100%">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="pinfo">
+</div>
+</body>
+</html>

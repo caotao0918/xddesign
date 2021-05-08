@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>售后支持中心</title>
+    <meta name="keywords" content="驻马店迅达智能,迅达智能家居,迅达智能家居售后支持">
+    <meta name="description" content="迅达智能家居售后支持中心是迅达智能家居产品的售后支持">
+    <title>迅达智能家居售后支持中心</title>
     <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
     <link href="/xddesign/css/xddesign.css" rel="stylesheet">
     <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
@@ -12,7 +14,6 @@
 
     <script>
         var category;
-        // var querypid;
         var pids = [];
         var querybtn = 1;
         $(function () {
@@ -65,7 +66,6 @@
             $(obj).css("color", "#2e6da4");
             $("#myModal").modal("hide");
             if (pid != null) {
-                // querypid = pid;
                 pids = [pid];
             }
             if (pname != null) {
@@ -124,9 +124,7 @@
                 $.get("/xddesign/public/guide", {"productId": pid}, function (data) {
                     for (var i = 0; i < data.length; i++) {
                         var piclink = data[i].pictureLink;
-                        // var piclink = "/xddesign/img/cusloginlogo.png";
                         var guidelink = data[i].guideLink;
-                        // var guidelink = "http://zmdxd.cn:8089/xddesign/guide/2021/03/23/f1d62a17%E7%87%83%E6%B0%94%E4%BC%A0%E6%84%9F%E5%99%A8%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf";
                         var guidename = data[i].guideName;
                         guidelink = guidelink.replace('\\', '/');
                         $("#support").append("<div onclick='window.open(\"" + guidelink + "\");' class='col-xs-6 col-sm-3 col-md-3 col-lg-2 product' style='text-align:center;height: 165px'><img style='width: 130px;' src='" + piclink + "'><br>" + guidename + "</div>");

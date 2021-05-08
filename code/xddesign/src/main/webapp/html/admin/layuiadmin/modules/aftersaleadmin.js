@@ -190,6 +190,8 @@
                     let guideId = $$('input[name="guideId"]').val();
                     let guideLink = $$('input[name="guideLink"]').val();
                     let pictureLink = $$('input[name="pictureLink"]').val();
+                    let guideName = $$('input[name="guideName"]').val();
+                    let guideDesc = $$('input[name="guideDesc"]').val();
 
                     iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
                         //提交 Ajax 成功后，静态更新表格中的数据
@@ -197,9 +199,11 @@
                             url: '/xddesign/admin/guide/saveorupdate'
                             ,type: 'POST'
                             ,data: {
-                                "guideId": guideId
+                                "guideName": guideName
+                                ,"guideId": guideId
                                 ,"guideLink": guideLink
                                 ,"pictureLink": pictureLink
+                                ,"guideDesc": guideDesc
                             }
                             ,dataType: 'json'
                             ,success: function (res) {
@@ -223,6 +227,8 @@
                     $("input[name='guideId']").val(e.data.guideId);
                     $("input[name='guideLink']").val(e.data.guideLink);
                     $("input[name='pictureLink']").val(e.data.pictureLink);
+                    $("input[name='guideName']").val(e.data.guideName);
+                    $("input[name='guideDesc']").val(e.data.guideDesc);
                 }
             })
         } else if ("pic" === e.event) {
@@ -324,6 +330,8 @@
                     let $$ = iframeWindow.layui.$;
                     let videoId = $$('input[name="videoId"]').val();
                     let videoLink = $$('input[name="videoLink"]').val();
+                    let videoName = $$('input[name="videoName"]').val();
+                    let videoDesc = $$('input[name="videoDesc"]').val();
 
                     //监听提交
                     iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
@@ -335,6 +343,8 @@
                             ,data: {
                                 "videoId": videoId
                                 ,"videoLink": videoLink
+                                ,"videoName": videoName
+                                ,"videoDesc": videoDesc
                             }
                             ,dataType: 'json'
                             ,success: function (res) {
@@ -357,6 +367,8 @@
                     $("#level").attr("hidden", true);
                     $("input[name='videoId']").val(e.data.videoId);
                     $("input[name='videoLink']").val(e.data.videoLink);
+                    $("input[name='videoName']").val(e.data.videoName);
+                    $("input[name='videoDesc']").val(e.data.videoDesc);
                 }
             })
         }

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>添加住宅</title>
+    <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/xddesign/css/xddesign.css" rel="stylesheet">
+    <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
+    <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
+    <script src="/xddesign/js/xddesign.js"></script>
+
+    <script>
+        var urlstr = window.location.search;
+        var cusid = geturlparabyname(urlstr, "cusid");
+        var name = decodeURI(geturlparabyname(urlstr, "cusname"));
+        var houseid = geturlparabyname(urlstr, "houseid");
+        var housename = decodeURI(geturlparabyname(urlstr, "housename"));
+        var houseaddr = decodeURI(geturlparabyname(urlstr, "houseaddr"));
+        var housetype = decodeURI(geturlparabyname(urlstr, "housetype"));
+
+        $(function () {
+            loadmenu();
+            $.get("/xddesign/design/customer/houseType", {}, function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    $("#housetype").append("<option>" + data[i].typeName + "</option>");
+                    if (houseid != undefined) {
+                        $("#savebtn").attr("disabled", false);
+                        $("#adddesignbtn").attr("disabled", false);
+                        $("#housename").val(housename);
+                        $("#housetype").val(housetype);
+                        $("#houseaddr").val(houseaddr);
+                    }
+
+                }
+
+            }, "json");
+            valsbtns(["housename", "housetype", "houseaddr"], ["savebtn", "adddesignbtn"]);
+            designlist();
+        });
+
+        function savehouse(next) {
+            var house = {};
+            if (houseid != undefined) {
+                house["houseId"] = houseid;
+            }
+            house["customerId"] = cusid;
+            house["houseName"] = $("#housename").val();
+            var housetypemap = {};
+            housetypemap["typeName"] = $("#housetype").val();
+            house["houseType"] = housetypemap;
+            house["houseAddress"] = $("#houseaddr").val();
+            var housejson = JSON.stringify(house);
+
+            $.ajax({
+                url: "/xddesign/design/customer/house/saveorupdate",
+                data: housejson,
+                dataType: "json",
+                contentType: 'application/json',
+                traditional: true,
+                type: "post",
+                async: false,
+                success: function (data) {
+                    if (next) {
+                        houseid = data.id;
+                        window.location.href = "editdesign.html?houseid=" + houseid + "&housename=" + $("#housename").val() + "&cusname=" + name + "&housetype=" + $("#housetype").val() + "&cusid=" + cusid + "&houseaddr=" + $("#houseaddr").val();
+                    } else {
+                        window.location.href = "editcustomer.html?houseid=" + houseid + "&housename=" + housename + "&cusname=" + name + "&housetype=" + housetype + "&cusid=" + cusid + "&houseaddr=" + houseaddr;
+                    }
+                },
+                error: function () {
+                    alert("服务器错误");
+                }
+            })
+        }
+
+        function adddesign() {
+            savehouse(true);
+        }
+
+        function editdesign(designid) {
+            window.location.href = "editdesign.html?houseid=" + houseid + "&housename=" + housename + "&cusname=" + name + "&housetype=" + housetype + "&cusid=" + cusid + "&houseaddr=" + houseaddr + "&designid=" + designid;
+        }
+
+        function designlist() {
+            $.get("/xddesign/public/customer/house/solutions", {
+                "houseId": houseid
+            }, function (data) {
+                for (var i = 0; i < data.records.length; i++) {
+                    var design = data.records[i];
+                    var designid = design.soluId;
+                    $("#designlist tbody").append("<tr><td>" + (i + 1) + "</td><td>" + name + "</td><td>" + design.soluName + "</td><td>" + design.state + "</td><td>" + design.addTime.split(" ")[0] + "<br>" + design.addTime.split(" ")[1] + "</td><td><button type='button' class='btn btn-default btn-xs' onclick='editdesign(" + designid + ")'>编辑</button><button class='btn btn-xs btn-default' onclick='editreport(" + data.records[i].soluId + ")'>报表</button><button class='btn btn-xs btn-default' onclick='showdesignrendering(" + data.records[i].soluId + ",\"" + design.soluName + "\")'>效果图</button><button type='button' class='btn btn-default btn-xs' onclick='deldesign(" + designid + ")'>删除</button></td></tr>");
+                }
+            }, "json");
+        }
+
+        function deldesign(designid) {
+            $.post("/xddesign/design/customer/solutions/delete", {"soluId": designid}, function (data) {
+                if (data.status == 1) {
+                    window.location.reload();
+                }
+            }, "json");
+        }
+
+        function editreport(designid) {
+            window.location.href = "editreport.html?designid=" + designid;
+        }
+
+        function showdesignrendering(designid, designname) {
+            window.location.href = "editrendering.html?designid=" + designid + "&designname=" + designname;
+        }
+    </script>
+</head>
+<body>
+<div id="menu"></div>
+
+<span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
+                                                                         onclick="backpage()">返回</button>
+    <span id="span1">编辑住宅</span>
+</span>
+
+<div class="panel panel-default" style="width: 90%;margin: 0 auto">
+    <div class="panel-heading">编辑住宅资料
+        <span></span>
+    </div>
+    <div class="panel-body">
+        <div class="input-group">
+            <span class="input-group-addon">住宅名称</span>
+            <input id='housename' class='form-control' type='text'>
+            <input type="hidden" id="houseid">
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <div class="input-group">
+            <span class="input-group-addon">户型</span>
+            <select class="form-control" id="housetype"></select>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="input-group">
+            <span class="input-group-addon">地址</span>
+            <input id='houseaddr' class='form-control' type='text'>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <div class="alert" role="alert" id="info" style="display: none"></div>
+    </div>
+    <div class="panel-body">
+        <button type="button" id="savebtn" onclick="savehouse(false)" class="btn btn-primary" style="width: 100%;"
+                disabled>
+            保存
+        </button>
+        <br><br>
+        <button type="button" onclick="backpage()" class="btn btn-default" style="width: 100%">返回</button>
+    </div>
+
+</div>
+
+<br>
+<span style="font-weight: bold;font-size: 30px;margin-left: 5%">方案列表</span>
+<button id="adddesignbtn" style="float: right;margin-top: 5px;margin-right: 5%" disabled class="btn btn-default"
+        onclick="adddesign()">添加方案
+</button>
+<table class="table table-bordered table-striped" id="designlist">
+    <thead>
+    <tr style="font-weight: bold">
+        <td></td>
+        <td>客户</td>
+        <td>方案</td>
+        <td>状态</td>
+        <td>时间</td>
+        <td></td>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+
+</body>
+</html>

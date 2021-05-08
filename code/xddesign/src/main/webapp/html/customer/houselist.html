@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>我的住宅</title>
     <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/xddesign/css/xddesign.css" rel="stylesheet">
     <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
     <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
     <script src="/xddesign/js/xddesign.js"></script>
@@ -13,59 +14,22 @@
         $(function () {
             loadmenu();
             $.get("/xddesign/public/customer", function (data) {
-                myHouseList = data.houseList;
-                for (var i = 0; i < myHouseList.length; i++) {
-                    var house = $("<div class='alert alert-success' role='alert' style='height: 270px'>");
-                    house.append("<p class='pname'><b>住宅名称</b></p>");
-                    house.append("<p class='pval'>" + myHouseList[i].houseName + "</p>");
-                    house.append("<p class='pname'><b>户型</b></p>");
-                    house.append("<p class='pval'>" + myHouseList[i].houseType.typeName + "</p>");
-                    house.append("<p class='pname'><b>地址</b></p>");
-                    house.append("<p class='pval'>" + myHouseList[i].houseAddress + "</p>");//myHouseList[i].houseId
-                    house.append("<p class='pname'><b>设计人员</b></p>");
-                    house.append("<p class='pval'>" + data.design.username + "</p>");
-                    house.append("<p class='pname'><b>设计人员电话</b></p>");
-                    house.append("<p class='pval'>" + data.design.mobile + "</p>");
-                    house.append("<p class='pbtn'><button type='button' class='btn btn-success' onclick='housedesign(" + myHouseList[i].houseId + ");'>查看</button></p>");
-                    house.append("</div>");
-
-                    var houseblock = $("<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'></div>");
-                    houseblock.append(house);
-                    $("#houselist").append(houseblock);
+                var houselist = data.houseList;
+                for (var i = 0; i < houselist.length; i++) {
+                    $("#houselist").append("<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'><div class='alert alert-success' role='alert'><table class='table table-bordered'><tr><td width='35%'>住宅名称</td><td>" + houselist[i].houseName + "</td></tr><tr><td>户型</td><td>" + houselist[i].houseType.typeName + "</td></tr><tr><td>地址</td><td>" + houselist[i].houseAddress + "</td></tr><tr><td>设计人员</td><td>" + data.design.username + "</td></tr><tr><td>设计人员电话</td><td>" + data.design.mobile + "</td></tr></table><div style='text-align: right'><button class='btn btn-success' onclick='housedesign(" + houselist[i].houseId + ");'>查看</button></div></div></div>");
                 }
             });
         });
 
         function housedesign(id) {
-            window.location.href = "designlist.html?houseId=" + id;
+            window.location.href = "designlist.html?houseid=" + id;
         }
     </script>
     <style>
-        table {
-            width: 100%;
-            height: 100%;
-        }
-
-        p {
-            padding-top: 10px;
-        }
-
-        .pname {
-            display: inline-block;
-            width: 30%;
+        table tr td:nth-child(1) {
             font-size: 12px;
+            font-weight: bold;
         }
-
-        .pval {
-            display: inline-block;
-            width: 65%;
-            font-size: 15px;
-        }
-
-        .pbtn {
-            text-align: right;
-        }
-
     </style>
 </head>
 <body>

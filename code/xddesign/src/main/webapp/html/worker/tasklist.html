@@ -17,7 +17,7 @@
             $.get("/xddesign/worker/order/unfinished", function (data) {
                 if (data.length === 0) {
                     $("#tasklist_no").append("没有待完成的施工任务哦...");
-                }else {
+                } else {
                     for (var i = 0; i < data.length; i++) {
                         var house = $("<div class='alert alert-success' role='alert' style='height: 335px'>");
                         house.append("<p class='pname'><b>客户名称</b></p>");
@@ -49,7 +49,7 @@
             $.get("/xddesign/worker/order/finished", function (data) {
                 if (data.length === 0) {
                     $("#tasklist_yes").append("没有已完成的施工任务哦...");
-                }else {
+                } else {
                     for (var i = 0; i < data.length; i++) {
                         var house = $("<div class='alert alert-success' role='alert' style='height: 360px'>");
                         house.append("<p class='pname'><b>客户名称</b></p>");
@@ -89,12 +89,15 @@
         function soluDetail(id) {
             window.location.href = "showdesign.html?soluId=" + id;
         }
+
         function quoteDetail(id) {
             window.location.href = "showreport.html?soluId=" + id;
         }
+
         function renderingsDetail(id) {
             window.location.href = "showrendering.html?soluId=" + id;
         }
+
         function workover(id) {
             let b = confirm("确定施工完成了吗？");
             if (b) {
@@ -103,7 +106,7 @@
                     url: "/xddesign/worker/over",
                     data: {
                         'soluId': id
-                        ,'workName': window.localStorage.getItem("username")
+                        , 'workName': window.localStorage.getItem("username")
                     },
                     dataType: "json",
                     beforeSend: function () {
@@ -166,7 +169,8 @@
 
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="active"><a href="#no" aria-controls="no" role="tab" data-toggle="tab">未施工</a></li>
+        <li role="presentation" class="active"><a href="#no" aria-controls="no" role="tab" data-toggle="tab">未施工</a>
+        </li>
         <li role="presentation"><a href="#yes" aria-controls="yes" role="tab" data-toggle="tab">已施工</a></li>
     </ul>
 

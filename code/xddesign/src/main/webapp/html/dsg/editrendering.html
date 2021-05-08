@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>编辑效果图</title>
+    <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/xddesign/css/xddesign.css" rel="stylesheet">
+    <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
+    <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
+    <script src="/xddesign/js/xddesign.js"></script>
+    <link rel="stylesheet" href="/xddesign/html/admin/layuiadmin/layui/css/layui.css" media="all">
+    <script src="/xddesign/html/admin/layuiadmin/layui/layui.js"></script>
+    <script>
+        var designid = geturlparabyname(window.location.search, "designid");
+        var designname = decodeURI(geturlparabyname(window.location.search, "designname"));
+        $(function () {
+            loadmenu();
+            $.get("/xddesign/public/customer/renderings", {"soluId": designid}, function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    // alert(JSON.stringify(data[i]));
+                    $(".row").append("<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'><div class='panel panel-default'><div class='panel-heading'><h3 class='panel-title'>" + data[i].rendId + "&nbsp;&nbsp;&nbsp;&nbsp;名称：" + data[i].rendName + "</h3></div><div class='panel-body'><img onclick='showrend(this,\"" + data[i].rendName + "\")' src='" + data[i].rendPath + "'><p>" + data[i].rendDesc + "</p><button style='float: right' onclick='delrend(" + data[i].rendId + ")' class='btn btn-xs btn-default'>删除</button></div></div></div>");
+                }
+            }, "json");
+            $("#addModal").on("hidden.bs.modal", function () {
+                window.location.reload();
+            });
+        });
+
+        function showrend(obj, name) {
+            $("#rendtitle").html(name);
+            $("#rend").empty();
+            $("#rend").append("<img src='" + $(obj).attr("src") + "'>");
+            $("#rendModal").modal("show");
+        }
+
+        function delrend(rendid) {
+            $.post("/xddesign/design/customer/renderings/delete", {"rendId": rendid}, function (data) {
+                if (data.status == 1) {
+                    window.location.reload();
+                }
+            }, "json");
+        }
+
+        layui.config({
+            base: '../admin/layuiadmin/'
+        }).extend({
+            index: 'lib/index'
+        }).use(['index', 'upload', 'element'], function () {
+            var $ = layui.$
+                , upload = layui.upload
+                , element = layui.element;
+
+            var soluId = designid;
+            var soluName = designname;
+            var loadindex;
+            upload.render({
+                elem: '#selectpic'
+                , url: '/xddesign/design/customer/renderings/save'
+                , auto: false
+                , data: {
+                    soluId: function () {
+                        return soluId;
+                    },
+                    soluName: function () {
+                        return soluName;
+                    }
+                }
+                , accept: "images"
+                , multiple: true
+                , size: 10 * 1024
+                , bindAction: '#uploadpic'
+                , choose: function (obj) {
+                    var files = obj.pushFile();
+                    obj.preview(function (index, file, result) {
+                        $('#showpic').append('<img src="' + result + '" alt="' + file.name + '" class="layui-upload-img" width="200px" height="200px">')
+                        $("#selectpic").after("<p>" + file.name + "</p>");
+                    });
+                }
+                , before: function (obj) {
+                    loadindex = layer.load();//上传loading
+                }
+                , progress: function (n, elem) {
+                    var percent = n + '%' //获取进度百分比
+                    element.progress('progress', percent);
+                }
+                , error: function (index, upload) {
+                    return layer.msg("服务器出现错误，请重试", {icon: 5});
+                }
+                , done: function (res, index, upload) {
+                    if (res.status == 0) {
+                        return layer.msg(res.msg, {icon: 5});
+                    }
+                }
+                , allDone: function (obj) {
+                    setTimeout(function () {
+                        let index = parent.layer.getFrameIndex(window.name);
+                        layer.close(loadindex);
+                        parent.layer.close(index);
+                        window.parent.location.reload();
+                    }, 2000);
+                }
+            });
+        })
+    </script>
+</head>
+<body>
+<div id="menu"></div>
+<button class="btn btn-default" style="float: right;margin-top: 5px;margin-right: 5%"
+        data-toggle="modal" data-target="#addModal">添加
+</button>
+<span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
+                                                                         onclick="backpage()">返回</button>
+    <span>编辑效果图</span>
+</span>
+<div class="container-fluid">
+    <div class="row">
+
+    </div>
+</div>
+
+<div class="modal" id="rendModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel"><span id="rendtitle"></span></h4>
+            </div>
+            <div class="modal-body">
+                <div id="rend"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" style="width: 100%" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">添加效果图</h4>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center">
+                    <button type="button" class="btn btn-default" id="selectpic">选择图片</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="uploadpic">上传图片</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

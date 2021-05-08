@@ -1,24 +1,30 @@
 <script>
-    var cusname = null;
+    var customername = null;
     var username = null;
 
     $(function () {
-        cusname = window.localStorage.getItem("cusName")
-        username = window.localStorage.getItem("username")
-
+        customername = window.localStorage.getItem("customername");
+        username = window.localStorage.getItem("username");
+        rolename = window.localStorage.getItem("rolename");
         var content = "";
-        if (cusname != null) {
+        if (customername != null) {
             $("#logoname").html("迅达智能家居-客户");
             $("#cus").show();
-            $("#cusname").html(cusname);
+            $("#cusname").html(customername);
             content += "<li><a href='/xddesign/html/customer/houselist.html'>我的住宅</a></li>";
-        } else if (username != null) {
+        } else if (rolename == "设计人员") {
             $("#logoname").html("迅达智能家居-设计人员");
             $("#user").show();
             $("#username").html(username);
             content += "<li><a href='/xddesign/html/dsg/customerlist.html'>客户管理</a></li>";
             content += "<li class='dropdown'><a href='#' class='dropdown-toggle' data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false'>方案管理<span class='caret'></span></a>";
-            content += "<ul class='dropdown-menu'><li><a href='#'>客户方案</a></li><li><a href='#'>快速方案</a></li><li><a href='#'>方案模板</a></li></ul></li>";
+            content += "<ul class='dropdown-menu'><li><a href='/xddesign/html/dsg/designlist.html'>客户方案</a></li><li><a href='/xddesign/html/dsg/quickdesign.html'>快速方案</a></li><li><a href='/xddesign/html/dsg/designtemplate.html'>方案模板</a></li></ul></li>";
+        } else if (rolename == "施工人员") {
+            $("#logoname").html("迅达智能家居-施工人员");
+            $("#user").show();
+            $("#username").html(username);
+            content += "<li><a href='/xddesign/html/worker/designlist.html'>未施工</a></li>";
+            content += "<li><a href='/xddesign/html/worker/designlistfinished.html'>已施工</a></li>";
         } else {
             $("#logoname").html("迅达智能家居");
             $("#login").show();
@@ -28,7 +34,6 @@
         }
         content += "<li><a href='/xddesign/html/productlist.html'>产品中心</a></li>";
         content += "<li><a href='/xddesign/html/aftersale.html'>售后支持</a></li>";
-        content += "<li><a href='http://zmdxd.cn/android.html'>迅达智能APP</a></li>";
         if (username != null) {
             content += "<li><a href='https://www.kujiale.com/' target='_blank'>酷家乐</a></li>";
         }
@@ -78,7 +83,7 @@
                     window.localStorage.clear();
                     location.href = '/xddesign/html/login/cuslgi.html';
                 } else {
-                    window.localStorage.clear();
+                	window.localStorage.clear();
                     alert("退出失败,请重新登录");
                 }
                 window.localStorage.clear();
@@ -96,7 +101,7 @@
                     window.localStorage.clear();
                     location.href = '/xddesign/html/login/userlgi.html';
                 } else {
-                    window.localStorage.clear();
+                	window.localStorage.clear();
                     alert("退出失败,请重新登录");
                 }
                 window.localStorage.clear();
@@ -115,7 +120,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/xddesign/html/index.html"><img alt="logo" src="/xddesign/img/logo.png" id="logo"
+            <a class="navbar-brand" href="javascript:void(0);"><img alt="logo" src="/xddesign/img/logo.png" id="logo"
                                                                     style="width: 40px;display: inline"><span
                     id="title">迅达智能家居</span></a>
         </div>
@@ -151,7 +156,7 @@
             <ul class="nav navbar-nav navbar-right" id="login" style="display: none">
                 <form class="navbar-form navbar-left">
                     <a href="/xddesign/html/login/cuslgi.html" class="btn btn-success btn-default">客户登录</a>
-                    <a href="/xddesign/html/login/userlogin.html" class="btn btn-success btn-default">设计人员登录</a>
+                    <a href="/xddesign/html/login/userlgi.html" class="btn btn-success btn-default">设计人员登录</a>
                 </form>
             </ul>
         </div>

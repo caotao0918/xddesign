@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>修改报表</title>
+    <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/xddesign/css/xddesign.css" rel="stylesheet">
+    <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
+    <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
+    <script src="/xddesign/js/xddesign.js"></script>
+    <script>
+        var designid = geturlparabyname(window.location.search, "designid")
+        $(function () {
+            loadmenu();
+            $.get("/xddesign/public/customer/quotes", {
+                "soluId": designid
+            }, function (data) {
+                var sum = 0;
+                for (var i = 0; i < data.length; i++) {
+                    sum += data[i].productNum * data[i].price;
+                    $("tbody").append("<tr><td>" + data[i].quoteId + "</td><td>" + data[i].roomName + "</td><td>" + data[i].productName + "</td><td>" + data[i].productNum + "</td><td><button onclick='showchangeprice(" + data[i].quoteId + ",\"" + data[i].productName + "\"," + data[i].price + ")' class='btn btn-xs btn-default'>" + data[i].price + "</button></td><td>" + (data[i].totalPrice).toFixed(2) + "</td><td><button class='btn btn-xs btn-default' onclick='delreport(" + data[i].quoteId + ")'>删除</button></td></tr>");
+                }
+                $("tbody").append("<tr style='font-weight: bold;'><td colspan='5' style='text-align: center'>产品总价</td><td>" + sum.toFixed(2) + "</td><td rowspan='3'></td></tr>");
+                $("tbody").append("<tr style='font-weight: bold;'><td colspan='5' style='text-align: center'>施工费</td><td>" + (sum * 0.1).toFixed(3) + "</td></tr>");
+                $("tbody").append("<tr class='tableheadcss'><td colspan='5'>总价</td><td style='text-align: left'>" + (sum * 0.1 + sum).toFixed(3) + "</td></tr>");
+                getdesc();
+            }, "json");
+
+        });
+
+        function getdesc() {
+            $.get("/xddesign/public/customer/quotes/info", {"soluId": designid}, function (data) {
+                $("tbody").append("<tr><td colspan='7'></td></tr>");
+                $("tbody").append("<tr><td colspan='7' style='line-height: 10px'>备注：</td></tr>");
+                $("tbody").append("<tr><td colspan='7' style=''>" + data.descr + "</td></tr>");
+            }, "json");
+        }
+
+        function delreport(id) {
+            $.post("/xddesign/design/customer/quote/delete", {"quoteId": id}, function (data) {
+                if (data.status == 1) {
+                    window.location.reload();
+                }
+            }, "json");
+        }
+
+        function showchangeprice(id, name, price) {
+            $("#name").html(name);
+            $("#price").val(price);
+            $("#btn").attr("onclick", "changeprice(" + id + ")");
+            $("#priceModal").modal("show");
+        }
+
+        function changeprice(id) {
+            if (isnum($("#price").val())) {
+                $.post("/xddesign/design/customer/quote/update", {
+                    "quoteId": id,
+                    "price": $("#price").val()
+                }, function (data) {
+                    if (data.status == 1) {
+                        $("#priceModal").modal("hide");
+                        window.location.reload();
+                    } else {
+                        alert();
+                    }
+                }, "json");
+            } else {
+                setinfo("请输入数字", false);
+            }
+        }
+
+        function toexcel() {
+            window.location.href = "/xddesign/design/quote/toexcel?soluId=" + designid;
+        }
+    </script>
+</head>
+<body>
+<div id="menu"></div>
+<button type="button" class="btn btn-default" style="float: right;margin-top: 5px;margin-right: 5%" onclick="toexcel()">
+    下载报表
+</button>
+<span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
+                                                                         onclick="backpage()">返回</button>
+    <span>修改报表</span>
+</span>
+<table class="table table-bordered">
+    <thead class="tableheadcss">
+    <tr style="font-weight: bold">
+        <td></td>
+        <td>房间</td>
+        <td>产品名称</td>
+        <td>产品数量</td>
+        <td>产品单价</td>
+        <td>合计</td>
+        <td></td>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<div class="modal" id="priceModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">请输入的价格</h4>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="price" class="form-control">
+                <div style="text-align: right">
+                    <br>
+                    <span id="name"></span></div>
+                <br>
+                <div class="alert info" role="alert" style="display: none"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btn" class="btn btn-primary">确定</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

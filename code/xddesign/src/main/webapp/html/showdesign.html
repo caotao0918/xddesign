@@ -11,12 +11,17 @@
     <script src="/xddesign/js/xddesign.js"></script>
 
     <script>
-        var soluId = window.location.search.split("=")[1];
+        var designid = geturlparabyname(window.location.search, "designid");
+        var tempname = decodeURI(geturlparabyname(window.location.search, "tempname"));
         $(function () {
             $("#pinfo").load("/xddesign/html/showproduct.html");
 
-            $.get("/xddesign/public/customer/solution", {"soluId": soluId}, function (data) {
-                $("#dname").html(data.soluName);
+            $.get("/xddesign/public/customer/solution", {"soluId": designid}, function (data) {
+                if (tempname == undefined || tempname == "undefined") {
+                    $("#dname").html(data.soluName);
+                } else {
+                    $("#dname").html(tempname);
+                }
                 roomlist = data.roomList;
                 for (var i = roomlist.length - 1; i >= 0; i--) {
                     $("#all").after("<div class='col-xs-3 col-sm-2 col-md-2 col-lg-1'><button type='button' onclick='showproducts(this," + roomlist[i].roomId + ")' class='btn btn-default btn-xs' style='width: 100%'>" + roomlist[i].roomName + "</button></div>");
@@ -56,10 +61,8 @@
         function list(productNumList) {
             for (var j = 0; j < productNumList.length; j++) {
                 productNum = productNumList[j];
-                for (var k = 0; k < productNum.pnNum; k++) {
-                    var pid = productNum.product.productId;
-                    $("#products").append("<div onclick='showproduct(" + pid + ")' class='col-xs-6 col-sm-4 col-md-4 col-lg-2 product'><img style='width: auto;height: 80%' src='" + productNum.product.pictureList[0].pictureLink + "' \><br>" + productNum.product.productName + "</div>");
-                }
+                var pid = productNum.product.productId;
+                $("#products").append("<div onclick='showproduct(" + pid + ")' class='col-xs-6 col-sm-4 col-md-4 col-lg-2 product'><img style='width: auto;height: 80%' src='" + productNum.product.pictureList[0].pictureLink + "' \><br><span style='font-weight: bold'>数量：" + productNum.pnNum + "</span><br>" + productNum.product.productName + "</div>");
             }
         }
 

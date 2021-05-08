@@ -795,12 +795,12 @@
         if ("del" === e.event){
             layer.confirm("真的删除行么", {icon:3, title: '提示'}, function (t) {
                 layui.$.ajax({
-                    url: '/xddesign/admin/housetype/del'
+                    url: '/xddesign/design/customer/housetype/del'
                     ,type: 'POST'
-                    ,data: {"typeId":e.data.typeId}
+                    ,data: {"housetypeId":e.data.housetypeId}
                     ,dataType: 'json'
                     ,success: function (res) {
-                        if (res.status === 0) {
+                        if (res.status == 0) {
                             layer.msg(res.msg, {icon:5});
                             return false;
                         }
@@ -813,7 +813,7 @@
         }else if ("edit" === e.event) {
             layer.open({
                 type: 2,
-                title: "编辑户型",
+                title: "编辑房子",
                 content: "housetypeform.html",
                 maxmin: !0,
                 area: ["550px", "700px"],
@@ -832,7 +832,6 @@
                         let name_tai = iframeWindow.layui.$('#name_tai').val() + '阳台';
                         field.typeName = name_shi + name_ting + name_chu + name_wei + name_tai;
                         field.typeDesc = iframeWindow.layui.$('#typeDesc').val();
-                        field.typeId = iframeWindow.layui.$("input[name='typeId']").val();
                         //提交 Ajax 成功后，静态更新表格中的数据
                         layui.$.ajax({
                             url: '/xddesign/admin/housetype/save'
@@ -853,25 +852,20 @@
                     submit.trigger('click');
                 }
                 , success: function (layero,index) {
+                    // 获取子页面的iframe
                     let iframe = window['layui-layer-iframe' + index];
                     let $ = iframe.layui.$;
-                    $("input[name='typeId']").val(e.data.typeId);
                     let type_name = e.data.typeName;
                     let name_shi = type_name.split('室')[0];
                     let name_ting = type_name.split('厅')[0];
-                    name_ting = name_ting.charAt(name_ting.length -1);
-                    let name_chu = type_name.split('厨')[0];
-                    name_chu = name_chu.charAt(name_chu.length -1);
-                    let name_wei = type_name.split('卫')[0];
-                    name_wei = name_wei.charAt(name_wei.length -1);
-                    let name_tai = type_name.split('阳')[0];
-                    name_tai = name_tai.charAt(name_tai.length -1);
-                    $('#name_shi').val(name_shi);
-                    $('#name_ting').val(name_ting);
-                    $('#name_chu').val(name_chu);
-                    $('#name_wei').val(name_wei);
-                    $('#name_tai').val(name_tai);
-                    $("#typeDesc").val(e.data.typeDesc);
+                    name_ting = name_ting.charAt();
+                    console.log(name_shi);
+                    console.log(name_ting);
+                    $('#name_shi').val();
+                    $('#name_ting').val();
+                    $('#name_chu').val();
+                    $('#name_wei').val();
+                    $('#name_tai').val();
                 }
             })
         }

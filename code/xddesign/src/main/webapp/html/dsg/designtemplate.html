@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>方案模板</title>
+    <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/xddesign/css/xddesign.css" rel="stylesheet">
+    <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
+    <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
+    <script src="/xddesign/js/xddesign.js"></script>
+    <script>
+        $(function () {
+            loadmenu();
+            $.get("/xddesign/design/customer/templates", {
+                "pageNum": 1,
+                "pageSize": 9999
+            }, function (data) {
+                for (var i = 0; i < data.records.length; i++) {
+                    $("tbody").append("<tr><td>" + (i + 1) + "</td><td>" + data.records[i].tempName + "</td><td>" + data.records[i].tempDesc + "</td><td>" + data.records[i].houseType.typeName + "</td><td>" + data.records[i].design.username + "</td><td><button class='btn btn-xs btn-default' onclick='showdesign(" + data.records[i].solutions.soluId + ",\"" + data.records[i].tempName + "\")'>查看</button><button onclick='deltemplate(" + data.records[i].tempId + "," + data.records[i].design.id + ")' class='btn btn-xs btn-default'>删除</button></td></tr>");
+                }
+            }, "json");
+        });
+
+        function deltemplate(tempid, designerid) {
+            $.post("/xddesign/design/customer/template/delete", {
+                "tempId": tempid,
+                "userId": designerid
+            }, function (data) {
+                if (data.status == 1) {
+                    window.location.reload();
+                }
+            }, "json");
+        }
+    </script>
+</head>
+<body>
+<div id="menu"></div>
+<span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
+                                                                         onclick="backpage()">返回</button>
+    <span>方案模板</span>
+</span>
+<table class="table table-striped table-bordered">
+    <thead>
+    <tr style="font-weight: bold">
+        <td></td>
+        <td>方案名称</td>
+        <td>描述</td>
+        <td>户型</td>
+        <td>设计员</td>
+        <td></td>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+</body>
+</html>

@@ -13,37 +13,25 @@
     <script>
         $(function () {
             loadmenu();
-            var cusName = window.localStorage.getItem("cusName");
-            var houseId = window.location.search.split("=")[1];
+            var cusname = window.localStorage.getItem("customername");
+            var houseid = geturlparabyname(window.location.search, "houseid");
             $.get("/xddesign/public/customer/house/solutions", {
-                'houseId': houseId
+                'houseId': houseid
             }, function (data) {
                 var total = data.total;
                 var list = data.records;
                 for (var i = 0; i < total; i++) {
                     var listtbody = $("<tr>");
                     listtbody.append("<td>" + (i + 1) + "</td>");
-                    listtbody.append("<td>" + cusName + "</td>");
+                    listtbody.append("<td>" + cusname + "</td>");
                     listtbody.append("<td>" + list[i].soluName + "</td>");
                     listtbody.append("<td>" + list[i].state + "</td>");
                     listtbody.append("<td>" + list[i].addTime + "</td>");
-                    listtbody.append("<td><button type='button' class='btn btn-default btn-xs'onclick='showdesign(\"" + list[i].soluId + "\");'>方案</button><br><button type='button' class='btn btn-default btn-xs' onclick='showquote(\"" + list[i].soluId + "\");'>报表</button><br><button type='button' onclick='showrendering("+list[i].soluId+")' class='btn btn-default btn-xs'>效果图</button></td></tr>");
+                    listtbody.append("<td><button type='button' class='btn btn-default btn-xs'onclick='showdesign(\"" + list[i].soluId + "\");'>方案</button><br><button type='button' class='btn btn-default btn-xs' onclick='showreport(\"" + list[i].soluId + "\");'>报表</button><br><button type='button' onclick='showrendering(" + list[i].soluId + ")' class='btn btn-default btn-xs'>效果图</button></td></tr>");
                     $("tbody").append(listtbody);
                 }
             }, "json");
         });
-
-        function showrendering(soluId){
-            window.location.href = "showrendering.html?soluId=" + soluId;
-        }
-
-        function showquote(soluId) {
-            window.location.href = "showreport.html?soluId=" + soluId;
-        }
-
-        function showdesign(soluId) {
-            window.location.href = "showdesign.html?soluId=" + soluId;
-        }
 
 
     </script>

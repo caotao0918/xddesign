@@ -197,19 +197,22 @@
               let  $$ = iframe.layui.$;
               let productSelect = $$('select[name="productId"]');
               let videoLink = $$('input[name="videoLink"]').val();
+              let videoName = $$('input[name="videoName"]').val();
+              let videoDesc = $$('input[name="videoDesc"]').val();
 
               //提交 Ajax 成功后，静态更新表格中的数据
               $.ajax({
                 url: '/xddesign/admin/video/saveorupdate'
                 ,type: 'POST'
                 ,data: {
-                  "videoName": productSelect.find("option:selected").text()
+                  "videoName": videoName
                   ,"productId": productSelect.val()
                   ,"videoLink": videoLink
+                  ,"videoDesc": videoDesc
                 }
                 ,dataType: 'json'
                 ,success: function (res) {
-                  if (res.status == 0) {
+                  if (res.status === 0) {
                     layer.msg(res.msg,{icon:5});
                     return false;
                   }

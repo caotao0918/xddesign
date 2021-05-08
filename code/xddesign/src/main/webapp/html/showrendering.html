@@ -13,14 +13,11 @@
     <script>
         $(function () {
             loadmenu();
-            var soluId = window.location.search.split("=")[1];
+            var designid = geturlparabyname(window.location.search, "designid");
 
-            $("#rid").html("soluId：" + soluId);
-
-            $.get("/xddesign/public/customer/renderings", {"soluId": soluId}, function (data) {
+            $.get("/xddesign/public/customer/renderings", {"soluId": designid}, function (data) {
                 for (var i = 0; i < data.length; i++) {
                     var picpath = data[i].rendPath;
-                    // picpath = "/xddesign/img/cusloginlogo.png";
                     $("#rndpics").append("<img src='" + picpath + "'>");
                     $("#rndpics").append("名称：" + data[i].rendName + "<br>");
                     $("#rndpics").append("描述：" + data[i].rendDesc);
@@ -37,7 +34,7 @@
                                                                          onclick="backpage()">返回</button>
     <span>效果图</span>
 </span>
-<br><!--<span style="font-size: 40px" id="rid"></span>-->
+<br>
 <div style="text-align: center" id="rndpics">
 </div>
 </body>

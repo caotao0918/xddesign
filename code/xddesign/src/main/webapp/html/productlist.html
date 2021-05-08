@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>产品中心</title>
+    <meta name="keywords" content="驻马店迅达,迅达智能家居,迅达智能家居产品中心">
+    <meta name="description" content="迅达智能家居产品中心是迅达智能家居研发的所有产品集合">
+    <title>迅达智能家居产品中心</title>
     <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
     <link href="/xddesign/css/xddesign.css" rel="stylesheet">
     <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
@@ -11,9 +13,10 @@
     <script src="/xddesign/js/xddesign.js"></script>
 
     <script>
-        var url = "/xddesign/public/products";
-        var pagesize = 6;
+        var pagesize = 12;
         var kw = "";
+        var item;
+        var itemid;
 
         $(function () {
             loadmenu();
@@ -26,37 +29,120 @@
 
             $("#pinfo").load("showproduct.html");
 
-
+            $.get("/xddesign/design/customer/solutions/level/products", {}, function (data) {
+                var maps = data;
+                for (var i = 0; i < maps.length; i++) {
+                    var map = maps[i];
+                    for (var key in map) {
+                        var menuid1 = $.trim(key.split("firstId:")[1].split(",")[0]);
+                        var menuname1 = $.trim(key.split("firstName:")[1].split(",")[0]).replaceAll("'", "");
+                        var menuid2 = $.trim(key.split("secondId:")[1].split(",")[0]);
+                        var menuname2 = $.trim(key.split("secondName:")[1].split(",")[0]).replaceAll("'", "");
+                        addmenu(menuid1, menuname1, menuid2, menuname2);
+                    }
+                }
+            }, "json");
         });
+
+        function addmenu(menuid1, menuname1, menuid2, menuname2) {
+            if (!$("#menulist div:contains('" + menuname1 + "')").text()) {//display: none
+                $("#menulist").append("<div onclick='showsubitem(this," + menuid1 + ")' style='font-size: 17px;'>" + menuname1 + "</div><ul style='display: none;margin-bottom: 0px' class='list-unstyled'></ul>");
+            }
+            var menu2 = $("#menulist div:contains(" + menuname1 + ")").next();
+            if (menu2.children().length == 0 || menu2.html().indexOf("&nbsp;&nbsp;&nbsp;&nbsp;" + menuname2) == -1) {
+                menu2.append("<li id='" + menuid2 + "' style='font-size: 15px;' onclick='showitemproduct(this," + menuid2 + ")'>&nbsp;&nbsp;&nbsp;&nbsp;" + menuname2 + "</li>");
+            }
+
+        }
+
+        function showsubitem(obj, id) {
+            item = 1;
+            itemid = id;
+            $("#span1").html($(obj).html());
+            $("#span2").html($(obj).html());
+            $("#menulist ul").hide();
+            $("#menulist li").css("color", "");
+            $(obj).next().show();
+            $("#btn").click();
+        }
+
+        function showitemproduct(obj, id) {
+            item = 2;
+            itemid = id;
+            $("#span1").html($(obj).html());
+            $("#span2").html($(obj).html());
+            $("#menulist li").css("color", "");
+            $(obj).css("color", "#2e6da4");
+            $("#btn").click();
+        }
 
         function getpages(current, size, kw) {
             $(".pagination").empty();
             $("#products").empty();
+            $("#selectModal").modal("show");
 
-            $.get(url, {current: current, size: size, productName: kw}, function (data) {
-                var list = data.records;
-                for (var i = 0; i < list.length; i++) {
-                    var pid = list[i].productId;
-                    $("#products").append("<div onclick='showproduct(" + pid + ")' class='col-xs-6 col-sm-4 col-md-4 col-lg-2 product'><img style='width: auto;height: 80%' src='" + list[i].pictureList[0].pictureLink + "' \><br><b>￥" + list[i].price + "</b><br>" + list[i].productName + "</div>");
-                }
-                pages = data.pages;
+            if (item == 1) {
+                $.get("/xddesign/public/products", {
+                    "current": current,
+                    "size": size,
+                    "productName": kw,
+                    "firstId": itemid
+                }, function (data) {
+                    products(current, data);
+                }, "json");
+            } else if (item == 2) {
+                $.get("/xddesign/public/products", {
+                    "current": current,
+                    "size": size,
+                    "productName": kw,
+                    "secondId": itemid
+                }, function (data) {
+                    products(current, data);
+                }, "json");
+            } else {
+                $.get("/xddesign/public/products", {
+                    "current": current,
+                    "size": size,
+                    "productName": kw
+                }, function (data) {
+                    products(current, data);
+                }, "json");
+            }
 
-                if (current != 1) {
-                    $(".pagination").append("<li><a href='javascript:void(0);' onclick='getpages(" + (current - 1) + ",pagesize,kw)' aria-label='Previous'><span aria-hidden='true'>&laquo;</span></a></li>");
-                }
-                for (var i = 1; i <= pages; i++) {
-                    if (i == current) {
-                        $(".pagination").append("<li class='active'><a href='javascript:void(0);' onclick='getpages(" + i + ",pagesize,kw)'>" + i + "</a></li>");
-                    } else {
-                        $(".pagination").append("<li><a href='javascript:void(0);' onclick='getpages(" + i + ",pagesize,kw)'>" + i + "</a></li>");
-                    }
-                }
-                if (current < pages) {
-                    $(".pagination").append("<li><a href='javascript:void(0);' onclick='getpages(" + (current + 1) + ",pagesize,kw)' aria-label='Previous'><span aria-hidden='true'>&raquo;</span></a></li>");
-                }
-            }, "json");
         }
 
+        function products(current, data) {
+            var list = data.records;
+            for (var i = 0; i < list.length; i++) {
+                var pid = list[i].productId;
+                $("#products").append("<div onclick='showproduct(" + pid + ")' class='col-xs-6 col-sm-4 col-md-4 col-lg-2 product'><img style='width: auto;height: 80%' src='" + list[i].pictureList[0].pictureLink + "' \><br><b>￥" + list[i].price + "</b><br>" + list[i].productName + "</div>");
+            }
+            pages = data.pages;
+
+            if (current != 1) {
+                $(".pagination").append("<li><a href='javascript:void(0);' onclick='getpages(" + (current - 1) + ",pagesize,kw)' aria-label='Previous'><span aria-hidden='true'>&laquo;</span></a></li>");
+            }
+            for (var i = 1; i <= pages; i++) {
+                if (i == current) {
+                    $(".pagination").append("<li class='active'><a href='javascript:void(0);' onclick='getpages(" + i + ",pagesize,kw)'>" + i + "</a></li>");
+                } else {
+                    $(".pagination").append("<li><a href='javascript:void(0);' onclick='getpages(" + i + ",pagesize,kw)'>" + i + "</a></li>");
+                }
+            }
+            if (current < pages) {
+                $(".pagination").append("<li><a href='javascript:void(0);' onclick='getpages(" + (current + 1) + ",pagesize,kw)' aria-label='Previous'><span aria-hidden='true'>&raquo;</span></a></li>");
+            }
+        }
+
+        function clearitem() {
+            item = undefined;
+            itemid = undefined;
+            $("#span1").html("全部");
+            $("#span2").html("");
+            $("#menulist li").css("color", "");
+            $("#itemModal").modal("hide");
+            $("#btn").click();
+        }
     </script>
 
     <style>
@@ -67,15 +153,21 @@
 <body>
 
 <div id="menu"></div>
-
+<div style="float: right;margin-right: 5%;margin-top: 5px">
+    <button class="btn btn-default" data-toggle="modal"
+            data-target="#itemModal">分类
+    </button>
+</div>
 <span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
                                                                          onclick="backpage()">返回</button>
     <span>产品中心</span>
 </span><br>
 
-<div style="text-align: center;margin-top: 30px">
+<div style="margin-top: 30px;margin-left: 5%">
+    当前分类：<span id="span1">全部</span><br>
     <input type="text" class="form-control" style="display: inline;width: 70%;" placeholder="请输入产品名称" id="kw">
-    <button type="button" class="btn btn-default" style="margin-bottom: 3px" onclick="getpages(1,pagesize,kw)">搜索
+    <button type="button" id="btn" class="btn btn-default" style="margin-bottom: 3px" onclick="getpages(1,pagesize,kw)">
+        搜索
     </button>
 </div>
 
@@ -93,7 +185,26 @@
 <div id="pinfo">
 </div>
 
-</body>
+<div class="modal col-xs-6 col-sm-4 col-md-4 col-lg-2" style="margin: 0 0 0 auto;" id="itemModal" tabindex="-1"
+     role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div id="menulist">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="float: left">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"
+                            onclick="clearitem()">清空
+                    </button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+</body>
 
 </html>

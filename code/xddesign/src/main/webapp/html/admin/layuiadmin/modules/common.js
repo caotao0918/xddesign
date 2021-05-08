@@ -7,7 +7,7 @@
             url: "/xddesign/user/logout", type: "POST", dataType: "JSON", success: function (res) {
                 if (res.status === 1) {
                     window.localStorage.clear();
-                    window.location.href = "../../login/userlogin.html";
+                    window.location.href = "../../index.html";
                 }else {
                     layui.layer("退出失败");
                 }

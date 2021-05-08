@@ -11,20 +11,22 @@
     <script src="/xddesign/js/xddesign.js"></script>
 
     <script>
+        var designid = geturlparabyname(window.location.search, "designid");
+
         function toDecimal(x) {
             var f = parseFloat(x);
             if (isNaN(f)) {
                 return;
             }
-            f = Math.round(x*100)/100;
+            f = Math.round(x * 100) / 100;
             return f;
         }
-        soluId = window.location.search.split("=")[1];
+
         $(function () {
             loadmenu();
             var totalprice = 0;
             $.ajaxSettings.async = false;
-            $.get("/xddesign/public/customer/quotes", {"soluId": soluId}, function (data) {
+            $.get("/xddesign/public/customer/quotes", {"soluId": designid}, function (data) {
                 var totalnum = 0;
 
                 for (var i = 0; i < data.length; i++) {
@@ -33,7 +35,7 @@
                     content.append("<td>" + data[i].productName + "</td>");
                     content.append("<td>" + data[i].productNum + "</td>");
                     content.append("<td>" + data[i].price + "</td>");
-                    content.append("<td>" + data[i].totalPrice + "</td></tr>");
+                    content.append("<td>" + (data[i].totalPrice).toFixed(2) + "</td></tr>");
                     totalnum += data[i].productNum;
                     totalprice += data[i].totalPrice;
                     $("#tablelist").append(content);
@@ -42,13 +44,13 @@
                 $("#tablelist").append("<tr style='text-align: left;font-weight: bold'><td colspan='5' style='text-align: center'>产品总价</td><td>" + totalprice + "</td></tr>");
             }, "json");
 
-            $.get("/xddesign/public/customer/quotes/info", {"soluId": soluId}, function (data) {
+            $.get("/xddesign/public/customer/quotes/info", {"soluId": designid}, function (data) {
                 $("#tableinfo").append("<tr><td colspan='4' style='border-right: 0px'>报价单号：" + data.quoteNum + "</td><td colspan='2' style='text-align: right;border-left: 0px'>日期：" + data.addTime.split(" ")[0] + "</td></tr>");
                 $("#tableinfo").append("<tr><td colspan='3' style='width: 50%'>设计师：" + data.designName + "</td><td colspan='3'>客户：" + data.cusName + "</td></tr>");
                 $("#tableinfo").append("<tr><td colspan='3'>联系方式：" + data.designMobile + "</td><td colspan='3'>联系方式：" + data.cusMobile + "</td></tr>");
                 $("#tableinfo").append("<tr><td colspan='6'>以下为智能家居方案产品明细，请详阅，如有疑问及时与设计师联系，谢谢</td></tr>");
-                $("#tablelist").append("<tr style='text-align: left;font-weight: bold'><td colspan='5' style='text-align: center'>施工费</td><td>" + toDecimal(totalprice*0.1) + "</td></tr>");
-                $("#tablelist").append("<tr style='text-align: left;font-weight: bold' class='tablecss'><td colspan='5' style='text-align: center'>总价</td><td>" + toDecimal(totalprice*1.1) + "</td></tr>");
+                $("#tablelist").append("<tr style='text-align: left;font-weight: bold'><td colspan='5' style='text-align: center'>施工费</td><td>" + (totalprice * 0.1).toFixed(3) + "</td></tr>");
+                $("#tablelist").append("<tr style='text-align: left;font-weight: bold' class='tablecss'><td colspan='5' style='text-align: center'>总价</td><td>" + (totalprice * 1.1).toFixed(3) + "</td></tr>");
                 $("#tablelist").append("<br>");
                 $("#tablelist").append("<tr><td style='line-height: 10px' colspan='6'>备注：</td></tr>");
                 $("#tablelist").append("<tr><td style='line-height: 10px' colspan='6'>" + data.descr + "</td></tr>");
@@ -56,7 +58,7 @@
         });
 
         function toexcel() {
-            window.location.href = "/xddesign/public/customer/quote/toexcel?soluId=" + soluId;
+            window.location.href = "/xddesign/public/customer/quote/toexcel?soluId=" + designid;
         }
     </script>
 
@@ -72,6 +74,9 @@
 </head>
 <body>
 <div id="menu"></div>
+<button type="button" class="btn btn-default" style="float: right;margin-top: 5px;margin-right: 5%" onclick="toexcel()">
+    下载报表
+</button>
 <span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
                                                                          onclick="backpage()">返回</button>
 <span></span>
@@ -101,7 +106,6 @@
         <tbody id="tablelist"></tbody>
     </table>
 
-    <button type="button" class="btn btn-default" style="float: right" onclick="toexcel()">下载报表</button>
 </div>
 
 </body>

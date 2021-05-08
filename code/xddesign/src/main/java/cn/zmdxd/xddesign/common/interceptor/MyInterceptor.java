@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author 曹涛
  * @date 2021/3/8 10:10
- * @description: 自定义拦截器 如果未登录，则跳转到产品中心(这里不跳转到登陆页面的原因是有两个登陆页面，不好做判断)
+ * @description: 自定义拦截器
  */
 @Configuration
 public class MyInterceptor implements HandlerInterceptor {
@@ -19,7 +19,7 @@ public class MyInterceptor implements HandlerInterceptor {
     private static final String designRoleName = "设计人员";
     private static final String workRoleName = "施工人员";
     private static final String cusLoginPage = "/xddesign/html/login/cuslgi.html";
-    private static final String userLoginPage = "/xddesign/html/login/userlogin.html";
+    private static final String userLoginPage = "/xddesign/html/login/userlgi.html";
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

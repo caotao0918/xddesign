@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>未施工</title>
+    <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/xddesign/css/xddesign.css" rel="stylesheet">
+    <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
+    <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
+    <script src="/xddesign/js/xddesign.js"></script>
+    <script>
+        $(function () {
+            loadmenu();
+            $.get("/xddesign/worker/order/unfinished", {}, function (data) {
+                // alert(JSON.stringify(data));
+                if (data.length == 0) {
+                    $("#showtext").show();
+                } else {
+                    for (var i = 0; i < data.length; i++) {
+                        $("#designlist").append("<div class='col-xs-12 col-sm-6 col-md-6 col-lg-4'><div class='alert alert-success' role='alert'><table class='table table-bordered'><tr><td width='35%'>客户名称</td><td>" + data[i].cusName + "</td></tr><tr><td>客户电话</td><td>" + data[i].cusMobile + "</td></tr><tr><td>客户地址</td><td>" + data[i].address + "</td></tr><tr><td>设计人员姓名</td><td>" + data[i].designName + "</td></tr><tr><td>设计人员电话</td><td>" + data[i].designMobile + "</td></tr><tr><td>方案名称</td><td>" + data[i].soluName + "</td></tr></table><div style='text-align: right'><button type='button' class='btn btn-success' onclick='showdesign(" + data[i].soluId + ")'>查看</button>&nbsp;&nbsp;<button type='button' class='btn btn-success' onclick='showreport(" + data[i].soluId + ")'>报表</button>&nbsp;&nbsp;<button type='button' class='btn btn-success' onclick='showrendering(" + data[i].soluId + ")'>效果图</button>&nbsp;&nbsp;<button type='button' class='btn btn-success' onclick='finishdesign(" + data[i].soluId + ")'>施工完成</button></div></div></div>");
+                    }
+                }
+            }, "json");
+        });
+
+        function finishdesign(designid) {
+            $.post("/xddesign/worker/over", {
+                "soluId": designid,
+                "workName": window.localStorage.getItem("username")
+            }, function (data) {
+                if (data.status == 1) {
+                    window.location.reload();
+                }
+            }, "json");
+        }
+    </script>
+    <style>
+        table tr td:nth-child(1) {
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div id="menu"></div>
+<span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
+                                                                         onclick="backpage()">返回</button>
+    <span>未施工方案</span>
+</span>
+<div id="showtext" style="display: none"><h1>无未施工方案</h1></div>
+<div class="container-fluid">
+    <div class="row" id="designlist">
+    </div>
+</div>
+</body>
+</html>

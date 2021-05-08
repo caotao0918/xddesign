@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>客户列表</title>
+    <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/xddesign/css/xddesign.css" rel="stylesheet">
+    <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
+    <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
+    <script src="/xddesign/js/xddesign.js"></script>
+
+    <script>
+        $(function () {
+            loadmenu();
+            customerlist();
+        });
+
+        function customerlist() {
+            $("#customerlist tbody").empty();
+            $.get("/xddesign/design/customers", {
+                'current': 1, 'size': 9999
+            }, function (data) {
+                var total = data.total;
+                var list = data.records;
+                for (var i = 0; i < total; i++) {
+                    var listtbody = $("<tr>");
+                    listtbody.append("<td>" + (i + 1) + "</td>");
+                    listtbody.append("<td>" + list[i].username + "</td>");
+                    listtbody.append("<td>" + list[i].desc + "</td>");
+                    listtbody.append("<td>" + list[i].mobile + "</td>");
+                    listtbody.append("<td>" + list[i].address + "</td>");
+                    listtbody.append("<td>" + window.localStorage.username + "</td>");
+                    listtbody.append("<td><button type='button' class='btn btn-default btn-xs' onclick='editcustomer(" + list[i].id + ")'>查看</button><button type='button' class='btn btn-default btn-xs'onclick='delcustomer(\"" + list[i].id + "\",\"" + list[i].username + "\");'>删除</button>");
+                    $("#customerlist tbody").append(listtbody);
+                }
+            }, "json");
+        }
+
+        function delcustomer(id, cusname) {
+            $.post("/xddesign/design/customer/del", {"id": id}, function (data) {
+                customerlist();
+            }, "json");
+        }
+
+        function editcustomer(id) {
+            window.location.href = "editcustomer.html?cusid=" + id;
+        }
+
+    </script>
+
+</head>
+<body>
+
+<div id="menu"></div>
+<button class="btn btn-default" style="float: right;margin-top: 5px;margin-right: 5%"
+        onclick="window.location.href='editcustomer.html'">添加客户
+</button>
+<span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
+                                                                         onclick="backpage()">返回</button>
+    <span>客户列表</span>
+</span>
+
+<table class="table table-bordered table-striped" id="customerlist">
+    <thead>
+    <tr style="font-weight: bold">
+        <td></td>
+        <td>名称</td>
+        <td>类别</td>
+        <td>手机</td>
+        <td>地址</td>
+        <td>设计师</td>
+        <td></td>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+
+</body>
+</html>

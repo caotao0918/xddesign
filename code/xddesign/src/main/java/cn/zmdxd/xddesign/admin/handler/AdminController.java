@@ -684,10 +684,10 @@ public class AdminController {
         if (video.getVideoId() == null && video.getProductId() == null) {
             return ReturnResult.returnResult(false, "请先选择一个产品");
         }
-        if (video.getVideoId() == null) {
+        /*if (video.getVideoId() == null) {
             video.setVideoName(video.getVideoName() + "安装使用视频");
             video.setVideoDesc("这是" + video.getVideoName());
-        }
+        }*/
         boolean saveOrUpdate = videoService.saveOrUpdate(video);
         return ReturnResult.returnResult(saveOrUpdate);
     }
@@ -736,7 +736,7 @@ public class AdminController {
         if (guide.getGuideId() == null && guide.getProductId() == null) {
             return ReturnResult.returnResult(false, "请先选择一个产品");
         }
-        if (guide.getGuideId() == null) {
+/*        if (guide.getGuideId() == null) {
             guide.setGuideName(guide.getGuideName() + "产品手册");
             guide.setGuideDesc("这是" + guide.getGuideName());
         }else {
@@ -744,7 +744,7 @@ public class AdminController {
             String guideName = guides.get(0).getGuideName();
             guide.setGuideName(guideName);
             guide.setGuideDesc("这是" + guideName);
-        }
+        }*/
         boolean saveOrUpdate = guideService.saveOrUpdate(guide);
         return ReturnResult.returnResult(saveOrUpdate);
     }
