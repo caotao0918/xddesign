@@ -1,5 +1,6 @@
 package cn.zmdxd.xddesign.admin.dao;
 
+import cn.zmdxd.xddesign.entity.FirstLevel;
 import cn.zmdxd.xddesign.entity.SecondLevel;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -22,5 +23,7 @@ public interface SecondLevelDao extends BaseMapper<SecondLevel> {
     IPage<SecondLevel> findSecondLevels(Page<SecondLevel> page, @Param("second") SecondLevel secondLevel);
 
     SecondLevel findSecondLevel(Integer secondId);
+
+    List<FirstLevel> selectFirstAndSecond();
 
 }

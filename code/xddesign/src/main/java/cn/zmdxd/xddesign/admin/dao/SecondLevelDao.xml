@@ -13,12 +13,6 @@
             <result property="firstName" column="first_name" />
             <result property="firstDesc" column="first_desc" />
         </association>
-<!--        <collection property="propertyList" ofType="Property">-->
-<!--            <id property="propertyId" column="property_id" />-->
-<!--            <result property="propertyName" column="property_name" />-->
-<!--            <result property="propertyDesc" column="property_desc" />-->
-<!--            <result property="commonValue" column="common_value"/>-->
-<!--        </collection>-->
     </resultMap>
 
     <insert id="insertSecondLevel" parameterType="SecondLevel">
@@ -43,6 +37,24 @@
         left join t_firstlevel first on second.first_id=first.first_id
         left join t_property property on property.second_id=second.second_id
         where second.second_id=#{secondId}
+    </select>
+
+
+    <resultMap id="FirstAndSecond" type="FirstLevel">
+        <id property="firstId" column="first_id" />
+        <result property="firstName" column="first_name" />
+        <result property="firstDesc" column="first_desc" />
+        <collection property="secondLevelList" ofType="SecondLevel">
+            <id property="secondId" column="second_id" />
+            <result property="secondName" column="second_name" />
+            <result property="secondDesc" column="second_desc" />
+        </collection>
+    </resultMap>
+
+    <select id="selectFirstAndSecond" resultMap="FirstAndSecond">
+        select fir.first_id, fir.first_name, sec.second_id, sec.second_name
+        from t_firstlevel fir, t_secondlevel sec
+        where fir.first_id = sec.first_id
     </select>
 
 </mapper>

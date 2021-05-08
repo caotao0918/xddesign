@@ -1,5 +1,6 @@
 package cn.zmdxd.xddesign.admin.service;
 
+import cn.zmdxd.xddesign.entity.FirstLevel;
 import cn.zmdxd.xddesign.entity.SecondLevel;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -19,4 +20,6 @@ public interface SecondLevelService extends IService<SecondLevel> {
     IPage<SecondLevel> findSecondLevels(Page<SecondLevel> page, SecondLevel secondLevel);
 
     SecondLevel findSecondLevel(Integer secondId);
+
+    List<FirstLevel> findFirstAndSecond();
 }

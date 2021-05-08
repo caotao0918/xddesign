@@ -514,6 +514,14 @@ public class DesignController {
     }
 
     /**
+     * @description: 查询一级分类及其下的二级分类列表
+     */
+    @RequestMapping(value = "firstlevel/secondlevel")
+    public List<FirstLevel> findFirstAndSecond() {
+        return secondLevelService.findFirstAndSecond();
+    }
+
+    /**
      * @description: 添加和修改方案信息-自定义方案
      * (当solutions中的solu_id为null时，直接添加方案;不为null时，先删除方案，数据库中设置的级联删除，所以这个方案的房间信息、房间内的产品信息、报价单信息也一并删除，然后再重新添加方案)
      * @param solutions:要添加的方案信息 (房子id、方案名称、方案描述、房间名称、产品id、产品数量)

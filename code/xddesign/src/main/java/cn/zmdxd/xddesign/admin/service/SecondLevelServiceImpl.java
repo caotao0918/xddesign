@@ -1,6 +1,7 @@
 package cn.zmdxd.xddesign.admin.service;
 
 import cn.zmdxd.xddesign.admin.dao.SecondLevelDao;
+import cn.zmdxd.xddesign.entity.FirstLevel;
 import cn.zmdxd.xddesign.entity.SecondLevel;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -37,5 +38,10 @@ public class SecondLevelServiceImpl extends ServiceImpl<SecondLevelDao, SecondLe
     @Override
     public SecondLevel findSecondLevel(Integer secondId) {
         return secondLevelDao.findSecondLevel(secondId);
+    }
+
+    @Override
+    public List<FirstLevel> findFirstAndSecond() {
+        return secondLevelDao.selectFirstAndSecond();
     }
 }
