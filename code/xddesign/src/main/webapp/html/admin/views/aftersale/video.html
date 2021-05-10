@@ -197,6 +197,7 @@
               let  $$ = iframe.layui.$;
               let productSelect = $$('select[name="productId"]');
               let videoLink = $$('input[name="videoLink"]').val();
+              let videoCover = $$('input[name="videoCover"]').val();
               let videoName = $$('input[name="videoName"]').val();
               let videoDesc = $$('input[name="videoDesc"]').val();
 
@@ -208,6 +209,7 @@
                   "videoName": videoName
                   ,"productId": productSelect.val()
                   ,"videoLink": videoLink
+                  ,"videoCover": videoCover
                   ,"videoDesc": videoDesc
                 }
                 ,dataType: 'json'

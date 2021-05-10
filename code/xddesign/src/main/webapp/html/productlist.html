@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="keywords" content="驻马店迅达,迅达智能家居,迅达智能家居产品中心">
-    <meta name="description" content="迅达智能家居产品中心是迅达智能家居研发的所有产品集合">
-    <title>迅达智能家居产品中心</title>
+    <title>产品中心</title>
     <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
     <link href="/xddesign/css/xddesign.css" rel="stylesheet">
     <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
@@ -29,7 +27,20 @@
 
             $("#pinfo").load("showproduct.html");
 
-            $.get("/xddesign/design/customer/solutions/level/products", {}, function (data) {
+            $.get("/xddesign/design/firstlevel/secondlevel", {}, function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    // alert(JSON.stringify(data[i]));
+                    $("#menulist").append("<div style='font-size: 17px;' onclick='showsubitem(this," + data[i].firstId + ")'>" + data[i].firstName + "</div>");
+                    var content = "<ul style='display: none;margin-bottom: 0px' class='list-unstyled'>";
+                    for (var j = 0; j < data[i].secondLevelList.length; j++) {
+                        content += "<li style='font-size: 15px;' onclick='showitemproduct(this," + data[i].secondLevelList[j].secondId + ")'>&nbsp;&nbsp;&nbsp;&nbsp;" + data[i].secondLevelList[j].secondName + "</li>";
+                    }
+                    content += "</ul>";
+                    $("#menulist").append(content);
+                }
+            }, "json");
+
+            /*$.get("/xddesign/design/customer/solutions/level/products", {}, function (data) {
                 var maps = data;
                 for (var i = 0; i < maps.length; i++) {
                     var map = maps[i];
@@ -41,7 +52,7 @@
                         addmenu(menuid1, menuname1, menuid2, menuname2);
                     }
                 }
-            }, "json");
+            }, "json");*/
         });
 
         function addmenu(menuid1, menuname1, menuid2, menuname2) {
@@ -115,7 +126,7 @@
             var list = data.records;
             for (var i = 0; i < list.length; i++) {
                 var pid = list[i].productId;
-                $("#products").append("<div onclick='showproduct(" + pid + ")' class='col-xs-6 col-sm-4 col-md-4 col-lg-2 product'><img style='width: auto;height: 80%' src='" + list[i].pictureList[0].pictureLink + "' \><br><b>￥" + list[i].price + "</b><br>" + list[i].productName + "</div>");
+                $("#products").append("<div onclick='showproduct(" + pid + ")' class='col-xs-6 col-sm-4 col-md-4 col-lg-2 product'><img src='" + list[i].pictureList[0].pictureLink + "' \><br><b>￥" + list[i].price + "</b><br>" + list[i].productName + "</div>");
             }
             pages = data.pages;
 
@@ -185,7 +196,7 @@
 <div id="pinfo">
 </div>
 
-<div class="modal col-xs-6 col-sm-4 col-md-4 col-lg-2" style="margin: 0 0 0 auto;" id="itemModal" tabindex="-1"
+<div class="modal col-xs-12 col-sm-6 col-md-4 col-lg-2" style="margin: 0 0 0 auto;" id="itemModal" tabindex="-1"
      role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">

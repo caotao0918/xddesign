@@ -63,25 +63,34 @@
             $("#editproductModal").on("hidden.bs.modal", function () {
                 $(".info").hide();
                 $("#info").hide();
+                $("input[value$=" + currentroom + "]").click();
             });
             $("#pinfo").load("/xddesign/html/showproduct.html");
         });
 
         function getproductsdata() {
-            $.get("/xddesign/design/customer/solutions/level/products", {}, function (data) {
-                maps = data;
-                for (var i = 0; i < maps.length; i++) {
-                    var map = maps[i];
-                    for (var key in map) {
-                        var menuid1 = $.trim(key.split("firstId:")[1].split(",")[0]);
-                        var menuname1 = $.trim(key.split("firstName:")[1].split(",")[0]).replaceAll("'", "");
-                        var menuid2 = $.trim(key.split("secondId:")[1].split(",")[0]);
-                        var menuname2 = $.trim(key.split("secondName:")[1].split(",")[0]).replaceAll("'", "");
-                        addmenu(menuid1, menuname1, menuid2, menuname2);
+            $.ajax({
+                url: "/xddesign/design/customer/solutions/level/products",
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    maps = data;
+                }
+            });
+
+            $.get("/xddesign/design/firstlevel/secondlevel", {}, function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    $("#menulist").append("<div style='font-size: 17px;' onclick='showsubitem(this," + data[i].firstId + ")'>" + data[i].firstName + "</div>");
+                    var content = "<ul style='display: none;margin-bottom: 0px' class='list-unstyled'>";
+                    for (var j = 0; j < data[i].secondLevelList.length; j++) {
+                        content += "<li style='font-size: 15px;' onclick='showitemproduct(this," + data[i].secondLevelList[j].secondId + ")' id='" + data[i].secondLevelList[j].secondId + "'>&nbsp;&nbsp;&nbsp;&nbsp;" + data[i].secondLevelList[j].secondName + "</li>";
                     }
+                    content += "</ul>";
+                    $("#menulist").append(content);
                 }
                 reshowroomproduct();
             }, "json");
+
         }
 
         function reshowroomproduct() {
@@ -105,7 +114,6 @@
                     $("input[value$=所有]").click();
                     setstatebtn();
                 }, "json");
-
             }
         }
 
@@ -139,56 +147,41 @@
             }, "json");
         }
 
-        function addmenu(menuid1, menuname1, menuid2, menuname2) {
-            if (!$("#menulist div:contains('" + menuname1 + "')").text()) {//display: none
-                $("#menulist").append("<div onclick='showsubitem(this)' style='font-size: 17px;'>" + menuname1 + "</div><ul style='display: none;margin-bottom: 0px' class='list-unstyled'></ul>");
-            }
-            var menu2 = $("#menulist div:contains(" + menuname1 + ")").next();
-            if (menu2.children().length == 0 || menu2.html().indexOf("&nbsp;&nbsp;&nbsp;&nbsp;" + menuname2) == -1) {
-                menu2.append("<li id='" + menuid2 + "' style='font-size: 15px;' onclick='showitemproduct(this)'>&nbsp;&nbsp;&nbsp;&nbsp;" + menuname2 + "</li>");
-            }
-
-        }
-
-        function showsubitem(obj) {
+        function showsubitem(obj, id) {
             $("#span2").html($(obj).html());
             $("#menulist ul").hide();
             $("#menulist li").css("color", "");
             $("#menuproducts").empty();
             $(obj).next().show();
-            for (var i = 0; i < $(obj).next().children().length; i++) {
-                showitemproduct1($(obj).next().children()[i]);
-            }
+            $.get("/xddesign/public/products", {
+                "current": 1,
+                "size": 1111,
+                "firstId": id
+            }, function (data) {
+                for (var i = 0; i < data.records.length; i++) {
+                    var pid = "p" + data.records[i].productId;
+                    $("#menuproducts").append("<div id='" + pid + "' class='col-xs-6 col-sm-4 col-md-3 col-lg-2 product' style='text-align: center;' onclick='chooseproduct(\"" + pid + "\")'><img style='width: auto;height: 80%' src='" + data.records[i].pictureList[0].pictureLink + "'>" + data.records[i].productName + "</div>");
+                    setdivclass("p" + data.records[i].productId);
+                }
+            });
         }
 
-        function showitemproduct(obj) {
+        function showitemproduct(obj, id) {
             $("#span2").html($(obj).html());
             $("#menulist li").css("color", "");
             $(obj).css("color", "#2e6da4");
             $("#menuproducts").empty();
-            showitemproduct1(obj);
-        }
-
-        function showitemproduct1(obj) {
-            var menuid2 = $(obj).attr("id");
-            for (var i = 0; i < maps.length; i++) {
-                var break1 = false;
-                var map = maps[i];
-                for (var key in map) {
-                    if ($.trim(key.split("secondId:")[1].split(",")[0]).replaceAll("'", "") == menuid2) {
-                        var productlist = map[key];
-                        for (var j = 0; j < productlist.length; j++) {
-                            var pid = "p" + productlist[j].productId;
-                            $("#menuproducts").append("<div id='" + pid + "' class='col-xs-6 col-sm-4 col-md-3 col-lg-2 product' style='text-align: center;' onclick='chooseproduct(\"" + pid + "\")'><img style='width: auto;height: 80%' src='" + productlist[j].pictureList[0].pictureLink + "'>" + productlist[j].productName + "</div>");
-                            setdivclass("p" + productlist[j].productId);
-                        }
-                        break1 = true;
-                    }
+            $.get("/xddesign/public/products", {
+                "current": 1,
+                "size": 9999,
+                "secondId": id
+            }, function (data) {
+                for (var i = 0; i < data.records.length; i++) {
+                    var pid = "p" + data.records[i].productId;
+                    $("#menuproducts").append("<div id='" + pid + "' class='col-xs-6 col-sm-4 col-md-3 col-lg-2 product' style='text-align: center;' onclick='chooseproduct(\"" + pid + "\")'><img style='width: auto;height: 80%' src='" + data.records[i].pictureList[0].pictureLink + "'>" + data.records[i].productName + "</div>");
+                    setdivclass("p" + data.records[i].productId);
                 }
-                if (break1) {
-                    return false;
-                }
-            }
+            });
         }
 
         function setdivclass(pid) {
@@ -238,23 +231,24 @@
             $("#addproductbtn").parent().siblings().remove();
             if (room != "所有") {
                 var roomproduct = roomproducts[room];
-                showroomproduct1(roomproduct);
+                showroomproduct1(currentroom, roomproduct);
             } else {
                 for (var key in roomproducts) {
                     var roomproduct = roomproducts[key];
-                    showroomproduct1(roomproduct);
+                    showroomproduct1(key, roomproduct);
                 }
             }
 
         }
 
-        function showroomproduct1(roomproduct) {
-            if (roomproduct == undefined) {
-                return;
-            }
-            for (var i = 0; i < roomproduct.length; i++) {
-                var product = getproductbyid(roomproduct[i]);
-                $("#addproductbtn").parent().before("<div onclick='editproduct(this," + product.productId + ",\"" + product.productName + "\")' class='col-xs-6 col-sm-4 col-md-4 col-lg-2 product'><img style='width: auto;height: 80%' src='" + product.pictureList[0].pictureLink + "' \><br><span>" + product.productName + "</span></div>");
+        function showroomproduct1(room, roomproduct) {
+            if (roomproduct != undefined) {
+                for (var i = 0; i < roomproduct.length; i++) {
+                    $.get("/xddesign/public/product", {"productId": roomproduct[i].replace("p", "")}, function (product) {
+                        var num = getproductnumbypid(room, "p" + product.productId);
+                        $("#addproductbtn").parent().before("<div onclick='editproduct(this," + product.productId + ",\"" + product.productName + "\")' class='col-xs-6 col-sm-4 col-md-4 col-lg-2 product'><img style='width: auto;height: 80%' src='" + product.pictureList[0].pictureLink + "' \><br><span style='font-weight: bold'>数量：" + num + "</span><br><span>" + product.productName + "</span></div>");
+                    }, "json");
+                }
             }
         }
 
@@ -264,7 +258,7 @@
             } else {
                 $("#editproductModal").modal("show");
                 $("#pname").html(pname);
-                $("#showproductbtn").attr("onclick", "showproduct1(" + pid + ")");
+                $("#showproductbtn").attr("onclick", "showproduct(" + pid + ")");
                 $("#delproductbtn").attr("onclick", "delproduct(" + pid + ")");
                 $("#setproductnumselect").empty();
                 var pnum = getproductnumbypid(currentroom, "p" + pid);
@@ -294,32 +288,12 @@
             return res;
         }
 
-        function showproduct1(pid) {
-            $("#editproductModal").modal("hide");
-            showproduct(pid);
-        }
-
         function delproduct(pid) {
             var productlist = roomproducts[currentroom];
             productlist.splice($.inArray("p" + pid, productlist), 1);
             roomproducts[currentroom] = productlist;
             $("input[value$=" + currentroom + "]").click();
             $("#editproductModal").modal("hide");
-        }
-
-        function getproductbyid(pid) {
-            for (var i = 0; i < maps.length; i++) {
-                var map = maps[i];
-                for (key in map) {
-                    var productlist = map[key];
-                    for (var j = 0; j < productlist.length; j++) {
-                        var product = productlist[j];
-                        if (product.productId == pid.replace("p", "")) {
-                            return product;
-                        }
-                    }
-                }
-            }
         }
 
         function addroom() {
@@ -452,14 +426,22 @@
                 for (var key in roomproducts) {
                     var productlist = [];
                     $.each(roomproducts[key], function (i, pid) {
-                        var product = getproductbyid(pid.substr(1));
-                        var pnum = getproductnumbypid(key, pid);
-                        productlist.push({
-                            "pnNum": parseInt(pnum),
-                            "product": {
-                                "productId": pid.substr(1),
-                                "price": product.price.toString(),
-                                "productName": product.productName
+                        $.ajax({
+                            url: "/xddesign/public/product",
+                            data: {"productId": pid.substr(1)},
+                            dataType: "json",
+                            async: false,
+                            type: "get",
+                            success: function (product) {
+                                var pnum = getproductnumbypid(key, pid);
+                                productlist.push({
+                                    "pnNum": parseInt(pnum),
+                                    "product": {
+                                        "productId": pid.substr(1),
+                                        "price": product.price.toString(),
+                                        "productName": product.productName
+                                    }
+                                });
                             }
                         });
                     });
@@ -468,6 +450,7 @@
                 $.ajax({
                     url: "/xddesign/design/customer/solutions/saveorupdate",
                     data: JSON.stringify(design),
+                    async: false,
                     contentType: "application/json",
                     dataType: "json",
                     type: "post",
@@ -488,27 +471,27 @@
 </head>
 <body>
 <div id="menu"></div>
-<input type="button" class="btn btn-default" value="备注" style="float: right;margin-right: 5%;margin-top: 5px;"
-       data-toggle="modal" data-target="#descModal">
-<input type="button" id="statebtn" class="btn btn-default" data-toggle="modal" data-target="#stateModal"
-       style="float: right;margin-top: 5px;margin-right: 5%;display: none">
 <span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
                                                                          onclick="backpage()">返回</button>
     <span>编辑方案</span>
-</span>
-<div style="margin-left:5%;margin-top: 30px">
+</span><br>
+<button class="btn btn-default" style="float:right;margin-right:5%;"
+        id="adddesignbtn" data-toggle="modal" data-target="#addroomModal">添加房间
+</button>
+<input type="button" class="btn btn-default" value="备注" style="margin-left: 5%"
+       data-toggle="modal" data-target="#descModal">
+<input type="button" id="statebtn" class="btn btn-default" data-toggle="modal" data-target="#stateModal"
+       style="display: none">
+<div style="margin-left:5%;margin-top: 10px">
     <input type="text" class="form-control" style="display: inline;width: 50%;" placeholder="请输入方案名"
            id="savedesigninput">
     <button type="button" class="btn btn-default" style="margin-bottom: 3px;" id="savedesignbtn" onclick="savedesign()">
         保存方案
     </button>
-    <button class="btn btn-default" style="float:right;margin-bottom: 3px;margin-right:5%;"
-            id="adddesignbtn" data-toggle="modal" data-target="#addroomModal">添加房间
-    </button>
 
 </div>
 
-<div class="container-fluid show" id="rooms">
+<div class="container-fluid show" id="rooms" style="margin-top: 10px;margin-bottom: 10px">
     <div class="col-xs-3 col-sm-2 col-md-2 col-lg-1">
         <input type="button" class="btn btn-xs btn-primary" style="width: 100%" onclick="chooseroom(this)" value="所有">
     </div>

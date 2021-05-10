@@ -109,13 +109,17 @@
         function showdesignrendering(designid, designname) {
             window.location.href = "editrendering.html?designid=" + designid + "&designname=" + designname;
         }
+
+        function toeditcustomer() {
+            window.location.href = "editcustomer.html?cusid=" + cusid;
+        }
     </script>
 </head>
 <body>
 <div id="menu"></div>
 
 <span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
-                                                                         onclick="backpage()">返回</button>
+                                                                         onclick="toeditcustomer()">返回</button>
     <span id="span1">编辑住宅</span>
 </span>
 
@@ -152,8 +156,6 @@
                 disabled>
             保存
         </button>
-        <br><br>
-        <button type="button" onclick="backpage()" class="btn btn-default" style="width: 100%">返回</button>
     </div>
 
 </div>

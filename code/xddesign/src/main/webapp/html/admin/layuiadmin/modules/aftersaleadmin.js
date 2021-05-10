@@ -330,6 +330,7 @@
                     let $$ = iframeWindow.layui.$;
                     let videoId = $$('input[name="videoId"]').val();
                     let videoLink = $$('input[name="videoLink"]').val();
+                    let videoCover = $$('input[name="videoCover"]').val();
                     let videoName = $$('input[name="videoName"]').val();
                     let videoDesc = $$('input[name="videoDesc"]').val();
 
@@ -343,12 +344,13 @@
                             ,data: {
                                 "videoId": videoId
                                 ,"videoLink": videoLink
+                                ,"videoCover": videoCover
                                 ,"videoName": videoName
                                 ,"videoDesc": videoDesc
                             }
                             ,dataType: 'json'
                             ,success: function (res) {
-                                if (res.status == 0) {
+                                if (res.status === 0) {
                                     layer.msg(res.msg,{icon:5});
                                     return false;
                                 }
@@ -367,6 +369,7 @@
                     $("#level").attr("hidden", true);
                     $("input[name='videoId']").val(e.data.videoId);
                     $("input[name='videoLink']").val(e.data.videoLink);
+                    $("input[name='videoCover']").val(e.data.videoCover);
                     $("input[name='videoName']").val(e.data.videoName);
                     $("input[name='videoDesc']").val(e.data.videoDesc);
                 }

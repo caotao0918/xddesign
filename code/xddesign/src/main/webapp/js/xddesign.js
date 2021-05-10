@@ -15,8 +15,7 @@ function isnum(val) {
 
 //返回上一页
 function backpage() {
-    // history.go(-1);
-    self.location=document.referrer;
+    history.go(-1);
 }
 
 //加载菜单

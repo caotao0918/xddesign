@@ -82,6 +82,10 @@
         function edithouse(cusname, houseid, housename, houseaddr, housetype) {
             window.location.href = "edithouse.html?cusid=" + cusid + "&cusname=" + cusname + "&houseid=" + houseid + "&housename=" + housename + "&houseaddr=" + houseaddr + "&housetype=" + housetype;
         }
+
+        function tocustomerlist() {
+            window.location.href="customerlist.html";
+        }
     </script>
 
 </head>
@@ -89,7 +93,7 @@
 <div id="menu"></div>
 
 <span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
-                                                                         onclick="backpage()">返回</button>
+                                                                         onclick="tocustomerlist()">返回</button>
     <span id="span1">添加客户</span>
 </span>
 
@@ -150,8 +154,6 @@
                 disabled>
             保存
         </button>
-        <br><br>
-        <button type="button" onclick="backpage()" class="btn btn-default" style="width: 100%">返回</button>
     </div>
 </div>
 <br>

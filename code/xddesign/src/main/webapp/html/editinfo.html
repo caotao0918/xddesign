@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>设置资料</title>
+    <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
+    <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
+    <script src="/xddesign/js/xddesign.js"></script>
+    <script>
+        $(function () {
+            loadmenu();
+            valsbtns(["username1", "mobile"], ["btn"]);
+            $("#rolename").val(window.localStorage.rolename);
+            $("#username1").val(window.localStorage.username);
+            $("#mobile").val(window.localStorage.mobile);
+            $("#lastlogintime").val(window.localStorage.lastlogintime);
+
+            $("#btn").click(function () {
+                if (!isphone($("#mobile").val())) {
+                    setinfo("手机号格式不正确", false);
+                    return false;
+                } else {
+                    $.post("/xddesign/admin/user/saveorupdate", {
+                        "role.name": $("#rolename").val(),
+                        "role.id": window.localStorage.roleid,
+                        "id": window.localStorage.userid,
+                        "username": $("#username1").val(),
+                        "mobile": $("#mobile").val(),
+                        "lastTime": $("#lastlogintime").val()
+                    }, function (res) {
+                        if (res == "操作成功") {
+                            window.localStorage.setItem("username", $("#username1").val());
+                            window.localStorage.setItem("mobile", $("#mobile").val());
+                            $("#menu").empty();
+                            loadmenu();
+                            setinfo(res, true);
+                        }
+                    }, "text");
+                }
+            });
+        });
+
+        function setinfo(msg, status) {
+            if ($("#info").hide()) {
+                $("#info").show();
+            }
+            if (status) {
+                $("#info").attr("class", "alert alert-success");
+            } else {
+                $("#info").attr("class", "alert alert-danger");
+            }
+            $("#info").html(msg);
+        }
+    </script>
+</head>
+
+<body>
+<div id="menu"></div>
+<div class="panel panel-default" style="width: 90%;margin: 0 auto">
+    <div class="panel-heading">设置资料
+        <span></span>
+    </div>
+    <div class="panel-body">
+        <div class="input-group">
+            <span class="input-group-addon">我的角色</span>
+            <input type="text" readonly class="form-control" id="rolename" aria-describedby="basic-addon1">
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <div class="input-group">
+            <span class="input-group-addon">用户名</span>
+            <input type="text" class="form-control" id="username1" aria-describedby="basic-addon1">
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="input-group">
+            <span class="input-group-addon">手机</span>
+            <input type="text" class="form-control" id="mobile" placeholder="" aria-describedby="basic-addon1">
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="input-group">
+            <span class="input-group-addon">上次登录时间</span>
+            <input type="text" class="form-control" id="lastlogintime" readonly
+                   aria-describedby="basic-addon1">
+        </div>
+    </div>
+    <div class="panel-body" style="display: none" id="info">
+        <div role="alert"></div>
+    </div>
+    <div class="panel-body">
+        <button type="button" id="btn" class="btn btn-primary" style="width: 100%">确认修改</button>
+        <br><br>
+        <button type="button" onclick="backpage()" class="btn btn-default" style="width: 100%">返回</button>
+    </div>
+</div>
+</body>
+</html>

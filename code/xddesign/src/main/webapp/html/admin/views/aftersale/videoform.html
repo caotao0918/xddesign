@@ -60,6 +60,12 @@
           <input type="text" name="videoLink" lay-verify="required|url" autocomplete="off" placeholder="请上传视频或输入视频链接" class="layui-input">
         </div>
       </div>
+      <div class="layui-form-item">
+        <div class="btnAndInp">
+          <button type="button" class="layui-btn" id="insertPicture" style="width: 110px;position: relative;z-index: 10;"><i class="layui-icon layui-icon-upload"></i>上传封面</button>
+          <input type="text" name="videoCover" lay-verify="required|url" autocomplete="off" placeholder="请上传封面图片或输入图片链接" class="layui-input">
+        </div>
+      </div>
     </div>
     <div class="layui-form-item layui-hide">
       <button class="layui-btn" lay-submit lay-filter="LAY-video-front-submit" id="LAY-video-front-submit">提交</button>
@@ -162,6 +168,30 @@
           return layer.msg(res.msg, {icon:5});
         }
         $('input[name="videoLink"]').val(res.data.src);
+      }
+    });
+
+    var loadindex2;
+    // 上传产品手册封面
+    upload.render({
+      elem: '#insertPicture'
+      ,url: '/xddesign/admin/video/upload'
+      ,accept: "images"
+      ,multiple: false
+      ,size: 5*1024
+      ,before: function(obj){
+        loadindex2 = layer.load();//上传loading
+      }
+      ,error: function(index, upload){
+        return layer.msg("服务器出现错误，请重试", {icon:5});
+      }
+      ,done: function (res, index, upload) {
+        layer.close(loadindex2);
+        //上传失败
+        if (res.status === 0) {
+          return layer.msg(res.msg, {icon:5});
+        }
+        $('input[name="videoCover"]').val(res.data.src);
       }
     });
 

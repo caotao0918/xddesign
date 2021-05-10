@@ -18,13 +18,22 @@ public class Video {
 
     @TableId(value = "video_id",type = IdType.AUTO)
     private Integer videoId;
-    private String videoName;          //视频名称
-    private String videoLink;          //视频链接
-    private Timestamp videoAddTime;    //视频上传日期
-    private String videoDesc;          //视频描述
-    private String videoReserve;       //保留字段
 
-    private Integer productId;         //产品id
+    // 视频名称
+    private String videoName;
+    // 视频链接
+    private String videoLink;
+    // 视频封面
+    private String videoCover;
+    // 视频上传日期
+    private Timestamp videoAddTime;
+    // 视频描述
+    private String videoDesc;
+    // 保留字段
+    private String videoReserve;
+
+    // 产品id
+    private Integer productId;
 
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     public Timestamp getVideoAddTime() {

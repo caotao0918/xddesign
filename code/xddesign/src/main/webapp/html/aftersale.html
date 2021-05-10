@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="keywords" content="驻马店迅达智能,迅达智能家居,迅达智能家居售后支持">
-    <meta name="description" content="迅达智能家居售后支持中心是迅达智能家居产品的售后支持">
-    <title>迅达智能家居售后支持中心</title>
+    <title>售后支持中心</title>
     <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
     <link href="/xddesign/css/xddesign.css" rel="stylesheet">
     <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
@@ -127,7 +125,7 @@
                         var guidelink = data[i].guideLink;
                         var guidename = data[i].guideName;
                         guidelink = guidelink.replace('\\', '/');
-                        $("#support").append("<div onclick='window.open(\"" + guidelink + "\");' class='col-xs-6 col-sm-3 col-md-3 col-lg-2 product' style='text-align:center;height: 165px'><img style='width: 130px;' src='" + piclink + "'><br>" + guidename + "</div>");
+                        $("#support").append("<div onclick='window.open(\"" + guidelink + "\");' class='col-xs-6 col-sm-3 col-md-3 col-lg-2 product'><img src='" + piclink + "'><br>" + guidename + "</div>");
                     }
                 }, "json");
             }

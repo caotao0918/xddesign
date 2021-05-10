@@ -5,7 +5,7 @@
 <mapper namespace="cn.zmdxd.xddesign.admin.dao.VideoDao">
 
     <select id="selectVideos" resultType="Video">
-        select video.video_id, video.video_name, video.video_link, video.video_add_time, video.video_desc, video.video_reserve
+        select video.video_id, video.video_name, video.video_link, video.video_cover, video.video_add_time, video.video_desc, video.video_reserve
         from t_video video
         left join t_product product on product.product_id=video.product_id
         left join t_secondlevel sec on product.second_id = sec.second_id
