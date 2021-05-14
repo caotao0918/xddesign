@@ -244,12 +244,24 @@
         function showroomproduct1(room, roomproduct) {
             if (roomproduct != undefined) {
                 for (var i = 0; i < roomproduct.length; i++) {
-                    $.get("/xddesign/public/product", {"productId": roomproduct[i].replace("p", "")}, function (product) {
-                        var num = getproductnumbypid(room, "p" + product.productId);
-                        $("#addproductbtn").parent().before("<div onclick='editproduct(this," + product.productId + ",\"" + product.productName + "\")' class='col-xs-6 col-sm-4 col-md-4 col-lg-2 product'><img style='width: auto;height: 80%' src='" + product.pictureList[0].pictureLink + "' \><br><span style='font-weight: bold'>数量：" + num + "</span><br><span>" + product.productName + "</span></div>");
-                    }, "json");
+                    $.ajax({
+                        url: "/xddesign/public/product",
+                        data: {"productId": roomproduct[i].replace("p", "")},
+                        type: "get",
+                        dataType: "json",
+                        async: false,
+                        success: function (product) {
+                            var num = getproductnumbypid(room, "p" + product.productId);
+                            $("#addproductbtn").parent().before("<div onclick='editproduct(this," + product.productId + ",\"" + product.productName + "\")' class='col-xs-6 col-sm-4 col-md-4 col-lg-2 product'><img style='width: auto;height: 80%' src='" + product.pictureList[0].pictureLink + "' \><br><span style='font-weight: bold'>数量：" + num + "</span><br><span>" + product.productName + "</span></div>");
+                        }
+                    });
                 }
             }
+        }
+
+        function showproduct1(pid) {
+            $("#editproductModal").modal("hide");
+            showproduct(pid);
         }
 
         function editproduct(obj, pid, pname) {
@@ -258,7 +270,7 @@
             } else {
                 $("#editproductModal").modal("show");
                 $("#pname").html(pname);
-                $("#showproductbtn").attr("onclick", "showproduct(" + pid + ")");
+                $("#showproductbtn").attr("onclick", "showproduct1(" + pid + ")");
                 $("#delproductbtn").attr("onclick", "delproduct(" + pid + ")");
                 $("#setproductnumselect").empty();
                 var pnum = getproductnumbypid(currentroom, "p" + pid);

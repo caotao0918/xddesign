@@ -32,8 +32,12 @@
             content += "<li><a href='http://zmdxd.cn/gwAction_toIntroduce1.action'>公司简介</a></li>";
             content += "<li><a href='http://zmdxd.cn/gwAction_toIntroduce4.action'>联系我们</a></li>";
         }
-        content += "<li><a href='/xddesign/html/productlist.html'>产品中心</a></li>";
-        content += "<li><a href='/xddesign/html/aftersale.html'>售后支持</a></li>";
+        if ($("title").html() != "迅达智能家居-与您一起见证智能家居的发展") {
+            content += "<li><a href='/xddesign/html/productlist.html'>产品中心</a></li>";
+            content += "<li><a href='/xddesign/html/aftersale.html'>售后支持</a></li>";
+        } else {
+            $("#login").hide();
+        }
         if (username != null) {
             content += "<li><a href='https://www.kujiale.com/' target='_blank'>酷家乐</a></li>";
         }
@@ -79,14 +83,12 @@
             dataType: "json",
             type: "POST",
             success: function (res) {
-                if (1 === res.status) {
+                if (1 == res.status) {
                     window.localStorage.clear();
                     location.href = '/xddesign/html/login/cuslgi.html';
                 } else {
-                    window.localStorage.clear();
                     alert("退出失败,请重新登录");
                 }
-                window.localStorage.clear();
             }
         });
     }

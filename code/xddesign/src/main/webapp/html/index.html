@@ -13,14 +13,27 @@
     <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
     <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
     <script src="/xddesign/js/xddesign.js"></script>
-
+    <script src="/xddesign/html/admin/layuiadmin/layui/layui.js"></script>
+    <style>
+        .div1 {
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-
-<div>
-    <div id="menu"></div>
+<div id="menu"></div>
+<div class="container-fluid">
+    <div class="col-xs-6 col-sm-3 col-md-3 col-lg-3 div1"><a href="/xddesign/html/productlist.html"><img
+            src="/xddesign/img/productlist.jpg"></a></div>
+    <div class="col-xs-6 col-sm-3 col-md-3 col-lg-3 div1"><a href="/xddesign/html/aftersale.html"><img
+            src="/xddesign/img/aftersale.jpg"></a></div>
+    <div class="col-xs-6 col-sm-3 col-md-3 col-lg-3 div1"><a href="/xddesign/html/login/cuslgi.html"><img
+            src="/xddesign/img/customerlogin.jpg"></a></div>
+    <div class="col-xs-6 col-sm-3 col-md-3 col-lg-3 div1"><a href="/xddesign/html/login/userlgi.html"><img
+            src="/xddesign/img/userlogin.jpg"></a></div>
 </div>
-<div class="layui-carousel" id="lunbo" style="height: 100%">
+
+<div class="layui-carousel" id="lunbo">
     <div carousel-item>
         <div><img src="/xddesign/img/carousel/carousel01.png" alt="轮播图"/></div>
         <div><img src="/xddesign/img/carousel/carousel02.png" alt="轮播图"/></div>
@@ -30,17 +43,17 @@
 </div>
 <!-- 条目中可以是任意内容，如：<img src=""> -->
 
-<script src="/xddesign/html/admin/layuiadmin/layui/layui.js"></script>
 <script>
     $(function () {
         loadmenu();
         loadtitle();
     });
+
     function loadtitle() {
         $.ajax({
-            url:"/xddesign/admin/company/info",
-            dataType:"json",
-            success:function(res) {
+            url: "/xddesign/admin/company/info",
+            dataType: "json",
+            success: function (res) {
                 if (res.title !== '') {
                     document.title = res.title + "-与您一起见证智能家居的发展";
                 }
@@ -48,15 +61,16 @@
             }
         })
     }
+
     layui.use('carousel', function () {
         var carousel = layui.carousel;
         //建造实例
         carousel.render({
             elem: '#lunbo'
             , width: '100%' //设置容器宽度
-            , height: '600px'
+            , height: '680px'
             , arrow: 'always' //始终显示箭头
-            //,anim: 'updown' //切换动画方式
+            // , anim: 'default' //切换动画方式
         });
     });
 </script>

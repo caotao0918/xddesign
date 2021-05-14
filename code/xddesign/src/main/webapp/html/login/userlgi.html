@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>设计人员登录</title>
+    <title>迅达智能家居-设计人员登录</title>
     <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
     <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
     <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
@@ -35,7 +35,7 @@
                     complete: function () {
                     },
                     success: function (data) {
-                        if (data.status == 0) {
+                        if (data.status === 0) {
                             setinfo(data.msg);
                         } else {
                             window.localStorage.clear();
@@ -45,9 +45,9 @@
                             window.localStorage.setItem("rolename", data.data.role.name);
                             window.localStorage.setItem("mobile", data.data.mobile);
                             window.localStorage.setItem("lastlogintime", data.data.lastTime);
-                            if (data.data.role.name == "设计人员") {
+                            if (data.data.role.name === "设计人员") {
                                 window.location.href = "../dsg/main.html";
-                            } else if (data.data.role.name == "施工人员") {
+                            } else if (data.data.role.name === "施工人员") {
                                 window.location.href = "../worker/designlist.html";
                             } else if (data.data.role.name === '管理员') {
                                 window.location.href = '../admin/views/index.html';

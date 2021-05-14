@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>售后支持中心</title>
+    <title>迅达智能家居-售后支持</title>
     <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
     <link href="/xddesign/css/xddesign.css" rel="stylesheet">
     <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
@@ -38,7 +38,7 @@
                 queryqa();
             }, "json");
 
-            $('#myModal').on('show.bs.modal', function (e) {
+            $('#itemModal').on('show.bs.modal', function (e) {
                 if ($("#pname").html() != "请选择产品") {
                     $("#item li").each(function () {
                         if ($.trim($(this).text()) == $.trim($("#pname").html())) {
@@ -49,6 +49,10 @@
                         }
                     });
                 }
+            });
+
+            $("#myModal").on("hidden.bs.modal", function () {
+                $("#div1").empty();
             });
         });
 
@@ -62,7 +66,7 @@
 
             $("#item li").css("color", "");
             $(obj).css("color", "#2e6da4");
-            $("#myModal").modal("hide");
+            $("#itemModal").modal("hide");
             if (pid != null) {
                 pids = [pid];
             }
@@ -138,10 +142,16 @@
                 var pid = pids[i];
                 $.get("/xddesign/public/video", {"productId": pid}, function (data) {
                     for (var i = 0; i < data.length; i++) {
-                        $("#support").append("<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'><video width='100%' controls='controls'><source src='" + data[i].videoLink + "' type='video/mp4'/></video><span>" + data[i].videoName + "</span><br><span>" + data[i].videoAddTime + "</span></div>");
+                        $("#support").append("<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3 product' onclick='change1(this,\"" + data[i].videoLink + "\",\"" + data[i].videoName + "\")'><img src='" + data[i].videoCover + "'><span>" + data[i].videoName + "</span><br>" + data[i].videoAddTime + "</div>");
                     }
                 }, "json");
             }
+        }
+
+        function change1(obj, link, name) {
+            $("#span1").html(name);
+            $("#div1").append("<video width='100%' controls='controls'><source src='" + link + "' type='video/mp4'/></video>");
+            $("#myModal").modal("show");
         }
 
         function searchkw() {
@@ -167,6 +177,10 @@
             });
         }
 
+        function clearitem(){
+            $("#itemModal").modal("hide");
+            window.location.reload();
+        }
     </script>
 
 
@@ -174,7 +188,7 @@
 <body>
 <div id="menu"></div>
 <button class="btn btn-default" style="float: right;margin-top: 5px;margin-right: 5%" data-toggle="modal"
-        data-target="#myModal">产品菜单
+        data-target="#itemModal">产品菜单
 </button>
 <span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
                                                                          onclick="backpage()">返回</button>
@@ -204,7 +218,7 @@
     </div>
 </div>
 
-<div class="modal" id="myModal" tabindex="-1"
+<div class="modal" id="itemModal" tabindex="-1"
      role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -215,10 +229,30 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" style="width: 100%" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" onclick="clearitem()">清空</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
             </div>
         </div>
     </div>
 </div>
+
+<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel"><span id="span1"></span></h4>
+            </div>
+            <div class="modal-body">
+                <div id="div1"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

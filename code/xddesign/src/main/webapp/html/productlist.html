@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>产品中心</title>
+    <title>迅达智能家居-产品中心</title>
     <link href="/xddesign/cmn/bootstrap/css/bootstrap.css" rel="stylesheet">
     <link href="/xddesign/css/xddesign.css" rel="stylesheet">
     <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
@@ -39,32 +39,7 @@
                     $("#menulist").append(content);
                 }
             }, "json");
-
-            /*$.get("/xddesign/design/customer/solutions/level/products", {}, function (data) {
-                var maps = data;
-                for (var i = 0; i < maps.length; i++) {
-                    var map = maps[i];
-                    for (var key in map) {
-                        var menuid1 = $.trim(key.split("firstId:")[1].split(",")[0]);
-                        var menuname1 = $.trim(key.split("firstName:")[1].split(",")[0]).replaceAll("'", "");
-                        var menuid2 = $.trim(key.split("secondId:")[1].split(",")[0]);
-                        var menuname2 = $.trim(key.split("secondName:")[1].split(",")[0]).replaceAll("'", "");
-                        addmenu(menuid1, menuname1, menuid2, menuname2);
-                    }
-                }
-            }, "json");*/
         });
-
-        function addmenu(menuid1, menuname1, menuid2, menuname2) {
-            if (!$("#menulist div:contains('" + menuname1 + "')").text()) {//display: none
-                $("#menulist").append("<div onclick='showsubitem(this," + menuid1 + ")' style='font-size: 17px;'>" + menuname1 + "</div><ul style='display: none;margin-bottom: 0px' class='list-unstyled'></ul>");
-            }
-            var menu2 = $("#menulist div:contains(" + menuname1 + ")").next();
-            if (menu2.children().length == 0 || menu2.html().indexOf("&nbsp;&nbsp;&nbsp;&nbsp;" + menuname2) == -1) {
-                menu2.append("<li id='" + menuid2 + "' style='font-size: 15px;' onclick='showitemproduct(this," + menuid2 + ")'>&nbsp;&nbsp;&nbsp;&nbsp;" + menuname2 + "</li>");
-            }
-
-        }
 
         function showsubitem(obj, id) {
             item = 1;
