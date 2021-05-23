@@ -473,8 +473,14 @@ public class AdminController {
     // 根据id删除产品二级分类信息
     @RequestMapping(value = "secondlevel/delete", method = RequestMethod.POST)
     public ReturnResult deleteSecondLevel(Integer secondId) {
-        boolean removeById = secondLevelService.removeById(secondId);
-        return ReturnResult.returnResult(removeById);
+        List<Property> propertyList = propertyService.list(new QueryWrapper<Property>().eq("second_id", secondId).select("property_id"));
+        List<Product> productList = productService.list(new QueryWrapper<Product>().eq("second_id", secondId).select("product_id"));
+        if (propertyList.isEmpty() && productList.isEmpty()) {
+            boolean removeById = secondLevelService.removeById(secondId);
+            return ReturnResult.returnResult(removeById);
+        }else {
+            return ReturnResult.returnResult(false, "请先删除对应的产品表或二级属性表");
+        }
     }
 
     /**

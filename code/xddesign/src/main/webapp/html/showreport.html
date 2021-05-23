@@ -46,6 +46,7 @@
 
             $.get("/xddesign/public/customer/quotes/info", {"soluId": designid}, function (data) {
                 $("#tableinfo").append("<tr><td colspan='4' style='border-right: 0px'>报价单号：" + data.quoteNum + "</td><td colspan='2' style='text-align: right;border-left: 0px'>日期：" + data.addTime.split(" ")[0] + "</td></tr>");
+                $("#tableinfo").append("<tr><td colspan='3'>户型：" + data.typeName + "</td><td colspan='3'>地址：" + data.address + "</td></tr>");
                 $("#tableinfo").append("<tr><td colspan='3' style='width: 50%'>设计师：" + data.designName + "</td><td colspan='3'>客户：" + data.cusName + "</td></tr>");
                 $("#tableinfo").append("<tr><td colspan='3'>联系方式：" + data.designMobile + "</td><td colspan='3'>联系方式：" + data.cusMobile + "</td></tr>");
                 $("#tableinfo").append("<tr><td colspan='6'>以下为智能家居方案产品明细，请详阅，如有疑问及时与设计师联系，谢谢</td></tr>");

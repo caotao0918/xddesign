@@ -16,23 +16,36 @@
                              style="text-align: center;">
                         </div>
                         <div id="ptool" class="row">
+                        </div><br>
+
+                        <div id="btn" style="padding-left: 15px">
+                            <input class="btn btn-large btn-default" type="button" id="queryqabtn" onclick="showqa(this)"
+                                   value="常见问题" style="display: none">
+                            <input class="btn btn-large btn-default" type="button" id="queryguidebtn" onclick="showguide(this)"
+                                   value="安装手册" style="display: none">
+                            <input class="btn btn-large btn-default" type="button" id="queryvideobtn" onclick="showvideo(this)"
+                                   value="安装视频" style="display: none">
                         </div>
+                        <br>
+                        <div id="aftersale">
+                        </div>
+
                         <div id="pdetail" class="row">
                         </div>
                     </div>
                 </div>
                 <br>
-                <div id="btn" style="padding-left: 15px">
-                    <input class="btn btn-xs btn-default" type="button" id="queryqabtn" onclick="showqa(this)"
-                           value="常见问题" style="display: none">
-                    <input class="btn btn-xs btn-default" type="button" id="queryguidebtn" onclick="showguide(this)"
-                           value="安装手册" style="display: none">
-                    <input class="btn btn-xs btn-default" type="button" id="queryvideobtn" onclick="showvideo(this)"
-                           value="安装视频" style="display: none">
-                </div>
+<!--                <div id="btn" style="padding-left: 15px">-->
+<!--                    <input class="btn btn-xs btn-default" type="button" id="queryqabtn" onclick="showqa(this)"-->
+<!--                           value="常见问题" style="display: none">-->
+<!--                    <input class="btn btn-xs btn-default" type="button" id="queryguidebtn" onclick="showguide(this)"-->
+<!--                           value="安装手册" style="display: none">-->
+<!--                    <input class="btn btn-xs btn-default" type="button" id="queryvideobtn" onclick="showvideo(this)"-->
+<!--                           value="安装视频" style="display: none">-->
+<!--                </div>-->
                 <br>
-                <div id="aftersale">
-                </div>
+<!--                <div id="aftersale">-->
+<!--                </div>-->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal" style="width: 100%">关闭</button>
@@ -50,6 +63,14 @@
             $("#queryqabtn,#queryguidebtn,#queryvideobtn").hide();
             setshow();
         })
+    });
+
+    $(document).mouseup(function(e) {
+        // 设置目标区域
+        let div = $('#myModal');
+        if (!div.is(e.target) && div.has(e.target).length === 0) {
+            $("#myModal").modal("hide");
+        }
     });
 
     function showproduct(id) {
@@ -73,10 +94,13 @@
         }, "json");
         $("#myModal").modal("show");
 
+        $.ajaxSettings.async = false;
+
         $.get("/xddesign/public/questions", {"productId": id}, function (data) {
             if (data.length > 0) {
                 $("#queryqabtn").show();
                 qadata = data;
+                showqa(this);
             }
         }, "json");
 
@@ -85,7 +109,7 @@
             if (data.length > 0) {
                 $("#queryguidebtn").show();
                 guidedata = data;
-
+                showguide(this);
             }
         }, "json");
 
@@ -93,7 +117,7 @@
             if (data.length > 0) {
                 $("#queryvideobtn").show();
                 videodata = data;
-
+                showvideo(this);
             }
         }, "json");
     }

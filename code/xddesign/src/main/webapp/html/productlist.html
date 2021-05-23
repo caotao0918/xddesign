@@ -9,6 +9,16 @@
     <script src="/xddesign/cmn/jquery/jquery-1.11.3.min.js"></script>
     <script src="/xddesign/cmn/bootstrap/js/bootstrap.js"></script>
     <script src="/xddesign/js/xddesign.js"></script>
+    <style>
+        #firstlev span{
+            padding: 4px;
+            margin-right: 15px;
+        }
+        #secondlev span{
+            padding: 2px;
+            margin-right: 15px;
+        }
+    </style>
 
     <script>
         var pagesize = 12;
@@ -17,6 +27,32 @@
         var itemid;
 
         $(function () {
+
+            var browser = {
+                versions: function() {
+                    var u = navigator.userAgent,
+                        app = navigator.appVersion;
+                    return { //移动终端浏览器版本信息
+                        trident: u.indexOf('Trident') > -1, //IE内核
+                        presto: u.indexOf('Presto') > -1, //opera内核
+                        webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+                        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+                        mobile: !!u.match(/AppleWebKit.*Mobile.*/) || !!u.match(/AppleWebKit/), //是否为移动终端
+                        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+                        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+                        iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者QQHD浏览器
+                        iPad: u.indexOf('iPad') > -1, //是否iPad
+                        webApp: u.indexOf('Safari') == -1 //是否web应该程序，没有头部与底部
+                    };
+                }(),
+                language: (navigator.browserLanguage || navigator.language).toLowerCase()
+            }
+
+            if (browser.versions.ios || browser.versions.iPhone || browser.versions.iPad || browser.versions.android) {
+                $("#level").html("");
+            }
+
+
             loadmenu();
 
             getpages(1, pagesize, kw);
@@ -31,6 +67,7 @@
                 for (var i = 0; i < data.length; i++) {
                     // alert(JSON.stringify(data[i]));
                     $("#menulist").append("<div style='font-size: 17px;' onclick='showsubitem(this," + data[i].firstId + ")'>" + data[i].firstName + "</div>");
+                    $("#firstlev").append("<span style='font-size: 17px;cursor: pointer' onclick='showsecondlev(this," + data[i].firstId + ")' onmouseover='setbackcolor(this," + data[i].firstId + ")'>" + data[i].firstName + "</span>");
                     var content = "<ul style='display: none;margin-bottom: 0px' class='list-unstyled'>";
                     for (var j = 0; j < data[i].secondLevelList.length; j++) {
                         content += "<li style='font-size: 15px;' onclick='showitemproduct(this," + data[i].secondLevelList[j].secondId + ")'>&nbsp;&nbsp;&nbsp;&nbsp;" + data[i].secondLevelList[j].secondName + "</li>";
@@ -40,6 +77,59 @@
                 }
             }, "json");
         });
+
+        function setbackcolor(obj, id) {
+            showsecondlev(obj, id);
+            $("#firstlev span").css("background-color", "");
+            $(obj).css("background-color", "#2e6da4");
+            $("#firstlev span").css("color", "");
+            $(obj).css("color", "#FFFFFF");
+        }
+
+        function setbackcolor2(obj) {
+            $("#secondlev span").css("background-color", "");
+            $(obj).css("background-color", "#2e6da4");
+            $("#secondlev span").css("color", "");
+            $(obj).css("color", "#FFFFFF");
+        }
+
+        function getsecondlev(id) {
+            $.ajax({
+                url:"/xddesign/admin/secondlevel/nopage?firstId=" + id
+                ,type:"GET"
+                ,dataType:"json"
+                ,async: false
+                ,success:function(res) {
+                    $("#secondlev").html("");
+                    for (let i = 0; i < res.length; i++) {
+                        $("#secondlev").append("<span style='font-size: 15px;cursor: pointer' onmouseover='setbackcolor2(this)' onclick='showsecondproduct(this," + res[i].secondId + ")'>" + res[i].secondName + "</span>");
+                    }
+                }
+            });
+        }
+
+        function showsecondlev(obj, id) {
+            item = 1;
+            itemid = id;
+            $("#span1").html($(obj).html());
+            $("#span2").html($(obj).html());
+            $("#menulist ul").hide();
+            $("#firstlev span").css("color", "");
+            $(obj).css("color", "#FFFFFF");
+            $(obj).next().show();
+            getsecondlev(id);
+            $("#btn").click();
+        }
+
+        function showsecondproduct(obj, id) {
+            item = 2;
+            itemid = id;
+            $("#span1").html($(obj).html());
+            $("#span2").html($(obj).html());
+            $("#secondlev span").css("color", "");
+            $(obj).css("color", "#FFFFFF");
+            $("#btn").click();
+        }
 
         function showsubitem(obj, id) {
             item = 1;
@@ -140,8 +230,8 @@
 
 <div id="menu"></div>
 <div style="float: right;margin-right: 5%;margin-top: 5px">
-    <button class="btn btn-default" data-toggle="modal"
-            data-target="#itemModal">分类
+    <button style="color: #FFFFFF; background-color: #5cb85c" class="btn btn-default" data-toggle="modal"
+            data-target="#itemModal">产品分类
     </button>
 </div>
 <span style="font-weight: bold;margin-left: 5%;font-size: 30px;"><button type="button" class="btn btn-primary back"
@@ -150,6 +240,10 @@
 </span><br>
 
 <div style="margin-top: 30px;margin-left: 5%">
+    <div id="level">
+        <span id="firstName">一级分类：</span><span id="firstlev"></span><br><br>
+        <span id="secondName">二级分类：</span><span id="secondlev"></span><br><br>
+    </div>
     当前分类：<span id="span1">全部</span><br>
     <input type="text" class="form-control" style="display: inline;width: 70%;" placeholder="请输入产品名称" id="kw">
     <button type="button" id="btn" class="btn btn-default" style="margin-bottom: 3px" onclick="getpages(1,pagesize,kw)">

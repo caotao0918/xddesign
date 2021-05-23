@@ -247,6 +247,8 @@ public class PublicController {
             map.put("cusName", quoteInfo.getCusName());
             map.put("cusMobile", quoteInfo.getCusMobile());
             map.put("descr", quoteInfo.getDescr());
+            map.put("address", quoteInfo.getAddress());
+            map.put("typeName", quoteInfo.getTypeName());
             // 产品合计
             map.put("total", totalPrice);
             // 施工费用称呼

@@ -707,6 +707,10 @@ public class DesignController {
             map.put("cusMobile", quoteInfo.getCusMobile());
             // 描述
             map.put("descr", quoteInfo.getDescr());
+            // 地址
+            map.put("address", quoteInfo.getAddress());
+            // 户型名称
+            map.put("typeName", quoteInfo.getTypeName());
 
             // 代理 产品总价
             map.put("provincePriceTotal", provincePriceTotal);
