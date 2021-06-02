@@ -38,9 +38,12 @@
         }
 
         function delcustomer(id, cusname) {
-            $.post("/xddesign/design/customer/del", {"id": id}, function (data) {
-                customerlist();
-            }, "json");
+            let isOK = confirm("确定要删除吗");
+            if (isOK) {
+                $.post("/xddesign/design/customer/del", {"id": id}, function (data) {
+                    customerlist();
+                }, "json");
+            }
         }
 
         function editcustomer(id) {

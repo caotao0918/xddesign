@@ -95,11 +95,14 @@
         }
 
         function deldesign(designid) {
-            $.post("/xddesign/design/customer/solutions/delete", {"soluId": designid}, function (data) {
-                if (data.status == 1) {
-                    window.location.reload();
-                }
-            }, "json");
+            let isOK = confirm("确定要删除吗");
+            if (isOK) {
+                $.post("/xddesign/design/customer/solutions/delete", {"soluId": designid}, function (data) {
+                    if (data.status === 1) {
+                        window.location.reload();
+                    }
+                }, "json");
+            }
         }
 
         function editreport(designid) {

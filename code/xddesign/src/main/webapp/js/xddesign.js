@@ -1,6 +1,6 @@
 //判断是不是手机号
 function isphone(phone) {
-    var pattern = /^1[34578]\d{9}$/;
+    var pattern = /^1[123456789]\d{9}$/;
     return pattern.test(phone);
 }
 

@@ -36,4 +36,7 @@ public class House {
     @TableField(exist = false)
     private Customer customer;
 
+    // 房子户型id
+    private Integer typeId;
+
 }

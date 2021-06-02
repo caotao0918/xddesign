@@ -23,14 +23,17 @@
         });
 
         function deltemplate(tempid, designerid) {
-            $.post("/xddesign/design/customer/template/delete", {
-                "tempId": tempid,
-                "userId": designerid
-            }, function (data) {
-                if (data.status == 1) {
-                    window.location.reload();
-                }
-            }, "json");
+            let isOK = confirm("确定要删除吗");
+            if (isOK) {
+                $.post("/xddesign/design/customer/template/delete", {
+                    "tempId": tempid,
+                    "userId": designerid
+                }, function (data) {
+                    if (data.status === 1) {
+                        window.location.reload();
+                    }
+                }, "json");
+            }
         }
     </script>
 </head>

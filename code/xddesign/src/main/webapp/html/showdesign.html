@@ -24,7 +24,7 @@
                 }
                 roomlist = data.roomList;
                 for (var i = roomlist.length - 1; i >= 0; i--) {
-                    $("#all").after("<div class='col-xs-3 col-sm-2 col-md-2 col-lg-1'><button type='button' onclick='showproducts(this," + roomlist[i].roomId + ")' class='btn btn-default btn-xs' style='width: 100%'>" + roomlist[i].roomName + "</button></div>");
+                    $("#all").after("<div class='col-xs-3 col-sm-2 col-md-2 col-lg-1' style='padding-right: 0'><button type='button' onclick='showproducts(this," + roomlist[i].roomId + ")' class='btn btn-default btn-xs' style='width: 100%'>" + roomlist[i].roomName + "</button></div>");
                 }
                 showproducts();
             }, "json");

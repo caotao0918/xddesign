@@ -408,6 +408,8 @@ public class DesignController {
         // 根据手机号查询客户存在与否
         Customer customer = customerService.getOne(new QueryWrapper<Customer>().select("id", "username").eq("mobile", templateVo.getMobile()), true);
         String cusName;
+        Integer houseId = null;
+        boolean isNewHouse = true;
         if (customer == null) {
             customer = new Customer();
             User design = new User();
@@ -426,8 +428,17 @@ public class DesignController {
         }else {
             // 还用原来的名称
             cusName = customer.getUsername();
+            List<House> houseList = houseService.list(new QueryWrapper<House>().select("house_id", "type_id").eq("customer_id", customer.getId()));
+            for (House house : houseList) {
+                if (house.getTypeId().equals(templateVo.getTypeId())) {
+                    isNewHouse = false;
+                    houseId = house.getHouseId();
+                    break;
+                }
+            }
+
         }
-        // 得到客户id
+/*        // 得到客户id
         Integer customerId = customer.getId();
         House house = new House();
         house.setCustomerId(customerId);
@@ -444,7 +455,28 @@ public class DesignController {
             return result;
         }
         // 得到房子id
-        Integer houseId = house.getHouseId();
+        Integer houseId = house.getHouseId();*/
+
+        if (isNewHouse) {
+            // 得到客户id
+            Integer customerId = customer.getId();
+            House house = new House();
+            house.setCustomerId(customerId);
+            HouseType houseType = new HouseType();
+            houseType.setTypeId(templateVo.getTypeId());
+            house.setHouseName("客户" + cusName + "的" + templateVo.getTypeName() + "的家");
+            house.setHouseAddress(templateVo.getAddress());
+            house.setHouseType(houseType);
+            // 添加客户房子
+            ReturnResult result = houseService.saveHouse(house);
+            if (result.getStatus() == 0) {
+                // 事务回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return result;
+            }
+            // 得到房子id
+            houseId = house.getHouseId();
+        }
 
         // 根据方案id查询方案详情
         Solutions solutions = solutionsService.findSolutions(templateVo.getSoluId());

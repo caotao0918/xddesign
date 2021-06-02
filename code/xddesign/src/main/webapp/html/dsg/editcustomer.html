@@ -74,9 +74,16 @@
         }
 
         function delhouse(houseid) {
-            $.post("/xddesign/design/customer/house/del", {"houseId": houseid}, function (data) {
-                window.location.reload();
-            }, "json");
+            let isOK = confirm("确定要删除吗");
+            if (isOK) {
+                $.post("/xddesign/design/customer/house/del", {"houseId": houseid}, function (data) {
+                    if (data.status === 0) {
+                        alert(data.msg);
+                    }else {
+                        window.location.reload();
+                    }
+                }, "json");
+            }
         }
 
         function edithouse(cusname, houseid, housename, houseaddr, housetype) {

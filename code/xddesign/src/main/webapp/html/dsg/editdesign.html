@@ -119,6 +119,14 @@
 
         function changedesc() {
             desc = $("#descarea").val();
+            $.post("/xddesign/design/customer/quote/editSoluDesc", {
+                "soluDesc": desc,
+                "soluId": designid
+            }, function (data) {
+                if (data.status === 0) {
+                    alert("编辑失败！");
+                }
+            }, "json");
             $("#descModal").modal("hide");
         }
 
@@ -274,7 +282,7 @@
                 $("#delproductbtn").attr("onclick", "delproduct(" + pid + ")");
                 $("#setproductnumselect").empty();
                 var pnum = getproductnumbypid(currentroom, "p" + pid);
-                for (var i = 1; i <= 10; i++) {
+                for (var i = 1; i <= 50; i++) {
                     var content = "<option>" + i + "</option>";
                     if (i == parseInt(pnum)) {
                         content = "<option selected='selected'>" + i + "</option>";
